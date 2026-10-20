@@ -26,7 +26,10 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Logo (Platzhalter) | Herz in einem umgedrehten Dreieck. Wird auch als Siegel im Terminbuch genutzt. | 20.10.2026 |
 | KI-Stufen | Praktikant, Azubi, Mitarbeiter, Teamleiter-Niveau. Je Stufe: Aussehen als KI-Agent, Aufwand der Einrichtung, benötigte Unterlagen. Handy: seitlich durchwischen. Desktop: beim Scrollen von rechts herein. | 20.10.2026 |
 | Terminbuch | Knopf öffnet ein Buch mit Kalender, belegte Tage sichtbar, Siegelstempel am gewählten Tag, beim Absenden faltet sich ein Brief und wird gesiegelt. Darf nie langsamer sein als ein schlichter Kalender. Auch von der Startseite aus erreichbar. | 20.10.2026 |
-| Kacheln | Desktop: Spur beim Überfahren, ohne Klicken. Pfad-Kacheln bleiben leuchten (Vorschlag Reihe 7/Spalte 7, dann 14/14, …). Handy: Funkeln beim Darüberstreichen. Auge folgt Maus bzw. Finger. | 20.10.2026 |
+| Kacheln | Desktop: Spur beim Überfahren, ohne Klicken. Pfad-Kacheln bleiben leuchten (Vorschlag Reihe 7/Spalte 7, dann 14/14, …). Handy: Effekt bleibt, aber mit angepasster Kachelgröße und eigenem Pfad; Funkeln beim Darüberstreichen. | 20.10.2026 |
+| Auge | Folgt zu Beginn dem Mauszeiger (bzw. Finger). Sobald die erste Pfad-Kachel erreicht ist, schaut es starr in Richtung der nächsten freizuschaltenden Kachel. | 20.10.2026 |
+| Monitor (Idee) | Kopfleiste bleibt oben stehen, der Monitor ist das, was scrollt. Beim Scrollen dreht der Inhalt wie an einem Rad zum nächsten Abschnitt. Muss sich so schnell und frei scrollen lassen wie eine normale Webseite, darf nicht aufhalten. | 20.10.2026 |
+| Zwischenstände | Nach Phase B wird ein Entwurf gezeigt, danach ein erster Monitor-Entwurf. | 20.10.2026 |
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |
 | Kontakt | Eigene Telefonnummer und E-Mail kommen. Bis dahin Platzhalter, Seite wird gebaut, als gäbe es sie schon. | 20.10.2026 |
 | Farbwelt | Aus der Vergleichsseite des Partners: dunkel mit Lila. Basis: Hintergrund `#0D0D13`, Flächen `#15151E`/`#1B1B26`, Linien `#272735`, Text `#EDECF6`, gedämpft `#9C9AB1`, Akzent `#7C4DFF`, hell `#A98BFF`, tief `#5B2BE0`. Kontraste werden geprüft und bei Bedarf angepasst. | 20.10.2026 |
@@ -36,7 +39,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Thema | Stand |
 |---|---|
 | Hosting-Anbieter und Domain | Gründer bucht selbst (Vorschlag: deutscher Anbieter wie netcup, Hetzner oder all-inkl, Domain beim selben Anbieter). |
-| Monitor-Zeitreise | Gründer möchte einen Entwurf sehen, dann Entscheidung. |
+| Monitor-Zeitreise | Entwurf folgt nach Phase B, dann Entscheidung. |
 | Wirkung der Kachel-Freischaltung | Vorschläge folgen in Phase C. |
 
 ## Offen (Platzhalter, bis entschieden)

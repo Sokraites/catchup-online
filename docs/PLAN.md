@@ -18,14 +18,16 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 ## Phase B: Inhalt ohne Effekte
 
-- [ ] Platzhaltertexte für alle Abschnitte geschrieben
-- [ ] neu: Texte der Unterseiten geschrieben (inkl. KI-Stufen: Praktikant, Azubi, Mitarbeiter, Teamleiter-Niveau mit Aufwand und benötigten Unterlagen)
-- [ ] neu: Schriften selbst ausgeliefert (Space Grotesk, Inter, JetBrains Mono)
-- [ ] Reine Textversion auf Smartphone-Breite gestaltet
-- [ ] Reine Textversion auf Tablet- und Desktop-Breite gestaltet
-- [ ] SEO-Grundlage gesetzt (Titel, Beschreibung, Open Graph, `sitemap.xml`, `robots.txt`)
-- [ ] Strukturierte Daten mit Platzhaltern eingebaut
-- [ ] FAQ-Abschnitt geschrieben
+- [x] Platzhaltertexte für alle Abschnitte geschrieben
+- [x] neu: Texte der Unterseiten geschrieben (inkl. KI-Stufen: Praktikant, Azubi, Mitarbeiter, Teamleiter-Niveau mit Aufwand und benötigten Unterlagen)
+- [x] neu: Abschnitt „Ablauf in vier Schritten“ (Idee aus der Vergleichsseite)
+- [x] neu: `llms.txt` für KI-Systeme
+- [x] neu: Schriften selbst ausgeliefert (Space Grotesk, Inter, JetBrains Mono)
+- [x] Reine Textversion auf Smartphone-Breite gestaltet
+- [x] Reine Textversion auf Tablet- und Desktop-Breite gestaltet
+- [x] SEO-Grundlage gesetzt (Titel, Beschreibung, Open Graph, `sitemap.xml`, `robots.txt`)
+- [x] Strukturierte Daten mit Platzhaltern eingebaut
+- [x] FAQ-Abschnitt geschrieben
 
 ## Phase C: Kachel-Hintergrund
 
@@ -82,7 +84,14 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - [ ] Eigene Telefonnummer und E-Mail-Adresse eingerichtet und in `src/config/site.ts` eingetragen
 - [ ] Messung der Anfragen datenschutzfreundlich eingerichtet
 
+## Prüfwerkzeuge
+
+- `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
+- `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.
+
 ## Bekannte Lücken (laufend)
 
-- Links in Menü und Fußbereich sind auf dem Handy noch kleiner als 24 px hoch (Antippen schwierig). Wird mit der Gestaltung in Phase B behoben.
-- Schriften sind noch Systemschriften. Eigene Schriften folgen in Phase B.
+- Alle Texte sind Entwürfe und müssen vom Gründer geprüft werden.
+- Terminseite ist bis Phase D3 nur ein Hinweis mit Telefon und E-Mail.
+- Strukturierte Daten lassen Telefon, E-Mail und Adresse weg, solange es Platzhalter sind (werden automatisch ergänzt, sobald echt eingetragen).
+- Das Vorschaubild für geteilte Links wurde noch nicht in echten Messengern getestet (geht erst mit veröffentlichter Seite).
