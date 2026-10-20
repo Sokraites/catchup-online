@@ -1,13 +1,65 @@
 ---
-import Base from '../layouts/Base.astro';
+import Leistung from '../layouts/Leistung.astro';
+import { site } from '../config/site';
 ---
 
-<Base title="Neue Webseite erstellen lassen">
-  <section class="section" aria-labelledby="seite-titel">
+<Leistung
+  title="Webseite erstellen lassen im Donnersbergkreis"
+  description={`Neue Webseite für deinen Betrieb im ${site.region.schwerpunkt}: schnell, fürs Handy gebaut und bei Google und KI-Suchen auffindbar.`}
+  eyebrow="Neue Webseite"
+  h1="Deine neue Webseite, von Grund auf gebaut."
+  lead="Eine Webseite, die zu deinem Betrieb passt, auf dem Handy glänzt und dir Anfragen bringt. Du erzählst uns, was dich ausmacht, den Rest übernehmen wir."
+  schemaName="Webseiten erstellen"
+>
+  <section class="section" aria-labelledby="bekommst-titel">
     <div class="wrap">
-      <h1 id="seite-titel">Deine neue Webseite, von Grund auf</h1>
-      <p>[Inhalt folgt in Phase B.]</p>
-      <a class="button" href="/termin/">Termin buchen</a>
+      <p class="eyebrow">Was du bekommst</p>
+      <h2 id="bekommst-titel">Mehr als eine digitale Visitenkarte.</h2>
+      <ul class="benefits">
+        <li>
+          <h3>Gestaltung, die zu dir passt</h3>
+          <p>Kein Baukasten-Look. Deine Seite sieht nach deinem Betrieb aus und hebt sich von Mitbewerbern ab.</p>
+        </li>
+        <li>
+          <h3>Texte, die überzeugen</h3>
+          <p>Wir schreiben die Texte mit dir zusammen: klar, ehrlich und so, dass Kunden sofort verstehen, warum du.</p>
+        </li>
+        <li>
+          <h3>Zuerst fürs Handy</h3>
+          <p>Wir bauen für den Daumen, nicht für die Maus. Auf Tablet und Computer sieht es danach genauso gut aus.</p>
+        </li>
+        <li>
+          <h3>Schnell geladen</h3>
+          <p>Jede Sekunde Wartezeit kostet Besucher. Deine Seite lädt schnell, auch mit schwachem Netz.</p>
+        </li>
+        <li>
+          <h3>Auffindbar von Anfang an</h3>
+          <p>Suchmaschinen und KI-Assistenten verstehen deine Seite vom ersten Tag an. <a href="/auffindbarkeit/">Mehr dazu</a></p>
+        </li>
+        <li>
+          <h3>Ohne Cookie-Banner</h3>
+          <p>Wir verzichten auf Tracker, die ein Einwilligungsbanner nötig machen. Deine Besucher landen direkt bei dir.</p>
+        </li>
+      </ul>
     </div>
   </section>
-</Base>
+
+  <section class="section" aria-labelledby="fuerwen-titel">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">Für wen</p>
+        <h2 id="fuerwen-titel">Für Betriebe, die gefunden werden wollen.</h2>
+      </div>
+      <div>
+        <p>
+          Ob Handwerksbetrieb, Praxis, Gastronomie, Händler oder Dienstleister: Wenn deine Kunden aus der Region kommen
+          und dich im Netz suchen, sollte deine Webseite der Grund sein, warum sie bei dir anrufen.
+        </p>
+        <p>
+          Du hast noch gar keine Webseite? Umso besser, dann fangen wir sauber an. Du hast eine, die nicht mehr passt?
+          Dann lohnt sich ein Blick auf die <a href="/webseiten-modernisieren/">Modernisierung</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Leistung>

@@ -1,0 +1,42 @@
+---
+import { site } from '../config/site';
+import Platzhalter from './Platzhalter.astro';
+
+/** Kontaktblock: Telefon, E-Mail, Termin. Wird auf Start- und Unterseiten genutzt. */
+interface Props {
+  titel?: string;
+  id?: string;
+}
+const { titel = 'Lass uns reden.', id = 'kontakt' } = Astro.props;
+const { telefon, email } = site.kontakt;
+---
+
+<section class="section kontakt" id={id} aria-labelledby={`${id}-titel`}>
+  <div class="wrap">
+    <p class="eyebrow">Kontakt</p>
+    <h2 id={`${id}-titel`}>{titel}</h2>
+    <p class="lead">
+      Erzähl uns von deinem Betrieb. Wir sagen dir ehrlich, was deine Webseite für dich tun kann. Ohne Fachchinesisch.
+    </p>
+    <div class="kontakt-wege">
+      <a class="button" href="/termin/">Termin buchen</a>
+      {
+        telefon.link ? (
+          <a class="button button-ghost" href={`tel:${telefon.link}`}>
+            Anrufen: {telefon.anzeige.text}
+          </a>
+        ) : (
+          <span class="button button-ghost" aria-disabled="true">
+            Anrufen:&nbsp;<Platzhalter wert={telefon.anzeige} />
+          </span>
+        )
+      }
+      <a class="button button-ghost" href={`mailto:${email.text}`}>
+        Schreiben:&nbsp;<Platzhalter wert={email} />
+      </a>
+    </div>
+    <p class="kontakt-hinweis">
+      Du brauchst etwas anderes rund um Digitalisierung in deinem Betrieb? Frag uns einfach.
+    </p>
+  </div>
+</section>

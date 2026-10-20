@@ -1,0 +1,40 @@
+---
+import Base from './Base.astro';
+import Kontakt from '../components/Kontakt.astro';
+import { brotkrumen, leistung } from '../lib/schema';
+
+/** Gemeinsamer Rahmen für die Leistungs-Unterseiten. */
+interface Props {
+  title: string;
+  description: string;
+  eyebrow: string;
+  h1: string;
+  lead: string;
+  schemaName: string;
+  schema?: object[];
+}
+
+const { title, description, eyebrow, h1, lead, schemaName, schema = [] } = Astro.props;
+const pfad = Astro.url.pathname;
+---
+
+<Base
+  title={title}
+  description={description}
+  schema={[leistung(schemaName, description, pfad), brotkrumen(eyebrow, pfad), ...schema]}
+>
+  <section class="hero hero-sub" aria-labelledby="seite-titel">
+    <div class="wrap">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <a href="/">Start</a> <span aria-hidden="true">/</span> <span aria-current="page">{eyebrow}</span>
+      </nav>
+      <h1 id="seite-titel">{h1}</h1>
+      <p class="lead">{lead}</p>
+      <div class="actions">
+        <a class="button" href="/termin/">Termin buchen</a>
+      </div>
+    </div>
+  </section>
+  <slot />
+  <Kontakt />
+</Base>

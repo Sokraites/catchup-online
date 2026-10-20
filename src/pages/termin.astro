@@ -1,13 +1,33 @@
 ---
 import Base from '../layouts/Base.astro';
+import Platzhalter from '../components/Platzhalter.astro';
+import { site } from '../config/site';
+import { brotkrumen } from '../lib/schema';
+
+const { telefon, email } = site.kontakt;
 ---
 
-<Base title="Termin buchen">
-  <section class="section" aria-labelledby="seite-titel">
+<Base
+  title="Termin buchen"
+  description={`Vereinbare ein Gespräch mit ${site.name} über deine Webseite.`}
+  schema={[brotkrumen('Termin buchen', '/termin/')]}
+>
+  <section class="hero hero-sub" aria-labelledby="seite-titel">
     <div class="wrap">
       <h1 id="seite-titel">Termin buchen</h1>
-      <p>[Inhalt folgt in Phase B.]</p>
-      <a class="button" href="/termin/">Termin buchen</a>
+      <p class="lead">
+        In einem Gespräch erzählst du uns von deinem Betrieb, und wir sagen dir, was deine Webseite für dich tun kann.
+      </p>
+      <p class="hinweis">Das Terminbuch mit Kalender folgt in Phase D3. Bis dahin: Anruf oder E-Mail.</p>
+      <ul class="kontakt-liste">
+        <li>
+          <strong>Telefon:</strong>
+          {telefon.link ? <a href={`tel:${telefon.link}`}>{telefon.anzeige.text}</a> : <Platzhalter wert={telefon.anzeige} />}
+        </li>
+        <li>
+          <strong>E-Mail:</strong> <a href={`mailto:${email.text}?subject=Terminanfrage`}><Platzhalter wert={email} /></a>
+        </li>
+      </ul>
     </div>
   </section>
 </Base>

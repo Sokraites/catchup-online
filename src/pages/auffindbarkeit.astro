@@ -1,13 +1,78 @@
 ---
-import Base from '../layouts/Base.astro';
+import Leistung from '../layouts/Leistung.astro';
+import Faq from '../components/Faq.astro';
+import { site } from '../config/site';
+import { faqAuffindbarkeit } from '../content/faq';
+import { faqSeite } from '../lib/schema';
 ---
 
-<Base title="Gefunden werden bei Google und KI-Suchen">
-  <section class="section" aria-labelledby="seite-titel">
+<Leistung
+  title="Gefunden werden bei Google, ChatGPT und Claude"
+  description={`Suchmaschinenoptimierung und Sichtbarkeit in KI-Suchen für Betriebe im ${site.region.schwerpunkt}: damit Kunden aus der Region dich finden.`}
+  eyebrow="Gefunden werden"
+  h1="Gefunden werden: bei Google, ChatGPT und Claude."
+  lead="Die beste Webseite bringt nichts, wenn sie niemand findet. Wir sorgen dafür, dass Suchmaschinen und KI-Assistenten genau verstehen, wer du bist, was du anbietest und wo."
+  schemaName="Suchmaschinenoptimierung und Sichtbarkeit in KI-Suchen"
+  schema={[faqSeite(faqAuffindbarkeit)]}
+>
+  <section class="section" aria-labelledby="zwei-titel">
     <div class="wrap">
-      <h1 id="seite-titel">Gefunden werden: bei Google, ChatGPT und Claude</h1>
-      <p>[Inhalt folgt in Phase B.]</p>
-      <a class="button" href="/termin/">Termin buchen</a>
+      <p class="eyebrow">Zwei Wege, ein Ziel</p>
+      <h2 id="zwei-titel">Mehr Anfragen aus deiner Region.</h2>
+      <div class="cards cards-2">
+        <article class="card">
+          <h3>Bei Google</h3>
+          <p>
+            Wer „Elektriker in der Nähe“ oder „Steuerberater {site.region.schwerpunkt}“ sucht, soll dich finden. Dafür
+            braucht deine Seite die richtigen Begriffe, einen sauberen Aufbau, schnelle Ladezeiten und stimmige Angaben
+            zu deinem Standort.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Bei KI-Assistenten</h3>
+          <p>
+            ChatGPT, Claude und Co. geben direkte Antworten und nennen dabei oft nur wenige Betriebe. Damit du dabei
+            bist, muss deine Seite klare Antworten auf echte Kundenfragen geben und für Maschinen eindeutig lesbar sein.
+          </p>
+        </article>
+      </div>
     </div>
   </section>
-</Base>
+
+  <section class="section" aria-labelledby="tun-titel">
+    <div class="wrap">
+      <p class="eyebrow">Was wir tun</p>
+      <h2 id="tun-titel">Klarheit für Menschen und Maschinen.</h2>
+      <ul class="benefits">
+        <li>
+          <h3>Klare Inhalte</h3>
+          <p>Wir formulieren, was du anbietest, so, dass Menschen es verstehen und Suchsysteme es richtig zuordnen.</p>
+        </li>
+        <li>
+          <h3>Antworten auf echte Fragen</h3>
+          <p>Wir sammeln die Fragen, die deine Kunden wirklich stellen, und beantworten sie auf deiner Seite.</p>
+        </li>
+        <li>
+          <h3>Maschinenlesbare Angaben</h3>
+          <p>Unsichtbare Zusatzinformationen sagen Suchmaschinen und KI genau, wer du bist und wo du arbeitest.</p>
+        </li>
+        <li>
+          <h3>Stimmige Spuren im Netz</h3>
+          <p>Name, Adresse und Leistungen sollen überall gleich auftauchen. Wir zeigen dir, wo es hakt.</p>
+        </li>
+      </ul>
+      <p class="note">
+        Übrigens: Diese Webseite ist selbst so gebaut. Alle Inhalte sind echter, lesbarer Text, auch hinter den
+        Effekten.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-titel">
+    <div class="wrap">
+      <p class="eyebrow">Häufige Fragen</p>
+      <h2 id="faq-titel">Fragen zur Auffindbarkeit.</h2>
+      <Faq fragen={faqAuffindbarkeit} />
+    </div>
+  </section>
+</Leistung>

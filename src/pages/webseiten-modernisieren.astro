@@ -1,13 +1,52 @@
 ---
-import Base from '../layouts/Base.astro';
+import Leistung from '../layouts/Leistung.astro';
+import { site } from '../config/site';
 ---
 
-<Base title="Webseite modernisieren">
-  <section class="section" aria-labelledby="seite-titel">
+<Leistung
+  title="Webseite modernisieren lassen"
+  description={`Bestehende Webseite modernisieren: neue Gestaltung, klarer Aufbau, fit fürs Handy. Für Betriebe im ${site.region.schwerpunkt} und in ${site.region.land}.`}
+  eyebrow="Modernisierung"
+  h1="Deine Webseite, zurück auf der Höhe der Zeit."
+  lead="Vieles an deiner alten Seite ist gut, nur die Verpackung nicht mehr. Wir behalten, was funktioniert, und machen den Rest fit für heute."
+  schemaName="Webseiten modernisieren"
+>
+  <section class="section" aria-labelledby="zeichen-titel">
     <div class="wrap">
-      <h1 id="seite-titel">Deine bestehende Webseite, modern gemacht</h1>
-      <p>[Inhalt folgt in Phase B.]</p>
-      <a class="button" href="/termin/">Termin buchen</a>
+      <p class="eyebrow">Erkennst du das?</p>
+      <h2 id="zeichen-titel">Fünf Zeichen, dass deine Webseite ein Update braucht.</h2>
+      <ul class="checklist">
+        <li>Auf dem Handy muss man zoomen und wischen, um etwas zu lesen.</li>
+        <li>Die Seite lädt so lange, dass du selbst ungeduldig wirst.</li>
+        <li>Du hast seit Jahren nichts mehr daran geändert, und man sieht es.</li>
+        <li>Über die Webseite kommen kaum Anfragen.</li>
+        <li>Wenn du deinen Betrieb googelst, findest du dich nicht auf Anhieb.</li>
+      </ul>
     </div>
   </section>
-</Base>
+
+  <section class="section" aria-labelledby="vorgehen-titel">
+    <div class="wrap">
+      <p class="eyebrow">So gehen wir vor</p>
+      <h2 id="vorgehen-titel">Modernisieren, ohne Bewährtes zu verlieren.</h2>
+      <ol class="steps">
+        <li>
+          <h3>Bestandsaufnahme</h3>
+          <p>Wir schauen uns deine Seite an: Was funktioniert, was bremst, was fehlt? Du bekommst eine ehrliche Einschätzung.</p>
+        </li>
+        <li>
+          <h3>Neue Gestaltung und Struktur</h3>
+          <p>Klarer Aufbau, moderne Optik, gut lesbar auf jedem Gerät. Deine Inhalte bekommen die Bühne, die sie verdienen.</p>
+        </li>
+        <li>
+          <h3>Umzug ohne Verluste</h3>
+          <p>Alte Adressen leiten wir sauber auf die neuen um, damit Google und deine Stammkunden dich weiterhin finden.</p>
+        </li>
+        <li>
+          <h3>Auffindbar gemacht</h3>
+          <p>Wir nutzen den Neustart, um deine Seite für Google und KI-Assistenten optimal lesbar zu machen.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+</Leistung>

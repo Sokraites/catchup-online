@@ -1,13 +1,69 @@
 ---
-import Base from '../layouts/Base.astro';
+import Leistung from '../layouts/Leistung.astro';
+import { kiStufen } from '../content/ki-stufen';
 ---
 
-<Base title="KI-Mitarbeiter für deinen Betrieb">
-  <section class="section" aria-labelledby="seite-titel">
+<Leistung
+  title="KI-Mitarbeiter für deinen Betrieb"
+  description="KI-Mitarbeiter für kleine und mittlere Betriebe: vom Praktikanten bis zum Teamleiter-Niveau. Was jede Stufe kann und was sie von dir braucht."
+  eyebrow="KI-Mitarbeiter"
+  h1="KI-Mitarbeiter: vom Praktikanten bis zur Teamleitung."
+  lead="Ein KI-Mitarbeiter übernimmt wiederkehrende Aufgaben in deinem Alltag. Wie viel er kann, hängt davon ab, wie gut wir ihn einarbeiten. Genau wie bei einem neuen Teammitglied."
+  schemaName="KI-Mitarbeiter für Betriebe"
+>
+  <section class="section" aria-labelledby="stufen-titel">
     <div class="wrap">
-      <h1 id="seite-titel">KI-Mitarbeiter: vom Praktikanten bis zur Teamleitung</h1>
-      <p>[Inhalt folgt in Phase B.]</p>
-      <a class="button" href="/termin/">Termin buchen</a>
+      <p class="eyebrow">Vier Stufen</p>
+      <h2 id="stufen-titel">Wie viel Verantwortung soll er bekommen?</h2>
+      <ol class="stufen">
+        {
+          kiStufen.map((s, i) => (
+            <li class="stufe" id={s.id}>
+              <p class="stufe-nr">Stufe {i + 1}</p>
+              <h3>{s.titel}</h3>
+              <p class="stufe-motto">{s.motto}</p>
+              <p>{s.kann}</p>
+              <dl>
+                <dt>Aufwand der Einrichtung</dt>
+                <dd>
+                  <span class="aufwand" aria-hidden="true">
+                    {[1, 2, 3, 4].map((n) => (
+                      <span class={n <= s.aufwandStufe ? 'an' : undefined} />
+                    ))}
+                  </span>
+                  {s.aufwand}
+                </dd>
+                <dt>Was er von dir braucht</dt>
+                <dd>
+                  <ul>
+                    {s.unterlagen.map((u) => (
+                      <li>{u}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </dl>
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </section>
-</Base>
+
+  <section class="section" aria-labelledby="start-titel">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">Klein anfangen</p>
+        <h2 id="start-titel">Jede Stufe lässt sich später ausbauen.</h2>
+      </div>
+      <div>
+        <p>
+          Du musst nicht gleich mit dem Teamleiter starten. Viele Aufgaben lassen sich schon mit einem gut eingearbeiteten
+          Praktikanten spürbar erleichtern. Wenn er sich bewährt, bekommt er mehr Verantwortung.
+        </p>
+        <p>
+          Und keine Sorge: Wir klären gemeinsam, welche Daten er sehen darf und welche nicht. Du behältst die Kontrolle.
+        </p>
+      </div>
+    </div>
+  </section>
+</Leistung>

@@ -1,0 +1,22 @@
+---
+import type { Frage } from '../content/faq';
+
+/** Aufklappbare Fragen. Funktioniert ohne JavaScript und per Tastatur. */
+interface Props {
+  fragen: Frage[];
+}
+const { fragen } = Astro.props;
+---
+
+<div class="faq">
+  {
+    fragen.map((f) => (
+      <details>
+        <summary>
+          <h3>{f.frage}</h3>
+        </summary>
+        <p>{f.antwort}</p>
+      </details>
+    ))
+  }
+</div>
