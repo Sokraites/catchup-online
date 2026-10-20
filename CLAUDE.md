@@ -21,6 +21,9 @@ Getroffene und offene Entscheidungen: `docs/ENTSCHEIDUNGEN.md`. Etappen: `docs/P
 7. **Rechtliches.** Impressum und Datenschutz als Seiten mit klar markierten Platzhaltern. Keine erfundenen Namen, Adressen, Telefonnummern oder Rechtsformen. Rechtliche Prüfung vor Livegang. Kein Livegang mit unvollständigen Angaben.
 8. **Zentral änderbar.** Name, Claim, Domain und Kontakt stehen nur in der Konfigurationsdatei, nie verstreut im Code.
 9. **Hosting.** Statisch ausliefern, Hosting in der EU.
+10. **Vorladen.** Links werden beim Überfahren (Desktop) bzw. Antippen (Handy) vorgeladen, damit der Klick sofort wirkt. Pflicht für jede Seite.
+11. **Animation bremst nie.** Eingaben reagieren sofort. Animationen laufen parallel und lassen sich unterbrechen, niemand wartet auf sie.
+12. **Handy darf anders aussehen.** Gleicher Inhalt im HTML, aber eigene Darstellung, wenn sie auf dem Handy besser wirkt.
 
 ## Was nicht ins Projekt gehört
 
@@ -28,6 +31,12 @@ Getroffene und offene Entscheidungen: `docs/ENTSCHEIDUNGEN.md`. Etappen: `docs/P
 - Keine Preise, keine Interna.
 - Keine Kopien von Texten, Bildern, Logos oder Marken (Apple oder andere).
 - Keine erfundenen Zahlen, Referenzen oder Kundenstimmen.
+
+## Technik
+
+- Astro (Seitenbaukasten), GSAP (Scroll-Animationen), Three.js nur auf der KI-Seite. Versionen fest eingetragen in `package.json`.
+- Zentrale Angaben: `src/config/site.ts`. Seiten: `src/pages/`. Bausteine: `src/components/`.
+- Lokal starten: `npm install`, dann `npm run dev`. Fertige Seite bauen: `npm run build` (Ergebnis in `dist/`).
 
 ## Arbeitsweise
 

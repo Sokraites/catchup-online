@@ -1,0 +1,41 @@
+---
+import { site, navigation } from '../config/site';
+import Logo from './Logo.astro';
+import Platzhalter from './Platzhalter.astro';
+
+const { telefon, email } = site.kontakt;
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <Logo size={36} />
+      <p>
+        <strong>{site.name}</strong><br />
+        Webseiten für Betriebe im {site.region.schwerpunkt} und in {site.region.land}.
+      </p>
+    </div>
+    <nav aria-label="Leistungen">
+      <ul>
+        {navigation.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+    <address>
+      <ul>
+        <li>
+          Telefon:{' '}
+          {telefon.link ? <a href={`tel:${telefon.link}`}>{telefon.anzeige.text}</a> : <Platzhalter wert={telefon.anzeige} />}
+        </li>
+        <li>
+          E-Mail: <a href={`mailto:${email.text}`}><Platzhalter wert={email} /></a>
+        </li>
+      </ul>
+    </address>
+    <nav aria-label="Rechtliches">
+      <ul>
+        <li><a href="/impressum/">Impressum</a></li>
+        <li><a href="/datenschutz/">Datenschutz</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, navigation } from '../config/site';
+---
+
+<Base>
+  <section class="section" aria-labelledby="einstieg-titel">
+    <div class="wrap">
+      <h1 id="einstieg-titel">{site.claim}</h1>
+      <p>[Einstiegstext folgt in Phase B.]</p>
+      <a class="button" href="/termin/">Termin buchen</a>
+    </div>
+  </section>
+
+  <section class="section" id="leistungen" aria-labelledby="leistungen-titel">
+    <div class="wrap">
+      <h2 id="leistungen-titel">Leistungen</h2>
+      <ul>
+        {navigation.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="nutzen" aria-labelledby="nutzen-titel">
+    <div class="wrap">
+      <h2 id="nutzen-titel">Nutzen: mehr Anfragen</h2>
+      <p>[Text folgt in Phase B.]</p>
+    </div>
+  </section>
+
+  <section class="section" id="auffindbarkeit" aria-labelledby="auffindbarkeit-titel">
+    <div class="wrap">
+      <h2 id="auffindbarkeit-titel">Gefunden werden bei Google und KI-Suchen</h2>
+      <p>[Text folgt in Phase B.]</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-titel">
+    <div class="wrap">
+      <h2 id="faq-titel">Häufige Fragen</h2>
+      <p>[Fragen folgen in Phase B.]</p>
+    </div>
+  </section>
+
+  <section class="section" id="kontakt" aria-labelledby="kontakt-titel">
+    <div class="wrap">
+      <h2 id="kontakt-titel">Kontakt</h2>
+      <p>Wir sind im {site.region.schwerpunkt} zu Hause. [Text folgt in Phase B.]</p>
+      <a class="button" href="/termin/">Termin buchen</a>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,42 @@
+---
+import '../styles/global.css';
+import { site } from '../config/site';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  /** Seitentitel ohne Firmennamen; der Name wird angehängt. */
+  title?: string;
+  description?: string;
+  /** Suchmaschinen sollen die Seite nicht aufnehmen (z. B. 404). */
+  noindex?: boolean;
+}
+
+const { title, description = site.beschreibung, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name}: ${site.claim}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+---
+
+<!doctype html>
+<html lang={site.sprache}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0D0D13" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+    <Header />
+    <main id="inhalt">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

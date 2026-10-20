@@ -1,0 +1,11 @@
+---
+import type { Wert } from '../config/site';
+
+/** Gibt einen Konfigurationswert aus und markiert Platzhalter sichtbar. */
+interface Props {
+  wert: Wert;
+}
+const { wert } = Astro.props;
+---
+
+{wert.platzhalter ? <mark class="platzhalter" title="Platzhalter, vor Livegang ersetzen">{wert.text}</mark> : wert.text}
