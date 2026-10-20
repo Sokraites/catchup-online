@@ -29,6 +29,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Kacheln | Desktop: Spur beim Überfahren, ohne Klicken. Pfad-Kacheln bleiben leuchten (Vorschlag Reihe 7/Spalte 7, dann 14/14, …). Handy: Effekt bleibt, aber mit angepasster Kachelgröße und eigenem Pfad; Funkeln beim Darüberstreichen. | 20.10.2026 |
 | Auge | Folgt zu Beginn dem Mauszeiger (bzw. Finger). Sobald die erste Pfad-Kachel erreicht ist, schaut es starr in Richtung der nächsten freizuschaltenden Kachel. | 20.10.2026 |
 | Monitor (Idee) | Kopfleiste bleibt oben stehen, der Monitor ist das, was scrollt. Beim Scrollen dreht der Inhalt wie an einem Rad zum nächsten Abschnitt. Muss sich so schnell und frei scrollen lassen wie eine normale Webseite, darf nicht aufhalten. | 20.10.2026 |
+| Private Vorschau | Erlaubt (20.10.2026): private Vorschau-Seite, nur für den Gründer sichtbar, nicht für Suchmaschinen. |
 | Zwischenstände | Nach Phase B wird ein Entwurf gezeigt, danach ein erster Monitor-Entwurf. | 20.10.2026 |
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |
 | Kontakt | Eigene Telefonnummer und E-Mail kommen. Bis dahin Platzhalter, Seite wird gebaut, als gäbe es sie schon. | 20.10.2026 |
@@ -39,7 +40,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Thema | Stand |
 |---|---|
 | Hosting-Anbieter und Domain | Gründer bucht selbst (Vorschlag: deutscher Anbieter wie netcup, Hetzner oder all-inkl, Domain beim selben Anbieter). |
-| Monitor-Zeitreise | Entwurf folgt nach Phase B, dann Entscheidung. |
+| Monitor-Zeitreise | Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
 | Wirkung der Kachel-Freischaltung | Vorschläge folgen in Phase C. |
 
 ## Offen (Platzhalter, bis entschieden)

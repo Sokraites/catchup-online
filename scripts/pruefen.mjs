@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 const axe = readFileSync(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
 const basis = 'http://localhost:4321';
 const fotos = process.argv[2];
-const seiten = ['/', '/webseiten-erstellen/', '/webseiten-modernisieren/', '/auffindbarkeit/', '/ki-mitarbeiter/', '/termin/', '/impressum/', '/datenschutz/'];
+const seiten = ['/', '/webseiten-erstellen/', '/webseiten-modernisieren/', '/auffindbarkeit/', '/ki-mitarbeiter/', '/termin/', '/impressum/', '/datenschutz/', '/entwurf/monitor/'];
 const geraete = {
   handy: { width: 390, height: 844 },
   tablet: { width: 820, height: 1180 },

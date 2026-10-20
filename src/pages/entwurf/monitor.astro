@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import StartInhalt from '../../components/StartInhalt.astro';
+import '../../styles/monitor.css';
+---
+
+<!--
+  Entwurf „Monitor-Zeitreise“. Nicht für Suchmaschinen (noindex, nicht in der Sitemap).
+  Ohne JavaScript oder bei reduzierter Bewegung ist das hier die ganz normale Startseite.
+-->
+<Base title="Entwurf: Monitor-Zeitreise" noindex>
+  <div class="buehne" data-monitor>
+    <div class="monitor">
+      <div class="monitor-geraet">
+        <div class="monitor-rahmen" aria-hidden="true">
+          <span class="monitor-jahr"></span>
+        </div>
+        <div class="monitor-schirm">
+          <StartInhalt />
+        </div>
+        <div class="monitor-scanlines" aria-hidden="true"></div>
+      </div>
+      <p class="monitor-tipp" aria-hidden="true">Scrollen</p>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { starteMonitor } from '../../scripts/monitor';
+  starteMonitor();
+</script>

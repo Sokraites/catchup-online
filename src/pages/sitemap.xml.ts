@@ -4,7 +4,7 @@ import { site } from '../config/site';
 /** Alle Seiten aus src/pages, außer 404 und Endpunkten. */
 const seiten = Object.keys(import.meta.glob('./**/*.astro'))
   .map((datei) => datei.replace(/^\.\//, '').replace(/\.astro$/, ''))
-  .filter((name) => name !== '404')
+  .filter((name) => name !== '404' && !name.startsWith('entwurf/'))
   .map((name) => (name === 'index' ? '/' : `/${name.replace(/\/index$/, '')}/`))
   .sort();
 

@@ -1,0 +1,132 @@
+/*
+ * Monitor-Zeitreise (Entwurf).
+ * Greift nur, wenn das Skript <html class="monitor-an"> setzt. Sonst normale Seite.
+ * Animiert werden nur transform, opacity und Schatten, damit es flüssig bleibt.
+ */
+
+.monitor-an .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+}
+
+.monitor-an .buehne {
+  position: relative;
+  /* Höhe setzt das Skript: Scrollweg aller Abschnitte plus eine Bildschirmhöhe. */
+}
+
+.monitor-an .monitor {
+  position: sticky;
+  top: var(--kopf, 0px);
+  display: grid;
+  place-items: center;
+  height: calc(100svh - var(--kopf, 0px));
+  overflow: hidden;
+}
+
+.monitor-an .monitor-geraet {
+  position: relative;
+  width: var(--schirm-b);
+  height: var(--schirm-h);
+  /* Zeit-Werte, die das Skript beim Scrollen verändert. */
+  --rand: 40px;
+  --rand-farbe: #cfc6b0;
+  --rand-radius: 22px;
+  --schirm-radius: 26px;
+  --scan: 0.35;
+  --leuchten: 0;
+  --jahr-sichtbar: 1;
+}
+
+.monitor-an .monitor-rahmen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--schirm-radius);
+  /* Der Rand ist ein Schatten: verändert keine Größen, kostet kaum Rechenzeit. */
+  box-shadow:
+    0 0 0 var(--rand) var(--rand-farbe),
+    0 calc(var(--rand) * 0.6) calc(var(--rand) * 2.2) calc(var(--rand) * 0.3) rgb(0 0 0 / 0.55),
+    0 0 calc(80px * var(--leuchten)) calc(6px * var(--leuchten)) rgb(124 77 255 / 0.45);
+}
+
+.monitor-an .monitor-jahr {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--rand) * -1);
+  height: var(--rand);
+  display: grid;
+  place-items: center;
+  /* Eigener Hintergrund in Randfarbe: optisch identisch, aber Kontrast messbar und lesbar. */
+  background: var(--rand-farbe);
+  color: var(--jahr-farbe, #3a3528);
+  font-family: var(--font-mono);
+  font-size: clamp(0.55rem, 1.6vw, 0.75rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--jahr-sichtbar);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.monitor-an .monitor-schirm {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--schirm-radius);
+  background: var(--bg);
+  perspective: 1600px;
+  isolation: isolate;
+}
+
+.monitor-an .monitor-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: var(--schirm-radius);
+  opacity: var(--scan);
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.35) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, rgb(60 255 140 / 0.08), rgb(0 0 0 / 0.5) 120%);
+}
+
+/* Jeder Abschnitt wird zu einer Seite des Rades. */
+.monitor-an .monitor-schirm > section {
+  position: absolute;
+  inset: 0;
+  padding-block: 0;
+  border: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  opacity: 0;
+  background: var(--bg);
+}
+.monitor-an .monitor-schirm > section:first-child {
+  opacity: 1;
+}
+.monitor-an .monitor-schirm > section > .wrap {
+  padding-block: clamp(1.5rem, 5vh, 3.5rem);
+  will-change: transform;
+}
+.monitor-an .monitor-schirm .hero h1 {
+  font-size: clamp(2.2rem, 8vw, 4.75rem);
+}
+
+.monitor-tipp {
+  display: none;
+}
+.monitor-an .monitor-tipp {
+  display: block;
+  position: absolute;
+  bottom: 0.25rem;
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: var(--tipp, 1);
+  pointer-events: none;
+}

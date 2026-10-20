@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "bilder": "node scripts/bilder.mjs",
-    "pruefen": "node scripts/pruefen.mjs"
+    "pruefen": "node scripts/pruefen.mjs",
+    "vorschau": "node scripts/vorschau.mjs"
   },
   "dependencies": {
     "astro": "7.3.5",

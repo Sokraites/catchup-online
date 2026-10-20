@@ -47,7 +47,9 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - [ ] Seiteninhalt im Monitor ist echter, lesbarer Text
 - [ ] Scrollgesteuerter Inhaltswechsel im Monitor
 - [ ] Zusammenspiel von Kacheln und Monitor abgestimmt
-- [ ] Idee „Monitor durch die Geschichte des Digitalen“ bewertet und entschieden (Gründer möchte sie sehen: als Entwurf zeigen)
+- [ ] Idee „Monitor durch die Geschichte des Digitalen“ bewertet und entschieden
+  - [x] Entwurf gebaut: `/entwurf/monitor/` (Rad-Wechsel, Epochen 1995 bis heute, normaler Scroll, Tastatur, ruhige Variante)
+  - [ ] Gründer hat den Entwurf auf Handy und Desktop angesehen und entschieden
 
 ## Phase D2 (neu): KI-Mitarbeiter-Unterseite
 
@@ -87,9 +89,12 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 ## Prüfwerkzeuge
 
 - `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
+- `npm run vorschau`: baut aus `dist/` eine Fassung mit relativen Links in `.vorschau/` (für die private Vorschau).
 - `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.
 
 ## Bekannte Lücken (laufend)
+
+- Monitor-Entwurf: lange Abschnitte scrollen im Monitor, die Drehung rastet am Ende ein. Auf echten Handys noch nicht getestet (nur nachgestellt).
 
 - Alle Texte sind Entwürfe und müssen vom Gründer geprüft werden.
 - Terminseite ist bis Phase D3 nur ein Hinweis mit Telefon und E-Mail.
