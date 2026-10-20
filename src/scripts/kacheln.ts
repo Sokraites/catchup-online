@@ -33,6 +33,11 @@ export function starteKacheln() {
   let dpr = 1;
   let breite = 0;
   let hoehe = 0;
+  /** Bereich, in dem es leuchtet: der ganze Bildschirm oder (Startseite) nur der Monitor. */
+  let bx = 0;
+  let by = 0;
+  let bb = 0;
+  let bh = 0;
 
   /** Nachleuchtende Kacheln: Schlüssel "reihe,spalte" (ab 0) → Zeitpunkt. */
   const leuchtet = new Map<string, number>();
@@ -48,27 +53,50 @@ export function starteKacheln() {
 
   const pfad = () => konfig[modus].pfad.map(([r, s]) => [r - 1, s - 1] as [number, number]);
 
+  /** Im Monitor-Modus leuchtet es nur auf dem Bildschirm des Monitors (unterhalb der Browserleiste). */
+  const monitorFlaeche = () =>
+    document.documentElement.classList.contains('monitor-an') ? document.querySelector<HTMLElement>('.monitor-flaeche') : null;
+
+  function bereich() {
+    const f = monitorFlaeche();
+    if (f) {
+      const r = f.getBoundingClientRect();
+      return { x: r.left, y: r.top, b: r.width, h: r.height, monitor: true };
+    }
+    return { x: 0, y: 0, b: innerWidth, h: innerHeight, monitor: false };
+  }
+
   function messe() {
     modus = matchMedia('(pointer: fine)').matches ? 'maus' : 'touch';
     const k = konfig[modus];
     breite = innerWidth;
     hoehe = innerHeight;
-    groesse = Math.round(Math.min(k.maxGroesse, Math.max(k.minGroesse, hoehe / k.reihen)));
-    spalten = Math.ceil(breite / groesse);
-    reihen = Math.ceil(hoehe / groesse);
+    const be = bereich();
+    ({ x: bx, y: by, b: bb, h: bh } = be);
+    // Im Monitor wandert die Zeichenfläche in den Bildschirm: Leuchten gibt es nur dort.
+    const f = monitorFlaeche();
+    if (f && canvas!.parentElement !== f) {
+      f.prepend(canvas!);
+      canvas!.classList.add('kacheln-im-monitor');
+    }
+    const min = be.monitor ? 22 : k.minGroesse;
+    groesse = Math.round(Math.min(k.maxGroesse, Math.max(min, bh / k.reihen)));
+    spalten = Math.ceil(bb / groesse);
+    reihen = Math.ceil(bh / groesse);
     dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas!.width = Math.round(breite * dpr);
-    canvas!.height = Math.round(hoehe * dpr);
+    canvas!.width = Math.round(bb * dpr);
+    canvas!.height = Math.round(bh * dpr);
     document.documentElement.style.setProperty('--kachel', `${groesse}px`);
     zeichne(performance.now());
   }
 
-  function kachelBei(x: number, y: number): [number, number] {
-    return [Math.floor(y / groesse), Math.floor(x / groesse)];
+  function kachelBei(x: number, y: number): [number, number] | null {
+    if (x < bx || y < by || x >= bx + bb || y >= by + bh) return null;
+    return [Math.floor((y - by) / groesse), Math.floor((x - bx) / groesse)];
   }
 
   function mitte([r, s]: [number, number]) {
-    return { x: (s + 0.5) * groesse, y: (r + 0.5) * groesse };
+    return { x: bx + (s + 0.5) * groesse, y: by + (r + 0.5) * groesse };
   }
 
   /** Alle Kacheln auf der Linie zwischen zwei Kacheln, damit schnelle Bewegungen keine Lücken lassen. */
@@ -121,6 +149,12 @@ export function starteKacheln() {
     const jetzt = performance.now();
     zeiger = { x, y };
     const kachel = kachelBei(x, y);
+    if (!kachel) {
+      letzteKachel = null;
+      schaue();
+      plane();
+      return;
+    }
     if (!letzteKachel || kachel[0] !== letzteKachel[0] || kachel[1] !== letzteKachel[1]) {
       const weg = letzteKachel ? linie(letzteKachel, kachel) : [kachel];
       weg.forEach((k) => beruehre(k, jetzt));
@@ -177,7 +211,8 @@ export function starteKacheln() {
   /** Zeichnet alles. Gibt zurück, ob noch etwas in Bewegung ist. */
   function zeichne(jetzt: number) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, breite, hoehe);
+    ctx.clearRect(0, 0, bb, bh);
+    // Gezeichnet wird in Koordinaten der Zeichenfläche; Zeigerpositionen (Bildschirm) werden umgerechnet.
     let aktiv = false;
 
     // Nachleuchtende Spur
@@ -209,7 +244,9 @@ export function starteKacheln() {
     const pulsAlter = jetzt - pulsSeit;
     if (pulsKachel && pulsAlter < PULS_DAUER && !ruhig) {
       const t = pulsAlter / PULS_DAUER;
-      const { x, y } = mitte(pulsKachel);
+      const m = mitte(pulsKachel);
+      const x = m.x - bx;
+      const y = m.y - by;
       ctx.strokeStyle = `rgba(${PFAD_FARBE}, ${0.8 * (1 - t)})`;
       ctx.lineWidth = 2;
       const halb = groesse * (0.5 + t * 1.6);
@@ -221,7 +258,7 @@ export function starteKacheln() {
     const welleAlter = jetzt - welleSeit;
     if (welleAlter < 1800 && !ruhig) {
       const ursprung = mitte(p[p.length - 1]);
-      const radius = (welleAlter / 1800) * Math.hypot(breite, hoehe);
+      const radius = (welleAlter / 1800) * Math.hypot(bb, bh);
       for (let r = 0; r < reihen; r++) {
         for (let s = 0; s < spalten; s++) {
           const m = mitte([r, s]);
@@ -241,8 +278,8 @@ export function starteKacheln() {
         continue;
       }
       const t = alter / FUNKEN_DAUER;
-      const x = f.x + f.vx * alter;
-      const y = f.y + f.vy * alter;
+      const x = f.x - bx + f.vx * alter;
+      const y = f.y - by + f.vy * alter;
       const g = f.groesse * (1 - t);
       ctx.fillStyle = `rgba(233, 227, 255, ${1 - t})`;
       // kleiner Stern: zwei gekreuzte Rauten
@@ -294,6 +331,24 @@ export function starteKacheln() {
   addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && meldung && !meldung.hidden) meldung.hidden = true;
   });
+
+  // Der Monitor kann sich beim Scrollen verschieben (z. B. am Ende der Startseite): Lage nachführen.
+  let lageGeplant = false;
+  addEventListener(
+    'scroll',
+    () => {
+      if (lageGeplant || !monitorFlaeche()) return;
+      lageGeplant = true;
+      requestAnimationFrame(() => {
+        lageGeplant = false;
+        const r = bereich();
+        if (r.x !== bx || r.y !== by || r.h !== bh || r.b !== bb) messe();
+      });
+    },
+    { passive: true },
+  );
+
+  addEventListener('monitor-gebaut', messe);
 
   let zeitgeber = 0;
   addEventListener('resize', () => {

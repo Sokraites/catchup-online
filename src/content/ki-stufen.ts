@@ -1,13 +1,15 @@
 /**
  * KI-Mitarbeiter-Stufen. Entwürfe zur Prüfung durch die Gründer.
- * Keine Zeit- oder Preisangaben, Aufwand nur als Einschätzung in Worten.
+ * Grundidee: Der KI-Mitarbeiter läuft im System des Betriebs, kennt die freigegebenen Unterlagen
+ * und ist per Handy erreichbar, auch abends. Keine Zeit- oder Preisangaben, Aufwand nur in Worten.
  */
 export const kiStufen = [
   {
     id: 'praktikant',
     titel: 'Praktikant',
-    motto: 'Fragt nach, bevor er etwas falsch macht.',
-    kann: 'Beantwortet einfache, häufige Fragen deiner Kunden, zum Beispiel zu Öffnungszeiten, Leistungen oder Anfahrt. Alles andere gibt er sauber an dich weiter.',
+    motto: 'Beantwortet die Standardfragen.',
+    kann: 'Beantwortet Fragen deiner Kunden auf der Webseite oder per Nachricht, zum Beispiel zu Öffnungszeiten, Leistungen oder Anfahrt. Was er nicht sicher weiß, gibt er an dich weiter.',
+    beispiel: '„Habt ihr samstags geöffnet?“',
     aufwand: 'Gering',
     aufwandStufe: 1,
     unterlagen: ['Deine Webseite', 'Eine Liste häufiger Kundenfragen', 'Öffnungszeiten und Kontaktwege'],
@@ -15,21 +17,19 @@ export const kiStufen = [
   {
     id: 'azubi',
     titel: 'Azubi',
-    motto: 'Kennt den Betrieb und lernt jeden Tag dazu.',
-    kann: 'Kennt dein Angebot im Detail, sortiert eingehende Anfragen vor und schreibt Antwortentwürfe, die du nur noch prüfst und abschickst.',
+    motto: 'Kennt eure Unterlagen und findet alles.',
+    kann: 'Hat Zugriff auf die Unterlagen, die du freigibst: Angebote, Preislisten, Handbücher, Verträge. Du fragst ihn per Handy, auch abends, und er antwortet mit der passenden Stelle oder schickt dir das Dokument.',
+    beispiel: '„Was haben wir letztes Jahr für das Dach in der Hauptstraße angeboten?“',
     aufwand: 'Überschaubar',
     aufwandStufe: 2,
-    unterlagen: [
-      'Alles vom Praktikanten',
-      'Beschreibungen deiner Leistungen oder Produkte',
-      'Ein paar gute Beispiel-Antworten aus deinem Alltag',
-    ],
+    unterlagen: ['Alles vom Praktikanten', 'Freigegebene Ordner auf eurem Firmenrechner oder Server', 'Wer was sehen darf'],
   },
   {
     id: 'mitarbeiter',
     titel: 'Mitarbeiter',
-    motto: 'Erledigt feste Abläufe selbstständig.',
-    kann: 'Übernimmt wiederkehrende Abläufe von Anfang bis Ende, zum Beispiel Terminvorschläge, Rückfragen oder das Eintragen von Anfragen in deine Programme. Bei Ausnahmen meldet er sich.',
+    motto: 'Erledigt Abläufe, nicht nur Fragen.',
+    kann: 'Übernimmt feste Abläufe von Anfang bis Ende: schickt einem Kunden die Unterlagen, schreibt einen Angebotsentwurf, trägt Termine ein. Bei allem, was ungewöhnlich ist, fragt er dich vorher.',
+    beispiel: '„Schick dem Kunden von heute Morgen die Wartungsunterlagen und biete ihm zwei Termine an.“',
     aufwand: 'Mittel',
     aufwandStufe: 3,
     unterlagen: [
@@ -43,7 +43,8 @@ export const kiStufen = [
     id: 'teamleiter',
     titel: 'Teamleiter-Niveau',
     motto: 'Behält den Überblick, damit du es nicht musst.',
-    kann: 'Koordiniert mehrere Aufgaben und Abläufe, fasst zusammen, was passiert ist, und meldet dir, wo du gebraucht wirst.',
+    kann: 'Koordiniert mehrere Aufgaben und Abläufe, achtet auf Fristen und schickt dir morgens eine kurze Übersicht aufs Handy: was erledigt ist, was ansteht und wo du gebraucht wirst.',
+    beispiel: '„Was muss ich heute wissen?“',
     aufwand: 'Hoch, Schritt für Schritt',
     aufwandStufe: 4,
     unterlagen: [
@@ -52,5 +53,25 @@ export const kiStufen = [
       'Wer im Betrieb wofür zuständig ist',
       'Was er freigeben darf und was nicht',
     ],
+  },
+] as const;
+
+/** Antwort auf den Einwand „Ich habe meine Dateien doch schon in der Cloud auf dem Handy“. */
+export const kiMehrwert = [
+  {
+    titel: 'Fragen statt suchen',
+    text: 'Ein Cloud-Ordner zeigt dir Dateien. Du musst wissen, wo etwas liegt, es öffnen und selbst lesen. Der KI-Mitarbeiter liest für dich und antwortet in einem Satz, mit Quelle.',
+  },
+  {
+    titel: 'Auch was nicht in der Cloud liegt',
+    text: 'In vielen Betrieben liegt das Wichtigste auf dem Firmenrechner, im Warenwirtschaftsprogramm oder in E-Mails. Der KI-Mitarbeiter kann auch dort nachsehen, wenn du es freigibst.',
+  },
+  {
+    titel: 'Er handelt, nicht nur zeigt',
+    text: 'Er schickt das Dokument an den Kunden, schreibt den Entwurf oder trägt den Termin ein. Eine Datei-App kann das nicht.',
+  },
+  {
+    titel: 'Du bestimmst, wo die Daten bleiben',
+    text: 'Auf Wunsch läuft er auf eurem eigenen System. Du legst fest, welche Ordner er sehen darf und was er ohne Rückfrage tun darf.',
   },
 ] as const;

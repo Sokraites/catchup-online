@@ -30,6 +30,10 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Kacheln | Desktop: Spur beim Überfahren, ohne Klicken. Pfad-Kacheln bleiben leuchten (Vorschlag Reihe 7/Spalte 7, dann 14/14, …). Handy: Effekt bleibt, aber mit angepasster Kachelgröße und eigenem Pfad; Funkeln beim Darüberstreichen. | 20.10.2026 |
 | Auge | Folgt zu Beginn dem Mauszeiger (bzw. Finger). Sobald die erste Pfad-Kachel erreicht ist, schaut es starr in Richtung der nächsten freizuschaltenden Kachel. | 20.10.2026 |
 | Monitor (Idee) | Kopfleiste bleibt oben stehen, der Monitor ist das, was scrollt. Beim Scrollen dreht der Inhalt wie an einem Rad zum nächsten Abschnitt. Muss sich so schnell und frei scrollen lassen wie eine normale Webseite, darf nicht aufhalten. | 20.10.2026 |
+| Leuchteffekte | Nur im Monitor-Bildschirm (Startseite). Raster und Pfad zählen ab der oberen linken Ecke des Bildschirms. Freischalten bleibt ein verstecktes Easter Egg. | 20.10.2026 |
+| Monitor-Gestaltung | Karten im Monitor kleiner, Gehäuse mit Tiefe nach hinten (Deckel), keine Unterschrift/Jahreszahl, Browserleiste im Stil der jeweiligen Zeit (ohne Logos und Markennamen). Wunsch: möglichst fotorealistisch. | 20.10.2026 |
+| KI-Mitarbeiter-Idee | Läuft im System des Betriebs, kennt freigegebene Unterlagen, per Handy erreichbar (auch abends). Abgrenzung zur Cloud-App: fragen statt suchen, auch Nicht-Cloud-Daten, handelt, Daten bleiben auf Wunsch im Betrieb. Texte als Entwurf umgesetzt. | 20.10.2026 |
+| KI-Avatar | Gewünscht: pro Stufe eine Person/KI-Avatar, die das Niveau sichtbar macht. Stil wird noch abgestimmt. | 20.10.2026 |
 | Private Vorschau | Erlaubt (20.10.2026): private Vorschau-Seite, nur für den Gründer sichtbar, nicht für Suchmaschinen. |
 | Zwischenstände | Nach Phase B wird ein Entwurf gezeigt, danach ein erster Monitor-Entwurf. | 20.10.2026 |
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |

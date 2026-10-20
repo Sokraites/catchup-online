@@ -16,33 +16,35 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 type Epoche = {
-  jahr: string;
-  /** Rahmenbreite, Kinn (untere Gehäusekante), Hals und Sockel in Pixeln (Desktop). */
+  /** Nur zur Orientierung im Code, wird nicht angezeigt. */
+  name: string;
+  /** Rahmenbreite, Kinn (untere Gehäusekante), Deckel (Gehäusetiefe), Hals und Sockel in Pixeln (Desktop). */
   rand: number;
   kinn: number;
+  deckel: number;
   halsH: number;
   halsB: string;
   sockelB: string;
   sockelH: number;
   randFarbe: string;
   fussFarbe: string;
-  jahrFarbe: string;
   schirmRadius: number;
-  /** 0 bis 1: Knöpfe sichtbar, Bildzeilen, Gehäusetiefe, lila Leuchten. */
+  /** 0 bis 1: Knöpfe, Betriebslämpchen, Glaswölbung mit Bildzeilen, Schattentiefe, lila Leuchten. */
   knoepfe: number;
-  scan: number;
+  led: number;
+  woelbung: number;
   tiefe: number;
   leuchten: number;
 };
 
-/** Eine Epoche pro Abschnitt. Der letzte Wert gilt für alle weiteren. */
+/** Eine Epoche pro Abschnitt. Der letzte Wert gilt für alle weiteren. Die Browserleiste wechselt mit (data-epoche). */
 const EPOCHEN: Epoche[] = [
-  { jahr: '1990 · Großer Röhrenmonitor', rand: 46, kinn: 34, halsH: 0, halsB: '0%', sockelB: '55%', sockelH: 18, randFarbe: '#d6cdb4', fussFarbe: '#c4bba2', jahrFarbe: '#3a3528', schirmRadius: 34, knoepfe: 1, scan: 0.4, tiefe: 1, leuchten: 0 },
-  { jahr: '1997 · Kleinerer Röhrenmonitor', rand: 34, kinn: 26, halsH: 0, halsB: '0%', sockelB: '42%', sockelH: 14, randFarbe: '#cbc7bd', fussFarbe: '#b9b5aa', jahrFarbe: '#37342d', schirmRadius: 22, knoepfe: 1, scan: 0.25, tiefe: 0.8, leuchten: 0 },
-  { jahr: '2004 · Flachbildschirm', rand: 24, kinn: 20, halsH: 34, halsB: '9%', sockelB: '34%', sockelH: 10, randFarbe: '#a9adb5', fussFarbe: '#9ba0a8', jahrFarbe: '#24262b', schirmRadius: 3, knoepfe: 0.6, scan: 0.04, tiefe: 0.35, leuchten: 0 },
-  { jahr: '2010 · Breitbild', rand: 18, kinn: 14, halsH: 44, halsB: '7%', sockelB: '30%', sockelH: 8, randFarbe: '#121216', fussFarbe: '#1d1d23', jahrFarbe: '#b4b2c6', schirmRadius: 2, knoepfe: 0, scan: 0, tiefe: 0.25, leuchten: 0 },
-  { jahr: '2016 · Schmaler Rand', rand: 8, kinn: 12, halsH: 52, halsB: '6%', sockelB: '26%', sockelH: 6, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', jahrFarbe: '#b4b2c6', schirmRadius: 4, knoepfe: 0, scan: 0, tiefe: 0.15, leuchten: 0.2 },
-  { jahr: 'Heute · Randlos', rand: 0, kinn: 0, halsH: 0, halsB: '0%', sockelB: '0%', sockelH: 0, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', jahrFarbe: '#b4b2c6', schirmRadius: 16, knoepfe: 0, scan: 0, tiefe: 0, leuchten: 1 },
+  { name: 'Großer Röhrenmonitor', rand: 46, kinn: 34, deckel: 30, halsH: 0, halsB: '0%', sockelB: '55%', sockelH: 18, randFarbe: '#d6cdb4', fussFarbe: '#c4bba2', schirmRadius: 34, knoepfe: 1, led: 1, woelbung: 1, tiefe: 1, leuchten: 0 },
+  { name: 'Kleinerer Röhrenmonitor', rand: 34, kinn: 26, deckel: 20, halsH: 0, halsB: '0%', sockelB: '42%', sockelH: 14, randFarbe: '#cbc7bd', fussFarbe: '#b9b5aa', schirmRadius: 22, knoepfe: 1, led: 1, woelbung: 0.75, tiefe: 0.8, leuchten: 0 },
+  { name: 'Flachbildschirm', rand: 24, kinn: 20, deckel: 5, halsH: 34, halsB: '9%', sockelB: '34%', sockelH: 10, randFarbe: '#a9adb5', fussFarbe: '#9ba0a8', schirmRadius: 3, knoepfe: 0.6, led: 1, woelbung: 0.12, tiefe: 0.4, leuchten: 0 },
+  { name: 'Breitbild', rand: 18, kinn: 14, deckel: 3, halsH: 44, halsB: '7%', sockelB: '30%', sockelH: 8, randFarbe: '#121216', fussFarbe: '#1d1d23', schirmRadius: 2, knoepfe: 0, led: 1, woelbung: 0.06, tiefe: 0.3, leuchten: 0 },
+  { name: 'Schmaler Rand', rand: 8, kinn: 12, deckel: 0, halsH: 52, halsB: '6%', sockelB: '26%', sockelH: 6, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', schirmRadius: 4, knoepfe: 0, led: 0.6, woelbung: 0.03, tiefe: 0.2, leuchten: 0.2 },
+  { name: 'Heute, randlos', rand: 0, kinn: 0, deckel: 0, halsH: 0, halsB: '0%', sockelB: '0%', sockelH: 0, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', schirmRadius: 16, knoepfe: 0, led: 0, woelbung: 0, tiefe: 0, leuchten: 1 },
 ];
 
 /** Anteil der Bildschirmhöhe, den eine Raddrehung an Scrollweg braucht. */
@@ -58,9 +60,9 @@ export function starteMonitor() {
   const kopf = document.querySelector<HTMLElement>('.site-header')!;
   const geraet = buehne.querySelector<HTMLElement>('.monitor-geraet')!;
   const schirm = buehne.querySelector<HTMLElement>('.monitor-schirm')!;
-  const jahr = buehne.querySelector<HTMLElement>('.monitor-jahr')!;
   const monitor = buehne.querySelector<HTMLElement>('.monitor')!;
-  const seiten = [...schirm.children].filter((e): e is HTMLElement => e.tagName === 'SECTION');
+  const flaeche = buehne.querySelector<HTMLElement>('.monitor-flaeche')!;
+  const seiten = [...flaeche.children].filter((e): e is HTMLElement => e.tagName === 'SECTION');
 
   html.classList.add('monitor-an');
 
@@ -89,21 +91,22 @@ export function starteMonitor() {
       '--hals-b': e.halsB,
       '--sockel-b': e.sockelB,
       '--sockel-h': `${e.sockelH * k}px`,
+      '--deckel': `${e.deckel * k}px`,
       '--rand-farbe': e.randFarbe,
       '--fuss-farbe': e.fussFarbe,
-      '--jahr-farbe': e.jahrFarbe,
       '--schirm-radius': `${e.schirmRadius * Math.max(f, 0.5)}px`,
       '--knoepfe': e.knoepfe,
-      '--scan': e.scan,
+      '--led': e.led,
+      '--woelbung': e.woelbung,
       '--tiefe': e.tiefe,
       '--leuchten': e.leuchten,
     };
   }
 
   function setzeAktiv(i: number) {
-    if (i === aktiv && jahr.textContent) return;
     aktiv = i;
-    jahr.textContent = EPOCHEN[Math.min(i, EPOCHEN.length - 1)].jahr;
+    const e = String(Math.min(i, EPOCHEN.length - 1));
+    if (geraet.dataset.epoche !== e) geraet.dataset.epoche = e;
   }
 
   function baue() {
@@ -122,17 +125,21 @@ export function starteMonitor() {
     const maxRand = Math.max(...EPOCHEN.map((e) => e.rand)) * f;
     const maxKinn = Math.max(...EPOCHEN.map((e) => e.kinn)) * kinnFaktor();
     const maxFuss = mitFuss() ? Math.max(...EPOCHEN.map((e) => e.halsH + e.sockelH)) * kinnFaktor() : 0;
+    const maxDeckel = Math.max(...EPOCHEN.map((e) => e.deckel)) * kinnFaktor();
     const luft = innerWidth < 600 ? 10 : 40;
     const verfuegbarH = innerHeight - kopfH;
     const b = Math.min(1200, innerWidth - 2 * (maxRand + luft));
-    const h = verfuegbarH - 2 * maxRand - maxKinn - maxFuss - (innerWidth < 600 ? 28 : 56);
+    const h = verfuegbarH - 2 * maxRand - maxKinn - maxFuss - maxDeckel - (innerWidth < 600 ? 24 : 48);
     geraet.style.setProperty('--kinn-max', `${maxKinn}px`);
+    geraet.style.setProperty('--deckel-max', `${maxDeckel}px`);
     geraet.style.setProperty('--fuss-max', `${maxFuss}px`);
     geraet.style.setProperty('--schirm-b', `${b}px`);
     geraet.style.setProperty('--schirm-h', `${h}px`);
     gsap.set(geraet, epoche(0));
 
-    const dreh = Math.round(h * DREH_WEG);
+    // Sichtbare Höhe für den Inhalt: Bildschirm minus Browserleiste.
+    const hInhalt = flaeche.clientHeight || h;
+    const dreh = Math.round(hInhalt * DREH_WEG);
     starts = [];
     innen = [];
     let pos = 0;
@@ -140,9 +147,9 @@ export function starteMonitor() {
     tl = gsap.timeline({ defaults: { ease: 'none' } });
     seiten.forEach((seite, i) => {
       const inhalt = seite.firstElementChild as HTMLElement;
-      gsap.set(seite, { transformOrigin: `50% 50% ${-h / 2}px`, rotateX: 0, opacity: i === 0 ? 1 : 0 });
+      gsap.set(seite, { transformOrigin: `50% 50% ${-hInhalt / 2}px`, rotateX: 0, opacity: i === 0 ? 1 : 0 });
       gsap.set(inhalt, { y: 0 });
-      const weg = Math.max(0, inhalt.offsetHeight - h);
+      const weg = Math.max(0, inhalt.offsetHeight - hInhalt);
       starts.push(pos);
       innen.push(weg);
       if (weg > 0) tl!.to(inhalt, { y: -weg, duration: weg }, pos);
@@ -206,6 +213,8 @@ export function starteMonitor() {
       scrollTo({ top: ziel, behavior: 'instant' as ScrollBehavior });
     }
     ScrollTrigger.refresh();
+    // Die Kacheln richten ihr Raster am Bildschirm des Monitors aus.
+    dispatchEvent(new Event('monitor-gebaut'));
   }
 
   /** Scrollt so, dass ein Abschnitt (und optional ein Element darin) sichtbar ist. */

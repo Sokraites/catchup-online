@@ -1,6 +1,6 @@
 ---
 import Leistung from '../layouts/Leistung.astro';
-import { kiStufen } from '../content/ki-stufen';
+import { kiStufen, kiMehrwert } from '../content/ki-stufen';
 ---
 
 <Leistung
@@ -8,7 +8,7 @@ import { kiStufen } from '../content/ki-stufen';
   description="KI-Mitarbeiter für kleine und mittlere Betriebe: vom Praktikanten bis zum Teamleiter-Niveau. Was jede Stufe kann und was sie von dir braucht."
   eyebrow="KI-Mitarbeiter"
   h1="KI-Mitarbeiter: vom Praktikanten bis zur Teamleitung."
-  lead="Ein KI-Mitarbeiter übernimmt wiederkehrende Aufgaben in deinem Alltag. Wie viel er kann, hängt davon ab, wie gut wir ihn einarbeiten. Genau wie bei einem neuen Teammitglied."
+  lead="Ein digitaler Kollege, der in deinem Betrieb mitarbeitet: Er kennt eure Unterlagen, ist per Handy erreichbar, auch abends, und übernimmt wiederkehrende Aufgaben. Wie viel er kann, hängt davon ab, wie gut wir ihn einarbeiten. Genau wie bei einem neuen Teammitglied."
   schemaName="KI-Mitarbeiter für Betriebe"
 >
   <section class="section" aria-labelledby="stufen-titel">
@@ -23,6 +23,7 @@ import { kiStufen } from '../content/ki-stufen';
               <h3>{s.titel}</h3>
               <p class="stufe-motto">{s.motto}</p>
               <p>{s.kann}</p>
+              <p class="stufe-beispiel"><span>Zum Beispiel:</span> {s.beispiel}</p>
               <dl>
                 <dt>Aufwand der Einrichtung</dt>
                 <dd>
@@ -46,6 +47,24 @@ import { kiStufen } from '../content/ki-stufen';
           ))
         }
       </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="mehrwert-titel">
+    <div class="wrap">
+      <p class="eyebrow">Und die Cloud auf dem Handy?</p>
+      <h2 id="mehrwert-titel">„Meine Dateien hab ich doch schon auf dem Handy.“</h2>
+      <p class="lead">Stimmt. Aber eine Datei-App ist ein Aktenschrank. Ein KI-Mitarbeiter ist der Kollege, der weiß, was drinsteht.</p>
+      <ul class="benefits">
+        {
+          kiMehrwert.map((m) => (
+            <li>
+              <h3>{m.titel}</h3>
+              <p>{m.text}</p>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 

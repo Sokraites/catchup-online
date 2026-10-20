@@ -1,0 +1,44 @@
+---
+import { site } from '../config/site';
+
+/**
+ * Browserleisten im Stil der jeweiligen Zeit, eine pro Monitor-Epoche.
+ * Nachempfunden, ohne Logos oder Markennamen. Rein dekorativ.
+ */
+const host = new URL(site.url).host;
+---
+
+<div class="browser" aria-hidden="true">
+  <div class="bl bl-0">
+    <div class="bl-titel"><span>{site.name} - Web-Browser</span><span class="bl-fenster"><i>_</i><i>□</i><i>×</i></span></div>
+    <div class="bl-leiste">
+      <span class="bl-knopf">Zurück</span><span class="bl-knopf">Vor</span><span class="bl-knopf bl-weg">Neu laden</span>
+      <span class="bl-adresse"><b>Adresse:</b> http://www.{host}/</span>
+    </div>
+  </div>
+  <div class="bl bl-1">
+    <div class="bl-titel"><span>{site.name} - Web-Browser</span><span class="bl-fenster"><i>_</i><i>□</i><i>×</i></span></div>
+    <div class="bl-leiste">
+      <span class="bl-knopf">◄</span><span class="bl-knopf">►</span><span class="bl-knopf bl-weg">Start</span>
+      <span class="bl-adresse"><b>Wechseln zu:</b> http://www.{host}/</span>
+    </div>
+  </div>
+  <div class="bl bl-2">
+    <div class="bl-titel"><span>{site.name}</span><span class="bl-fenster"><i>_</i><i>□</i><i class="bl-zu">×</i></span></div>
+    <div class="bl-leiste">
+      <span class="bl-rund">◄</span><span class="bl-rund">►</span>
+      <span class="bl-adresse"><b>Adresse</b> http://www.{host}/</span>
+    </div>
+  </div>
+  <div class="bl bl-3">
+    <div class="bl-tabs"><span class="bl-tab">{site.name}</span><span class="bl-tab bl-tab-neu">+</span><span class="bl-fenster"><i>_</i><i>□</i><i class="bl-zu">×</i></span></div>
+    <div class="bl-leiste"><span class="bl-rund">◄</span><span class="bl-rund bl-weg">►</span><span class="bl-adresse">http://www.{host}/</span></div>
+  </div>
+  <div class="bl bl-4">
+    <div class="bl-tabs"><span class="bl-tab">{site.name}</span><span class="bl-tab bl-tab-neu">+</span><span class="bl-fenster"><i>–</i><i>□</i><i>×</i></span></div>
+    <div class="bl-leiste"><span class="bl-pfeil">←</span><span class="bl-pfeil bl-weg">→</span><span class="bl-adresse"><svg class="bl-schloss" viewBox="0 0 10 12" width="9" height="11"><rect x="1" y="5" width="8" height="6.5" rx="1.2" fill="currentColor"></rect><path d="M3 5V3.5a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg> https://{host}</span></div>
+  </div>
+  <div class="bl bl-5">
+    <div class="bl-leiste"><span class="bl-adresse"><svg class="bl-schloss" viewBox="0 0 10 12" width="9" height="11"><rect x="1" y="5" width="8" height="6.5" rx="1.2" fill="currentColor"></rect><path d="M3 5V3.5a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg> {host}</span></div>
+  </div>
+</div>
