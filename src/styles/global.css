@@ -180,6 +180,101 @@ a:hover {
   color: var(--muted);
 }
 
+/* Kachel-Hintergrund: Schachbrett und Linien kommen aus CSS, die Zeichenfläche malt nur das Leuchten. */
+.kacheln {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  --k: var(--kachel, 56px);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    repeating-conic-gradient(rgb(255 255 255 / 0.018) 0 25%, transparent 0 50%);
+  background-size:
+    var(--k) var(--k),
+    var(--k) var(--k),
+    calc(var(--k) * 2) calc(var(--k) * 2);
+}
+.site-header,
+main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+.site-header {
+  z-index: 10;
+  background: var(--bg);
+}
+
+/* Meldung am Ende des Kachel-Pfads */
+.pfad-meldung {
+  position: fixed;
+  z-index: 50;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  max-width: 26rem;
+  margin-inline: auto;
+  padding: 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5), 0 0 40px rgb(124 77 255 / 0.25);
+}
+.pfad-meldung p {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+}
+.pfad-meldung .pfad-meldung-titel {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.pfad-meldung-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+button.button {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Auge im Kopfbereich */
+.auge {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+}
+.auge-form {
+  fill: var(--ink);
+  stroke: var(--accent-2);
+  stroke-width: 1.5;
+}
+.auge-iris {
+  fill: var(--accent);
+}
+.auge-kern {
+  fill: var(--bg);
+}
+.auge-glanz {
+  fill: #fff;
+}
+.auge-pupille {
+  transition: transform 0.12s ease-out;
+}
+.auge-starr .auge-pupille {
+  transition-duration: 0.35s;
+}
+.auge-froh .auge-form {
+  stroke: var(--placeholder);
+}
+
 /* Rechtliche Seiten */
 .legal h1 {
   font-size: clamp(2rem, 8vw, 3.5rem);
@@ -218,6 +313,11 @@ a:hover {
 }
 .header-cta {
   margin-left: auto;
+}
+@media (max-width: 59.99rem) {
+  .header-inner {
+    column-gap: 0.75rem;
+  }
 }
 .main-nav {
   order: 3;
@@ -386,7 +486,7 @@ span.button {
 .card {
   position: relative;
   padding: 1.5rem;
-  background: var(--surface);
+  background: rgb(21 21 30 / 0.82);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   transition: border-color 0.2s, background-color 0.2s;

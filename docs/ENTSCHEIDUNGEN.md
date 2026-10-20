@@ -13,6 +13,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Anrede | „du“ (weicht vom Vorschlag „Sie“ ab). | 20.10.2026 |
 | Ziel der Seite | Besucher sind beeindruckt und wollen etwas Ähnliches im eigenen Stil. | 20.10.2026 |
 | Domain (Platzhalter) | `catchup-digital.com` | 20.10.2026 |
+| Schreibweise | „Catch up“, getrennt geschrieben, überall und auch künftig. Die Domain bleibt `catchup-digital.com`. | 20.10.2026 |
 | Ort (Platzhalter) | Donnersbergkreis | 20.10.2026 |
 | Team-Abschnitt | Entfällt komplett, keine Fotos. | 20.10.2026 |
 | KI-Lösungen | **Ändert die Übergabe (Abschnitt 2):** KI-Lösungen werden aktiv gezeigt, als eigene Unterseite. Stufen: Praktikant, Azubi, Mitarbeiter, Teamleiter-Niveau. Spielerisch, 3D, beim Scrollen einladende (winkende) Animationen. | 20.10.2026 |
@@ -40,8 +41,9 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Thema | Stand |
 |---|---|
 | Hosting-Anbieter und Domain | Gründer bucht selbst (Vorschlag: deutscher Anbieter wie netcup, Hetzner oder all-inkl, Domain beim selben Anbieter). |
-| Monitor-Zeitreise | Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
-| Wirkung der Kachel-Freischaltung | Vorschläge folgen in Phase C. |
+| Monitor-Zeitreise | Epochen: großer Röhrenmonitor 1990, kleinerer Röhrenmonitor 1997, Flachbildschirm 2004, Breitbild 2010, schmaler Rand 2016, heute randlos. Mit Gehäusekante und Standfuß (Handy ohne Fuß). Bildschirm durchsichtig, Kacheln scheinen durch. Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
+| Wirkung der Kachel-Freischaltung | Vorläufig umgesetzt: Lichtwelle über das Raster, Auge freut sich, Meldung „Du hast den Weg gefunden“ mit Termin-Knopf. Alternativen vorgeschlagen, Gründer wählt. |
+| Kachel-Pfad | Vorschlag umgesetzt: Maus 7/7 → 14/14 → 4/18 → 11/20 → 3/10, Touch 7/7 → 13/2 → 4/3 → 16/6 → 10/4 (Reihe/Spalte). Bestätigung offen. |
 
 ## Offen (Platzhalter, bis entschieden)
 

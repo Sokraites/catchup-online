@@ -1,6 +1,7 @@
 ---
 import { site, navigation } from '../config/site';
 import Logo from './Logo.astro';
+import Auge from './Auge.astro';
 
 const current = Astro.url.pathname;
 ---
@@ -11,6 +12,7 @@ const current = Astro.url.pathname;
       <Logo size={30} />
       <span>{site.name}</span>
     </a>
+    <Auge />
     <nav class="main-nav" aria-label="Hauptnavigation">
       <ul class="nav-list">
         {

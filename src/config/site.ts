@@ -11,7 +11,7 @@ const PLATZHALTER = (text: string): Wert => ({ text, platzhalter: true });
 
 export const site = {
   /** Arbeitsname, nicht endgültig. */
-  name: 'Catchup',
+  name: 'Catch up',
   /** Claim aus der Vergleichsseite übernommen, noch nicht final. */
   claim: 'Webseiten, die aufholen.',
   /** Platzhalter-Domain, noch nicht registriert. Ohne Schrägstrich am Ende. */

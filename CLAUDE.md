@@ -1,6 +1,6 @@
 # CLAUDE.md – verbindliche Regeln für dieses Projekt
 
-Webseite „Catchup“ (Arbeitsname). Ausführliche Quelle: `UEBERGABE.md`.
+Webseite „Catch up“ (Arbeitsname, immer getrennt geschrieben). Ausführliche Quelle: `UEBERGABE.md`.
 Getroffene und offene Entscheidungen: `docs/ENTSCHEIDUNGEN.md`. Etappen: `docs/PLAN.md`.
 
 ## Rangfolge bei Zielkonflikten

@@ -1,14 +1,13 @@
 /*
  * Monitor-Zeitreise (Entwurf).
  * Greift nur, wenn das Skript <html class="monitor-an"> setzt. Sonst normale Seite.
- * Animiert werden nur transform, opacity und Schatten, damit es flüssig bleibt.
+ * Animiert werden nur transform, opacity, Schatten und kleine Zierteile, damit es flüssig bleibt.
+ * Der Bildschirm ist durchsichtig: Das Kachelraster dahinter scheint durch.
  */
 
 .monitor-an .site-header {
   position: sticky;
   top: 0;
-  z-index: 20;
-  background: var(--bg);
 }
 
 .monitor-an .buehne {
@@ -29,14 +28,23 @@
   position: relative;
   width: var(--schirm-b);
   height: var(--schirm-h);
+  /* Unterkante (Kinn) und Fuß schieben das Gerät etwas nach oben. */
+  margin-bottom: calc(var(--kinn-max, 0px) + var(--fuss-max, 0px));
   /* Zeit-Werte, die das Skript beim Scrollen verändert. */
-  --rand: 40px;
-  --rand-farbe: #cfc6b0;
-  --rand-radius: 22px;
-  --schirm-radius: 26px;
-  --scan: 0.35;
+  --rand: 46px;
+  --rand-farbe: #d6cdb4;
+  --schirm-radius: 34px;
+  --kinn: 34px;
+  --knoepfe: 1;
+  --hals-h: 0px;
+  --hals-b: 0%;
+  --sockel-b: 55%;
+  --sockel-h: 18px;
+  --fuss-farbe: #c4bba2;
+  --scan: 0.4;
   --leuchten: 0;
-  --jahr-sichtbar: 1;
+  --jahr-farbe: #3a3528;
+  --tiefe: 1;
 }
 
 .monitor-an .monitor-rahmen {
@@ -46,28 +54,85 @@
   /* Der Rand ist ein Schatten: verändert keine Größen, kostet kaum Rechenzeit. */
   box-shadow:
     0 0 0 var(--rand) var(--rand-farbe),
-    0 calc(var(--rand) * 0.6) calc(var(--rand) * 2.2) calc(var(--rand) * 0.3) rgb(0 0 0 / 0.55),
+    0 calc(30px * var(--tiefe)) calc(90px * var(--tiefe)) calc(20px * var(--tiefe)) rgb(0 0 0 / 0.6),
+    inset 0 0 calc(60px * var(--tiefe)) rgb(0 0 0 / calc(0.7 * var(--tiefe))),
     0 0 calc(80px * var(--leuchten)) calc(6px * var(--leuchten)) rgb(124 77 255 / 0.45);
+  z-index: 2;
+  pointer-events: none;
 }
 
-.monitor-an .monitor-jahr {
+/* Gehäuse-Unterkante mit Jahreszahl, Knöpfen und Betriebslämpchen */
+.monitor-an .monitor-kinn {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--rand) * -1);
-  height: var(--rand);
-  display: grid;
-  place-items: center;
-  /* Eigener Hintergrund in Randfarbe: optisch identisch, aber Kontrast messbar und lesbar. */
+  top: calc(100% + var(--rand) - 1px);
+  left: calc(var(--rand) * -1);
+  right: calc(var(--rand) * -1);
+  height: var(--kinn);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-inline: calc(var(--rand) + 4px);
   background: var(--rand-farbe);
-  color: var(--jahr-farbe, #3a3528);
+  border-radius: 0 0 calc(var(--schirm-radius) * 0.5 + 4px) calc(var(--schirm-radius) * 0.5 + 4px);
+  overflow: hidden;
+}
+.monitor-an .monitor-jahr {
+  flex: 1;
+  text-align: center;
+  color: var(--jahr-farbe);
   font-family: var(--font-mono);
-  font-size: clamp(0.55rem, 1.6vw, 0.75rem);
+  font-size: clamp(0.55rem, 1.5vw, 0.75rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: var(--jahr-sichtbar);
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  /* Eigener Hintergrund: optisch gleich, aber der Kontrast ist messbar. */
+  background: var(--rand-farbe);
+}
+.monitor-an .monitor-knoepfe {
+  display: flex;
+  gap: 6px;
+  opacity: var(--knoepfe);
+}
+.monitor-an .monitor-knoepfe i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.25);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.4);
+}
+.monitor-an .monitor-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4cd18a;
+  box-shadow: 0 0 6px #4cd18a;
+}
+
+/* Standfuß: Hals und Sockel */
+.monitor-an .monitor-fuss {
+  position: absolute;
+  top: calc(100% + var(--rand) + var(--kinn) - 2px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.monitor-an .monitor-hals {
+  width: var(--hals-b);
+  height: var(--hals-h);
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.25), transparent 40%, rgb(0 0 0 / 0.25)), var(--fuss-farbe);
+}
+.monitor-an .monitor-sockel {
+  width: var(--sockel-b);
+  height: var(--sockel-h);
+  border-radius: 4px 4px 10px 10px;
+  background: var(--fuss-farbe);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
 }
 
 .monitor-an .monitor-schirm {
@@ -75,7 +140,7 @@
   inset: 0;
   overflow: hidden;
   border-radius: var(--schirm-radius);
-  background: var(--bg);
+  background: rgb(13 13 19 / 0.55);
   perspective: 1600px;
   isolation: isolate;
 }
@@ -83,12 +148,13 @@
 .monitor-an .monitor-scanlines {
   position: absolute;
   inset: 0;
+  z-index: 1;
   pointer-events: none;
   border-radius: var(--schirm-radius);
   opacity: var(--scan);
   background:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.35) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, rgb(60 255 140 / 0.08), rgb(0 0 0 / 0.5) 120%);
+    radial-gradient(ellipse at center, rgb(60 255 140 / 0.08), rgb(0 0 0 / 0.55) 120%);
 }
 
 /* Jeder Abschnitt wird zu einer Seite des Rades. */
@@ -101,17 +167,17 @@
   backface-visibility: hidden;
   will-change: transform, opacity;
   opacity: 0;
-  background: var(--bg);
+  background: transparent;
 }
 .monitor-an .monitor-schirm > section:first-child {
   opacity: 1;
 }
 .monitor-an .monitor-schirm > section > .wrap {
-  padding-block: clamp(1.5rem, 5vh, 3.5rem);
+  padding-block: clamp(1.25rem, 4vh, 3rem);
   will-change: transform;
 }
 .monitor-an .monitor-schirm .hero h1 {
-  font-size: clamp(2.2rem, 8vw, 4.75rem);
+  font-size: clamp(2.1rem, 8vw, 4.5rem);
 }
 
 .monitor-tipp {
@@ -129,4 +195,12 @@
   text-transform: uppercase;
   opacity: var(--tipp, 1);
   pointer-events: none;
+}
+
+/* Auf dem Handy kein Standfuß: jeder Millimeter gehört dem Inhalt. */
+@media (max-width: 599px) {
+  .monitor-an .monitor-fuss,
+  .monitor-an .monitor-knoepfe {
+    display: none;
+  }
 }

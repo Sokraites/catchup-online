@@ -17,24 +17,32 @@ gsap.registerPlugin(ScrollTrigger);
 
 type Epoche = {
   jahr: string;
+  /** Rahmenbreite, Kinn (untere Gehäusekante), Hals und Sockel in Pixeln (Desktop). */
   rand: number;
+  kinn: number;
+  halsH: number;
+  halsB: string;
+  sockelB: string;
+  sockelH: number;
   randFarbe: string;
-  randRadius: number;
-  schirmRadius: number;
-  scan: number;
-  leuchten: number;
-  jahrSichtbar: number;
+  fussFarbe: string;
   jahrFarbe: string;
+  schirmRadius: number;
+  /** 0 bis 1: Knöpfe sichtbar, Bildzeilen, Gehäusetiefe, lila Leuchten. */
+  knoepfe: number;
+  scan: number;
+  tiefe: number;
+  leuchten: number;
 };
 
 /** Eine Epoche pro Abschnitt. Der letzte Wert gilt für alle weiteren. */
 const EPOCHEN: Epoche[] = [
-  { jahr: '1995 · Röhrenmonitor', rand: 40, randFarbe: '#cfc6b0', randRadius: 22, schirmRadius: 26, scan: 0.35, leuchten: 0, jahrSichtbar: 1, jahrFarbe: '#3a3528' },
-  { jahr: '2003 · Flachbildschirm', rand: 30, randFarbe: '#bdb8ad', randRadius: 10, schirmRadius: 3, scan: 0.08, leuchten: 0, jahrSichtbar: 1, jahrFarbe: '#37342d' },
-  { jahr: '2009 · Breitbild', rand: 24, randFarbe: '#18181d', randRadius: 14, schirmRadius: 2, scan: 0, leuchten: 0, jahrSichtbar: 1, jahrFarbe: '#b4b2c6' },
-  { jahr: '2015 · Schmaler Rand', rand: 14, randFarbe: '#2b2b35', randRadius: 10, schirmRadius: 2, scan: 0, leuchten: 0, jahrSichtbar: 1, jahrFarbe: '#b4b2c6' },
-  { jahr: '2020 · Fast randlos', rand: 6, randFarbe: '#22222c', randRadius: 12, schirmRadius: 10, scan: 0, leuchten: 0.3, jahrSichtbar: 0, jahrFarbe: '#b4b2c6' },
-  { jahr: 'Heute', rand: 0, randFarbe: '#22222c', randRadius: 16, schirmRadius: 16, scan: 0, leuchten: 1, jahrSichtbar: 0, jahrFarbe: '#b4b2c6' },
+  { jahr: '1990 · Großer Röhrenmonitor', rand: 46, kinn: 34, halsH: 0, halsB: '0%', sockelB: '55%', sockelH: 18, randFarbe: '#d6cdb4', fussFarbe: '#c4bba2', jahrFarbe: '#3a3528', schirmRadius: 34, knoepfe: 1, scan: 0.4, tiefe: 1, leuchten: 0 },
+  { jahr: '1997 · Kleinerer Röhrenmonitor', rand: 34, kinn: 26, halsH: 0, halsB: '0%', sockelB: '42%', sockelH: 14, randFarbe: '#cbc7bd', fussFarbe: '#b9b5aa', jahrFarbe: '#37342d', schirmRadius: 22, knoepfe: 1, scan: 0.25, tiefe: 0.8, leuchten: 0 },
+  { jahr: '2004 · Flachbildschirm', rand: 24, kinn: 20, halsH: 34, halsB: '9%', sockelB: '34%', sockelH: 10, randFarbe: '#a9adb5', fussFarbe: '#9ba0a8', jahrFarbe: '#24262b', schirmRadius: 3, knoepfe: 0.6, scan: 0.04, tiefe: 0.35, leuchten: 0 },
+  { jahr: '2010 · Breitbild', rand: 18, kinn: 14, halsH: 44, halsB: '7%', sockelB: '30%', sockelH: 8, randFarbe: '#121216', fussFarbe: '#1d1d23', jahrFarbe: '#b4b2c6', schirmRadius: 2, knoepfe: 0, scan: 0, tiefe: 0.25, leuchten: 0 },
+  { jahr: '2016 · Schmaler Rand', rand: 8, kinn: 12, halsH: 52, halsB: '6%', sockelB: '26%', sockelH: 6, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', jahrFarbe: '#b4b2c6', schirmRadius: 4, knoepfe: 0, scan: 0, tiefe: 0.15, leuchten: 0.2 },
+  { jahr: 'Heute · Randlos', rand: 0, kinn: 0, halsH: 0, halsB: '0%', sockelB: '0%', sockelH: 0, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', jahrFarbe: '#b4b2c6', schirmRadius: 16, knoepfe: 0, scan: 0, tiefe: 0, leuchten: 1 },
 ];
 
 /** Anteil der Bildschirmhöhe, den eine Raddrehung an Scrollweg braucht. */
@@ -66,19 +74,29 @@ export function starteMonitor() {
   const buehnenStart = () => buehne!.getBoundingClientRect().top + scrollY - kopf.offsetHeight;
 
   const randFaktor = () => (innerWidth < 600 ? 0.35 : innerWidth < 1000 ? 0.7 : 1);
+  const kinnFaktor = () => (innerWidth < 600 ? 0.6 : innerWidth < 1000 ? 0.8 : 1);
+  /** Auf dem Handy kein Standfuß (siehe monitor.css). */
+  const mitFuss = () => innerWidth >= 600;
 
   function epoche(i: number) {
     const e = EPOCHEN[Math.min(i, EPOCHEN.length - 1)];
     const f = randFaktor();
+    const k = kinnFaktor();
     return {
       '--rand': `${e.rand * f}px`,
+      '--kinn': `${e.kinn * k}px`,
+      '--hals-h': `${e.halsH * k}px`,
+      '--hals-b': e.halsB,
+      '--sockel-b': e.sockelB,
+      '--sockel-h': `${e.sockelH * k}px`,
       '--rand-farbe': e.randFarbe,
-      '--rand-radius': `${e.randRadius}px`,
-      '--schirm-radius': `${e.schirmRadius * Math.max(f, 0.5)}px`,
-      '--scan': e.scan,
-      '--leuchten': e.leuchten,
-      '--jahr-sichtbar': e.jahrSichtbar,
+      '--fuss-farbe': e.fussFarbe,
       '--jahr-farbe': e.jahrFarbe,
+      '--schirm-radius': `${e.schirmRadius * Math.max(f, 0.5)}px`,
+      '--knoepfe': e.knoepfe,
+      '--scan': e.scan,
+      '--tiefe': e.tiefe,
+      '--leuchten': e.leuchten,
     };
   }
 
@@ -101,11 +119,15 @@ export function starteMonitor() {
 
     // Größe des Bildschirms: so groß wie möglich, mit Platz für den dicksten Rand.
     const f = randFaktor();
-    const maxRand = EPOCHEN[0].rand * f;
+    const maxRand = Math.max(...EPOCHEN.map((e) => e.rand)) * f;
+    const maxKinn = Math.max(...EPOCHEN.map((e) => e.kinn)) * kinnFaktor();
+    const maxFuss = mitFuss() ? Math.max(...EPOCHEN.map((e) => e.halsH + e.sockelH)) * kinnFaktor() : 0;
     const luft = innerWidth < 600 ? 10 : 40;
     const verfuegbarH = innerHeight - kopfH;
     const b = Math.min(1200, innerWidth - 2 * (maxRand + luft));
-    const h = verfuegbarH - 2 * maxRand - (innerWidth < 600 ? 34 : 70);
+    const h = verfuegbarH - 2 * maxRand - maxKinn - maxFuss - (innerWidth < 600 ? 28 : 56);
+    geraet.style.setProperty('--kinn-max', `${maxKinn}px`);
+    geraet.style.setProperty('--fuss-max', `${maxFuss}px`);
     geraet.style.setProperty('--schirm-b', `${b}px`);
     geraet.style.setProperty('--schirm-h', `${h}px`);
     gsap.set(geraet, epoche(0));

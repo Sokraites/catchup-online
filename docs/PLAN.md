@@ -31,15 +31,15 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 ## Phase C: Kachel-Hintergrund
 
-- [ ] Kachelraster statisch sichtbar auf Smartphone, Tablet und Desktop
-- [ ] Aufleuchten beim Mauszeiger auf dem Desktop (Spur wie bei einem Spiel, ohne Klicken)
-- [ ] Touch-Variante des Aufleuchtens auf Smartphone und Tablet (Funkeln beim Darüberstreichen)
-- [ ] Erste festgelegte Kachel bleibt nach Aktivierung dauerhaft leuchtend (Vorschlag: Reihe 7, Spalte 7)
-- [ ] Zweite Kachel wird dadurch freigeschaltet (Vorschlag: Reihe 14, Spalte 14)
-- [ ] Gesamte Kette aller festgelegten Kacheln umgesetzt
-- [ ] neu: Auge, das Mauszeiger bzw. Finger folgt, mit Kacheln verbunden
-- [ ] Wirkung der Freischaltung vorgeschlagen, entschieden und umgesetzt
-- [ ] Ruhige Variante bei reduzierter Bewegung umgesetzt
+- [x] Kachelraster statisch sichtbar auf Smartphone, Tablet und Desktop
+- [x] Aufleuchten beim Mauszeiger auf dem Desktop (Spur wie bei einem Spiel, ohne Klicken)
+- [x] Touch-Variante des Aufleuchtens auf Smartphone und Tablet (Funkeln beim Darüberstreichen)
+- [x] Erste festgelegte Kachel bleibt nach Aktivierung dauerhaft leuchtend (Vorschlag: Reihe 7, Spalte 7)
+- [x] Zweite Kachel wird dadurch freigeschaltet (Vorschlag: Reihe 14, Spalte 14)
+- [x] Gesamte Kette aller festgelegten Kacheln umgesetzt
+- [x] neu: Auge, das Mauszeiger bzw. Finger folgt, mit Kacheln verbunden
+- [ ] Wirkung der Freischaltung vorgeschlagen, entschieden und umgesetzt (vorläufig: Welle über das Raster plus Meldung mit Termin-Knopf)
+- [x] Ruhige Variante bei reduzierter Bewegung umgesetzt
 
 ## Phase D: Monitor und Scroll-Erlebnis
 
@@ -93,6 +93,9 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.
 
 ## Bekannte Lücken (laufend)
+
+- Kacheln auf dem Handy: Funkeln beim Wischen nur nachgestellt getestet, nicht auf echten Geräten.
+- Pfad-Kacheln hinter dem Kopfbereich oder außerhalb kleiner Bildschirme (z. B. Handy quer) sind nicht erreichbar.
 
 - Monitor-Entwurf: lange Abschnitte scrollen im Monitor, die Drehung rastet am Ende ein. Auf echten Handys noch nicht getestet (nur nachgestellt).
 

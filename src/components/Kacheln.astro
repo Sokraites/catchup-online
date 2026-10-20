@@ -1,0 +1,21 @@
+---
+/**
+ * Kachel-Hintergrund mit Freischalt-Pfad. Rein dekorativ: für Hilfstechnik ausgeblendet.
+ * Ohne JavaScript bleibt das ruhige Schachbrett-Raster als Hintergrund stehen.
+ */
+---
+
+<canvas class="kacheln" aria-hidden="true"></canvas>
+<div class="pfad-meldung" role="status" hidden>
+  <p class="pfad-meldung-titel">Du hast den Weg gefunden.</p>
+  <p>Genau so führen wir deine Kunden zu dir: Schritt für Schritt, bis sie bei dir ankommen.</p>
+  <div class="pfad-meldung-aktionen">
+    <a class="button button-small" href="/termin/">Termin buchen</a>
+    <button class="button button-small button-ghost" type="button" data-pfad-schliessen>Schließen</button>
+  </div>
+</div>
+
+<script>
+  import { starteKacheln } from '../scripts/kacheln';
+  starteKacheln();
+</script>
