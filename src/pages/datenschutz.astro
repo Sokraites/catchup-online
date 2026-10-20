@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Platzhalter from '../components/Platzhalter.astro';
+import { site } from '../config/site';
+
+const r = site.rechtliches;
+const { email } = site.kontakt;
+const todo = (text: string) => ({ text, platzhalter: true });
+---
+
+<Base title="Datenschutz" description={`Datenschutzerklärung von ${site.name}.`}>
+  <section class="section legal" aria-labelledby="seite-titel">
+    <div class="wrap">
+      <h1 id="seite-titel">Datenschutzerklärung</h1>
+      <p class="hinweis">
+        Entwurf mit Platzhaltern und Gliederung. Kein Rechtsrat. Vor dem Livegang vollständig ausfüllen und rechtlich
+        prüfen lassen.
+      </p>
+
+      <h2>1. Verantwortliche Stelle</h2>
+      <p>
+        {site.name} · <Platzhalter wert={r.verantwortlich} /><br />
+        <Platzhalter wert={r.anschrift} /><br />
+        E-Mail: <Platzhalter wert={email} />
+      </p>
+
+      <h2>2. Grundsatz: keine Tracker, keine Cookies</h2>
+      <p>
+        Diese Webseite setzt keine Cookies und bindet keine Analyse- oder Werbedienste ein. Schriften und Programmteile
+        werden von unserem eigenen Server ausgeliefert, nicht von Drittanbietern.
+      </p>
+
+      <h2>3. Hosting und Server-Protokolle</h2>
+      <p><Platzhalter wert={todo('[Anbieter, Serverstandort, Art und Speicherdauer der Protokolle – nach Wahl des Hostings ergänzen]')} /></p>
+
+      <h2>4. Kontakt per Telefon oder E-Mail</h2>
+      <p><Platzhalter wert={todo('[Zweck, Rechtsgrundlage, Speicherdauer – ergänzen]')} /></p>
+
+      <h2>5. Terminanfrage</h2>
+      <p><Platzhalter wert={todo('[Welche Angaben erhoben werden, wie sie übermittelt und wie lange sie gespeichert werden – nach Umsetzung der Terminbuchung ergänzen]')} /></p>
+
+      <h2>6. Deine Rechte</h2>
+      <p><Platzhalter wert={todo('[Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit – ausformulieren]')} /></p>
+
+      <h2>7. Beschwerderecht</h2>
+      <p>
+        Du kannst dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel beim Landesbeauftragten für den
+        Datenschutz und die Informationsfreiheit Rheinland-Pfalz.
+      </p>
+    </div>
+  </section>
+</Base>

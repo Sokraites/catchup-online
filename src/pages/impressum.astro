@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Platzhalter from '../components/Platzhalter.astro';
+import { site } from '../config/site';
+
+const r = site.rechtliches;
+const { telefon, email } = site.kontakt;
+---
+
+<Base title="Impressum" description={`Impressum von ${site.name}.`}>
+  <section class="section legal" aria-labelledby="seite-titel">
+    <div class="wrap">
+      <h1 id="seite-titel">Impressum</h1>
+      <p class="hinweis">
+        Entwurf mit Platzhaltern. Vor dem Livegang vollständig ausfüllen und rechtlich prüfen lassen.
+      </p>
+
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <p>
+        {site.name} · <Platzhalter wert={r.rechtsform} /><br />
+        <Platzhalter wert={r.verantwortlich} /><br />
+        <Platzhalter wert={r.anschrift} />
+      </p>
+
+      <h2>Kontakt</h2>
+      <p>
+        Telefon: <Platzhalter wert={telefon.anzeige} /><br />
+        E-Mail: <Platzhalter wert={email} />
+      </p>
+
+      <h2>Umsatzsteuer</h2>
+      <p><Platzhalter wert={r.ustId} /></p>
+
+      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+      <p>
+        <Platzhalter wert={r.verantwortlich} /><br />
+        <Platzhalter wert={r.anschrift} />
+      </p>
+    </div>
+  </section>
+</Base>
