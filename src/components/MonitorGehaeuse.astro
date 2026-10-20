@@ -1,0 +1,36 @@
+---
+/**
+ * Gehäuse der Monitor-Epochen: gerenderte Bilder (siehe scripts/monitore-rendern.mjs),
+ * zusammengesetzt um den Bildschirm. Der Rahmen ist dehnbar (9-Slice), Ecken bleiben unverzerrt.
+ * Eine Ebene pro Epoche; das Skript blendet zwischen ihnen über. Rein dekorativ.
+ */
+import konfig from '../config/monitore.json';
+import bilder from '../config/monitore-bilder.json';
+
+const masse = bilder as Record<string, { b: number; h: number }>;
+const epochen = konfig.epochen.map((e, i) => ({ ...e, i })).filter((e) => e.rand > 0);
+
+const dunkler = (hex: string, anteil: number) => `color-mix(in srgb, ${hex}, #000 ${anteil}%)`;
+---
+
+{
+  epochen.map((e) => {
+    const unten = e.rand + e.kinn;
+    const fuss = masse[`fuss-${e.i}`];
+    const knoepfe = masse[`knoepfe-${e.i}`];
+    return (
+      <div
+        class="mg"
+        data-mg={e.i}
+        aria-hidden="true"
+        style={`--o:${e.oben};--r:${e.rand};--u:${unten};--k:${e.kinn};--ra:${e.radiusAussen};--d:${e.deckel};--farbe:${e.farbe};--farbe-dunkel:${dunkler(e.farbe, 35)};`}
+      >
+        {e.deckel > 0 && <div class="mg-deckel" />}
+        <div class="mg-rahmen" style={`border-image-source:url(/monitore/rahmen-${e.i}.webp)`} />
+        {knoepfe && <img class="mg-knoepfe" src={`/monitore/knoepfe-${e.i}.webp`} alt="" width={knoepfe.b} height={knoepfe.h} style={`--kb:${knoepfe.b};--kh:${knoepfe.h}`} />}
+        <span class="mg-led" />
+        {fuss && <img class="mg-fuss" src={`/monitore/fuss-${e.i}.webp`} alt="" width={fuss.b} height={fuss.h} style={`--fb:${fuss.b};--fh:${fuss.h}`} />}
+      </div>
+    );
+  })
+}

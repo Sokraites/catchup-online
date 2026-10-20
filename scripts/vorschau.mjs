@@ -7,6 +7,7 @@
 //   npm run build && npm run vorschau
 import { mkdirSync, rmSync, readdirSync, readFileSync, writeFileSync, statSync, copyFileSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
+import { buildSync } from 'esbuild';
 
 const AUS = '.vorschau';
 rmSync(AUS, { recursive: true, force: true });
@@ -17,7 +18,10 @@ const alle = (ordner) =>
 const schrift = (pfad) => `data:font/woff2;base64,${readFileSync(join('dist', pfad)).toString('base64')}`;
 const css = (pfad) =>
   readFileSync(join('dist', pfad), 'utf8').replace(/url\(\/(fonts\/[^)]+)\)/g, (_, f) => `url(${schrift(f)})`);
-const js = (pfad) => readFileSync(join('dist', pfad), 'utf8');
+// Skripte samt nachgeladenen Teilen (z. B. 3D) zu einer Datei bündeln, damit sie direkt in der Seite stehen können.
+const js = (pfad) =>
+  buildSync({ entryPoints: [join('dist', pfad)], bundle: true, format: 'esm', write: false, minify: true, logLevel: 'error' })
+    .outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 
 const STATUS = `
 <div id="vorschau-status" aria-hidden="true" style="position:fixed;z-index:99;left:max(8px,env(safe-area-inset-left,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:6px 10px;border-radius:999px;background:#ffd166;color:#1a1400;font:600 11px/1.3 ui-monospace,Menlo,monospace;pointer-events:none;max-width:calc(100vw - 16px)">Vorschau · Skripte laufen nicht</div>
@@ -55,6 +59,7 @@ function seite(quelle, tiefe, { fragment = false } = {}) {
     const ziel = weg === '' ? 'index.html' : weg.endsWith('/') ? `${weg}index.html` : weg;
     return `${attr}="${zurWurzel}site/${ziel}${anker ? '#' + anker : ''}"`;
   });
+  html = html.replace(/url\(\/((?:monitore|ki)\/)/g, `url(${zurWurzel}site/$1`);
   html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">');
   html = html.replace(/<\/body>/, `${STATUS}</body>`);
   if (fragment) {

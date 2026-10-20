@@ -4,51 +4,25 @@
  * Idee: Die Abschnitte der Startseite laufen über einen Monitor. Innerhalb eines Abschnitts
  * scrollt der Inhalt ganz normal (1:1 mit dem Finger bzw. Mausrad). Am Ende eines Abschnitts
  * dreht sich der Bildschirm wie ein Rad zum nächsten, und der Monitor wird eine Epoche moderner.
+ * Auf dem Handy wird der Bildschirm beim Wechsel kurz zum Querformat: Dann sieht man das ganze Gerät.
  *
  * Grundsätze:
  * - Der Inhalt bleibt normales HTML. Ohne JavaScript oder bei reduzierter Bewegung passiert nichts.
  * - Gescrollt wird mit dem normalen Seiten-Scroll, nichts wird festgehalten.
- * - Bewegt werden nur transform und opacity.
+ * - Bewegt werden fast nur transform und opacity; die Gehäuse sind fertige Bilder.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import konfig from '../config/monitore.json';
+import bilder from '../config/monitore-bilder.json';
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Epoche = {
-  /** Nur zur Orientierung im Code, wird nicht angezeigt. */
-  name: string;
-  /** Rahmenbreite, Kinn (untere Gehäusekante), Deckel (Gehäusetiefe), Hals und Sockel in Pixeln (Desktop). */
-  rand: number;
-  kinn: number;
-  deckel: number;
-  halsH: number;
-  halsB: string;
-  sockelB: string;
-  sockelH: number;
-  randFarbe: string;
-  fussFarbe: string;
-  schirmRadius: number;
-  /** 0 bis 1: Knöpfe, Betriebslämpchen, Glaswölbung mit Bildzeilen, Schattentiefe, lila Leuchten. */
-  knoepfe: number;
-  led: number;
-  woelbung: number;
-  tiefe: number;
-  leuchten: number;
-};
-
-/** Eine Epoche pro Abschnitt. Der letzte Wert gilt für alle weiteren. Die Browserleiste wechselt mit (data-epoche). */
-const EPOCHEN: Epoche[] = [
-  { name: 'Großer Röhrenmonitor', rand: 46, kinn: 34, deckel: 30, halsH: 0, halsB: '0%', sockelB: '55%', sockelH: 18, randFarbe: '#d6cdb4', fussFarbe: '#c4bba2', schirmRadius: 34, knoepfe: 1, led: 1, woelbung: 1, tiefe: 1, leuchten: 0 },
-  { name: 'Kleinerer Röhrenmonitor', rand: 34, kinn: 26, deckel: 20, halsH: 0, halsB: '0%', sockelB: '42%', sockelH: 14, randFarbe: '#cbc7bd', fussFarbe: '#b9b5aa', schirmRadius: 22, knoepfe: 1, led: 1, woelbung: 0.75, tiefe: 0.8, leuchten: 0 },
-  { name: 'Flachbildschirm', rand: 24, kinn: 20, deckel: 5, halsH: 34, halsB: '9%', sockelB: '34%', sockelH: 10, randFarbe: '#a9adb5', fussFarbe: '#9ba0a8', schirmRadius: 3, knoepfe: 0.6, led: 1, woelbung: 0.12, tiefe: 0.4, leuchten: 0 },
-  { name: 'Breitbild', rand: 18, kinn: 14, deckel: 3, halsH: 44, halsB: '7%', sockelB: '30%', sockelH: 8, randFarbe: '#121216', fussFarbe: '#1d1d23', schirmRadius: 2, knoepfe: 0, led: 1, woelbung: 0.06, tiefe: 0.3, leuchten: 0 },
-  { name: 'Schmaler Rand', rand: 8, kinn: 12, deckel: 0, halsH: 52, halsB: '6%', sockelB: '26%', sockelH: 6, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', schirmRadius: 4, knoepfe: 0, led: 0.6, woelbung: 0.03, tiefe: 0.2, leuchten: 0.2 },
-  { name: 'Heute, randlos', rand: 0, kinn: 0, deckel: 0, halsH: 0, halsB: '0%', sockelB: '0%', sockelH: 0, randFarbe: '#1c1c22', fussFarbe: '#b8bcc4', schirmRadius: 16, knoepfe: 0, led: 0, woelbung: 0, tiefe: 0, leuchten: 1 },
-];
+const EPOCHEN = konfig.epochen;
+const FUSS = bilder as Record<string, { b: number; h: number }>;
 
 /** Anteil der Bildschirmhöhe, den eine Raddrehung an Scrollweg braucht. */
-const DREH_WEG = 0.7;
+const DREH_WEG = 0.8;
 const DREH_WINKEL = 72;
 
 export function starteMonitor() {
@@ -63,50 +37,40 @@ export function starteMonitor() {
   const monitor = buehne.querySelector<HTMLElement>('.monitor')!;
   const flaeche = buehne.querySelector<HTMLElement>('.monitor-flaeche')!;
   const seiten = [...flaeche.children].filter((e): e is HTMLElement => e.tagName === 'SECTION');
+  const gehaeuse = new Map([...buehne.querySelectorAll<HTMLElement>('.mg')].map((el) => [Number(el.dataset.mg), el]));
 
   html.classList.add('monitor-an');
 
   let tl: gsap.core.Timeline | null = null;
-  let starts: number[] = []; // Scrollposition (relativ), an der Abschnitt i beginnt
+  let starts: number[] = []; // Scrollposition (relativ), an der Abschnitt i zu lesen beginnt
   let innen: number[] = []; // Scrollweg innerhalb von Abschnitt i
   let breiteZuletzt = 0;
   let aktiv = 0;
+  let massstab = 0.62;
 
   /** Scrollposition, an der das Rad beginnt (Bühne stößt an die Kopfleiste). */
   const buehnenStart = () => buehne!.getBoundingClientRect().top + scrollY - kopf.offsetHeight;
-
-  const randFaktor = () => (innerWidth < 600 ? 0.35 : innerWidth < 1000 ? 0.7 : 1);
-  const kinnFaktor = () => (innerWidth < 600 ? 0.6 : innerWidth < 1000 ? 0.8 : 1);
-  /** Auf dem Handy kein Standfuß (siehe monitor.css). */
-  const mitFuss = () => innerWidth >= 600;
-
-  function epoche(i: number) {
-    const e = EPOCHEN[Math.min(i, EPOCHEN.length - 1)];
-    const f = randFaktor();
-    const k = kinnFaktor();
-    return {
-      '--rand': `${e.rand * f}px`,
-      '--kinn': `${e.kinn * k}px`,
-      '--hals-h': `${e.halsH * k}px`,
-      '--hals-b': e.halsB,
-      '--sockel-b': e.sockelB,
-      '--sockel-h': `${e.sockelH * k}px`,
-      '--deckel': `${e.deckel * k}px`,
-      '--rand-farbe': e.randFarbe,
-      '--fuss-farbe': e.fussFarbe,
-      '--schirm-radius': `${e.schirmRadius * Math.max(f, 0.5)}px`,
-      '--knoepfe': e.knoepfe,
-      '--led': e.led,
-      '--woelbung': e.woelbung,
-      '--tiefe': e.tiefe,
-      '--leuchten': e.leuchten,
-    };
-  }
+  const handy = () => innerWidth < 600;
 
   function setzeAktiv(i: number) {
     aktiv = i;
-    const e = String(Math.min(i, EPOCHEN.length - 1));
-    if (geraet.dataset.epoche !== e) geraet.dataset.epoche = e;
+    const n = Math.min(i, EPOCHEN.length - 1);
+    const e = String(n);
+    if (geraet.dataset.epoche !== e) {
+      geraet.dataset.epoche = e;
+      // Bildschirmecken passend zum Loch im Gehäuse
+      geraet.style.setProperty('--schirm-radius', `${(EPOCHEN[n].radiusLoch ?? 20) * massstab}px`);
+    }
+  }
+
+  /** Platz, den Gehäuse (Rahmen oben/unten, Deckel, Fuß) bei Maßstab m höchstens braucht. */
+  function gehaeuseHoehe(m: number) {
+    return Math.max(
+      ...EPOCHEN.map((e, i) => {
+        const fuss = FUSS[`fuss-${i}`]?.h ?? 0;
+        return (e.oben + e.rand + e.kinn + fuss + (e.deckel ?? 0) * 64) * m;
+      }),
+    );
   }
 
   function baue() {
@@ -119,32 +83,46 @@ export function starteMonitor() {
 
     const kopfH = kopf.offsetHeight;
     html.style.setProperty('--kopf', `${kopfH}px`);
-
-    // Größe des Bildschirms: so groß wie möglich, mit Platz für den dicksten Rand.
-    const f = randFaktor();
-    const maxRand = Math.max(...EPOCHEN.map((e) => e.rand)) * f;
-    const maxKinn = Math.max(...EPOCHEN.map((e) => e.kinn)) * kinnFaktor();
-    const maxFuss = mitFuss() ? Math.max(...EPOCHEN.map((e) => e.halsH + e.sockelH)) * kinnFaktor() : 0;
-    const maxDeckel = Math.max(...EPOCHEN.map((e) => e.deckel)) * kinnFaktor();
-    const luft = innerWidth < 600 ? 10 : 40;
     const verfuegbarH = innerHeight - kopfH;
-    const b = Math.min(1200, innerWidth - 2 * (maxRand + luft));
-    const h = verfuegbarH - 2 * maxRand - maxKinn - maxFuss - maxDeckel - (innerWidth < 600 ? 24 : 48);
-    geraet.style.setProperty('--kinn-max', `${maxKinn}px`);
-    geraet.style.setProperty('--deckel-max', `${maxDeckel}px`);
-    geraet.style.setProperty('--fuss-max', `${maxFuss}px`);
-    geraet.style.setProperty('--schirm-b', `${b}px`);
-    geraet.style.setProperty('--schirm-h', `${h}px`);
-    gsap.set(geraet, epoche(0));
 
-    // Sichtbare Höhe für den Inhalt: Bildschirm minus Browserleiste.
-    const hInhalt = flaeche.clientHeight || h;
+    // Maßstab des Gehäuses und Größe des Bildschirms
+    const m = handy() ? 0.34 : innerWidth < 1000 ? 0.5 : 0.62;
+    const randMax = Math.max(...EPOCHEN.map((e) => e.rand)) * m;
+    const luft = handy() ? 6 : 40;
+    const b = Math.min(1100, innerWidth - 2 * (randMax + luft), handy() ? Infinity : (verfuegbarH - gehaeuseHoehe(m)) * 1.7);
+    const hLesen = Math.max(260, verfuegbarH - gehaeuseHoehe(m) - (handy() ? 10 : 24));
+    // Querformat wie ein echter Monitor (nur Handy, beim Epochenwechsel und am Anfang)
+    const hQuer = Math.min(hLesen, Math.round(b * 0.78));
+    const mitQuer = handy() && hQuer < hLesen - 40;
+
+    massstab = m;
+    // Platz über und unter dem Bildschirm, damit das ganze Gerät (mit Deckel und Fuß) mittig steht
+    const oben = Math.max(...EPOCHEN.map((e) => e.oben + (e.deckel ?? 0) * 64)) * m;
+    const unten = Math.max(...EPOCHEN.map((e, i) => e.rand + e.kinn + (FUSS[`fuss-${i}`]?.h ?? 0))) * m;
+    geraet.style.marginTop = `${oben}px`;
+    geraet.style.marginBottom = `${unten}px`;
+    delete geraet.dataset.epoche;
+    geraet.style.setProperty('--m', String(m));
+    geraet.style.setProperty('--schirm-b', `${b}px`);
+    gsap.set(geraet, { '--schirm-h': `${hLesen}px`, scale: 1, '--woelbung': EPOCHEN[0].woelbung, '--leuchten': 0 });
+    gehaeuse.forEach((el, i) => gsap.set(el, { opacity: i === 0 ? 1 : 0 }));
+
+    // Sichtbare Höhe für den Inhalt im Lesezustand: Bildschirm minus Browserleiste.
+    const hInhalt = flaeche.clientHeight || hLesen;
     const dreh = Math.round(hInhalt * DREH_WEG);
     starts = [];
     innen = [];
     let pos = 0;
 
     tl = gsap.timeline({ defaults: { ease: 'none' } });
+
+    // Auftakt auf dem Handy: erst der ganze Monitor im Querformat, beim ersten Scrollen wird er zum Lesebildschirm.
+    if (mitQuer) {
+      const auftakt = Math.round(hLesen * 0.35);
+      tl.fromTo(geraet, { '--schirm-h': `${hQuer}px` }, { '--schirm-h': `${hLesen}px`, duration: auftakt, ease: 'power1.inOut' }, 0);
+      pos += auftakt;
+    }
+
     seiten.forEach((seite, i) => {
       const inhalt = seite.firstElementChild as HTMLElement;
       gsap.set(seite, { transformOrigin: `50% 50% ${-hInhalt / 2}px`, rotateX: 0, opacity: i === 0 ? 1 : 0 });
@@ -156,9 +134,23 @@ export function starteMonitor() {
       pos += weg;
       const naechste = seiten[i + 1];
       if (naechste) {
+        const e = Math.min(i + 1, EPOCHEN.length - 1);
         tl!.to(seite, { rotateX: DREH_WINKEL, opacity: 0, duration: dreh }, pos);
         tl!.fromTo(naechste, { rotateX: -DREH_WINKEL, opacity: 0 }, { rotateX: 0, opacity: 1, duration: dreh }, pos);
-        tl!.to(geraet, { ...epoche(i + 1), duration: dreh }, pos);
+        // Gehäuse überblenden
+        const alt = gehaeuse.get(Math.min(i, EPOCHEN.length - 1));
+        const neu = gehaeuse.get(e);
+        if (alt && alt !== neu) tl!.to(alt, { opacity: 0, duration: dreh * 0.5 }, pos + dreh * 0.25);
+        if (neu && alt !== neu) tl!.to(neu, { opacity: 1, duration: dreh * 0.5 }, pos + dreh * 0.25);
+        tl!.to(geraet, { '--woelbung': EPOCHEN[e].woelbung ?? 0, '--leuchten': e === EPOCHEN.length - 1 ? 1 : 0, duration: dreh }, pos);
+        // Kurz herauszoomen, damit man das ganze Gerät sieht
+        if (mitQuer) {
+          tl!.to(geraet, { '--schirm-h': `${hQuer}px`, duration: dreh * 0.45, ease: 'power1.inOut' }, pos);
+          tl!.to(geraet, { '--schirm-h': `${hLesen}px`, duration: dreh * 0.45, ease: 'power1.inOut' }, pos + dreh * 0.55);
+        } else {
+          tl!.to(geraet, { scale: 0.9, duration: dreh * 0.5, ease: 'power1.inOut' }, pos);
+          tl!.to(geraet, { scale: 1, duration: dreh * 0.5, ease: 'power1.inOut' }, pos + dreh * 0.5);
+        }
         pos += dreh;
       }
     });
@@ -174,6 +166,11 @@ export function starteMonitor() {
       return i;
     };
 
+    // Bereiche, in denen nicht gelesen wird (Auftakt und Drehungen): dort nie stehen bleiben.
+    const zwischen: [number, number][] = [];
+    if (mitQuer) zwischen.push([0, starts[0]]);
+    for (let n = 1; n < starts.length; n++) zwischen.push([starts[n] - dreh, starts[n]]);
+
     ScrollTrigger.create({
       animation: tl,
       trigger: buehne,
@@ -181,25 +178,23 @@ export function starteMonitor() {
       end: () => `+=${gesamt}`,
       scrub: true,
       onUpdate: (st) => setzeAktiv(abschnittBei(st.progress * gesamt)),
-      // Nie mitten in einer Drehung stehen bleiben, beim Lesen aber nie springen.
       snap: {
         // GSAP übergibt eine aus der Wischgeschwindigkeit hochgerechnete Zielposition.
         // Wir rechnen bewusst mit der echten Position, damit es nie weit springt.
         snapTo: (p, st) => {
           const echt = st ? st.progress : p;
           const rel = echt * gesamt;
-          for (let n = 1; n < starts.length; n++) {
-            const ende = starts[n];
-            const anfang = ende - dreh;
+          for (const [anfang, ende] of zwischen) {
             if (rel > anfang && rel < ende) {
+              const laenge = ende - anfang;
               const richtung = st?.direction ?? 1;
-              const ziel = richtung > 0 ? (rel - anfang > dreh * 0.15 ? ende : anfang) : (ende - rel > dreh * 0.15 ? anfang : ende);
+              const ziel = richtung > 0 ? (rel - anfang > laenge * 0.15 ? ende : anfang) : (ende - rel > laenge * 0.15 ? anfang : ende);
               return ziel / gesamt;
             }
           }
           return echt;
         },
-        duration: { min: 0.2, max: 0.45 },
+        duration: { min: 0.2, max: 0.5 },
         delay: 0.08,
         ease: 'power2.out',
       },
@@ -219,14 +214,13 @@ export function starteMonitor() {
 
   /** Scrollt so, dass ein Abschnitt (und optional ein Element darin) sichtbar ist. */
   function zeige(i: number, element?: HTMLElement) {
-    const start = buehnenStart();
     let versatz = 0;
     if (element) {
       const inhalt = seiten[i].firstElementChild as HTMLElement;
       const oben = element.getBoundingClientRect().top - inhalt.getBoundingClientRect().top;
       versatz = Math.min(Math.max(0, oben - 80), innen[i]);
     }
-    scrollTo({ top: start + starts[i] + versatz, behavior: 'instant' as ScrollBehavior });
+    scrollTo({ top: buehnenStart() + starts[i] + versatz, behavior: 'instant' as ScrollBehavior });
   }
 
   // Interne Sprungmarken (#leistungen usw.) führen zur passenden Stelle im Rad.

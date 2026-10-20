@@ -11,43 +11,81 @@ import { kiStufen, kiMehrwert } from '../content/ki-stufen';
   lead="Ein digitaler Kollege, der in deinem Betrieb mitarbeitet: Er kennt eure Unterlagen, ist per Handy erreichbar, auch abends, und übernimmt wiederkehrende Aufgaben. Wie viel er kann, hängt davon ab, wie gut wir ihn einarbeiten. Genau wie bei einem neuen Teammitglied."
   schemaName="KI-Mitarbeiter für Betriebe"
 >
-  <section class="section" aria-labelledby="stufen-titel">
-    <div class="wrap">
-      <p class="eyebrow">Vier Stufen</p>
-      <h2 id="stufen-titel">Wie viel Verantwortung soll er bekommen?</h2>
-      <ol class="stufen">
-        {
-          kiStufen.map((s, i) => (
-            <li class="stufe" id={s.id}>
-              <p class="stufe-nr">Stufe {i + 1}</p>
+  <section class="section stufen-bereich" aria-labelledby="stufen-titel" data-stufen>
+    <div class="wrap stufen-kopf">
+      <div>
+        <p class="eyebrow">Vier Stufen</p>
+        <h2 id="stufen-titel">Wie viel Verantwortung soll er bekommen?</h2>
+      </div>
+      <div class="stufen-steuerung">
+        <button class="stufen-pfeil" type="button" data-stufe-zurueck aria-label="Vorherige Stufe">←</button>
+        <div class="stufen-punkte">
+          {kiStufen.map((s, i) => <button type="button" class="stufen-punkt" data-stufe-punkt={i} aria-label={`Stufe ${i + 1}: ${s.titel}`} />)}
+        </div>
+        <button class="stufen-pfeil" type="button" data-stufe-weiter aria-label="Nächste Stufe">→</button>
+      </div>
+    </div>
+    <ol class="stufen-spur" aria-label="Die vier Stufen">
+      {
+        kiStufen.map((s, i) => (
+          <li class="stufe" id={s.id}>
+            <div class="stufe-titel">
+              <p class="stufe-nr">Stufe {i + 1} von {kiStufen.length}</p>
               <h3>{s.titel}</h3>
               <p class="stufe-motto">{s.motto}</p>
-              <p>{s.kann}</p>
-              <p class="stufe-beispiel"><span>Zum Beispiel:</span> {s.beispiel}</p>
-              <dl>
-                <dt>Aufwand der Einrichtung</dt>
-                <dd>
+            </div>
+            <div class="stufe-buehne">
+              <div class="figur">
+                <p class="sprechblase">{s.beispiel}</p>
+                <img
+                  src={`/ki/figur-${i}.webp`}
+                  alt={`KI-Mitarbeiter auf Stufe ${s.titel}`}
+                  width="600"
+                  height="600"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+                <canvas data-figur={i} aria-hidden="true" />
+              </div>
+              <ul class="faehigkeiten" aria-label="Fähigkeiten">
+                {s.faehigkeiten.map((f) => (
+                  <li>{f}</li>
+                ))}
+              </ul>
+            </div>
+            <div class="stufe-unten">
+              <p class="stufe-kann">{s.kann}</p>
+              <h4>Einsatzbeispiele</h4>
+              <ul class="einsatz">
+                {s.einsatz.map((e) => (
+                  <li>{e}</li>
+                ))}
+              </ul>
+              <div class="stufe-fakten">
+                <p>
+                  <span class="fakt-label">Aufwand der Einrichtung</span>
                   <span class="aufwand" aria-hidden="true">
                     {[1, 2, 3, 4].map((n) => (
                       <span class={n <= s.aufwandStufe ? 'an' : undefined} />
                     ))}
                   </span>
                   {s.aufwand}
-                </dd>
-                <dt>Was er von dir braucht</dt>
-                <dd>
+                </p>
+                <details>
+                  <summary>Was er von dir braucht</summary>
                   <ul>
                     {s.unterlagen.map((u) => (
                       <li>{u}</li>
                     ))}
                   </ul>
-                </dd>
-              </dl>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
+                </details>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="stufen-tipp wrap" aria-hidden="true">Zur Seite wischen für die nächste Stufe</p>
   </section>
 
   <section class="section" aria-labelledby="mehrwert-titel">
@@ -86,3 +124,8 @@ import { kiStufen, kiMehrwert } from '../content/ki-stufen';
     </div>
   </section>
 </Leistung>
+
+<script>
+  import { starteKiSeite } from '../scripts/ki-seite';
+  starteKiSeite();
+</script>

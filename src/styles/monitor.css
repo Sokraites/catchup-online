@@ -28,26 +28,14 @@
   position: relative;
   width: var(--schirm-b);
   height: var(--schirm-h);
-  /* Gehäusekante, Fuß und Deckel brauchen Platz außen herum. */
-  margin-top: var(--deckel-max, 0px);
-  margin-bottom: calc(var(--kinn-max, 0px) + var(--fuss-max, 0px));
   --leiste-h: 52px;
-  /* Zeit-Werte (Startwerte = großer Röhrenmonitor) */
-  --rand: 46px;
-  --kinn: 34px;
-  --deckel: 30px;
-  --rand-farbe: #d6cdb4;
-  --fuss-farbe: #c4bba2;
-  --schirm-radius: 34px;
-  --hals-h: 0px;
-  --hals-b: 0%;
-  --sockel-b: 55%;
-  --sockel-h: 18px;
-  --knoepfe: 1;
-  --led: 1;
+  /* Maßstab: Bild-Pixel des Gehäuses → Bildschirm-Pixel (setzt das Skript je Gerätegröße) */
+  --m: 0.72;
   --woelbung: 1;
-  --tiefe: 1;
   --leuchten: 0;
+  box-shadow: 0 0 calc(90px * var(--leuchten)) calc(8px * var(--leuchten)) rgb(124 77 255 / 0.45);
+  border-radius: 16px;
+  will-change: transform;
 }
 @media (max-width: 599px) {
   .monitor-an .monitor-geraet {
@@ -55,95 +43,70 @@
   }
 }
 
-/* Gehäuse: Rahmen und Kinn sind ein Teil, mit Lichtkante oben und Schatten unten. */
-.monitor-an .monitor-rahmen {
-  position: absolute;
-  top: calc(var(--rand) * -1);
-  left: calc(var(--rand) * -1);
-  right: calc(var(--rand) * -1);
-  bottom: calc((var(--rand) + var(--kinn)) * -1);
-  border-radius: calc(var(--schirm-radius) * 0.55 + var(--rand) * 0.45);
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--rand-farbe), #fff 22%) 0%,
-      var(--rand-farbe) 18%,
-      var(--rand-farbe) 70%,
-      color-mix(in srgb, var(--rand-farbe), #000 22%) 100%
-    );
-  box-shadow:
-    inset 0 2px 1px rgb(255 255 255 / 0.35),
-    inset 0 -3px 6px rgb(0 0 0 / 0.3),
-    inset 2px 0 3px rgb(255 255 255 / 0.12),
-    inset -2px 0 3px rgb(0 0 0 / 0.15),
-    0 calc(40px * var(--tiefe) + 10px) calc(80px * var(--tiefe) + 20px) calc(-10px) rgb(0 0 0 / 0.7),
-    0 0 calc(90px * var(--leuchten)) calc(8px * var(--leuchten)) rgb(124 77 255 / 0.45);
+/* Gehäuse je Epoche: gerenderte Bilder, der Rahmen dehnt sich (9-Slice) um den Bildschirm. */
+.mg {
+  display: none;
 }
-.monitor-an .monitor-knoepfe {
+.monitor-an .mg {
+  display: block;
   position: absolute;
-  left: calc(var(--rand) + 6px);
-  bottom: calc(var(--kinn) * 0.5 - 5px);
-  display: flex;
-  gap: 7px;
-  opacity: var(--knoepfe);
+  inset: 0;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
 }
-.monitor-an .monitor-knoepfe i {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.5), rgb(0 0 0 / 0.25) 70%);
-  box-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
+.monitor-an .mg[data-mg='0'] {
+  opacity: 1;
 }
-.monitor-an .monitor-led {
+.monitor-an .mg-rahmen {
   position: absolute;
-  right: calc(var(--rand) + 8px);
-  bottom: calc(var(--kinn) * 0.5 - 3px);
+  top: calc(var(--o) * var(--m) * -1px);
+  left: calc(var(--r) * var(--m) * -1px);
+  right: calc(var(--r) * var(--m) * -1px);
+  bottom: calc(var(--u) * var(--m) * -1px);
+  border-style: solid;
+  border-color: transparent;
+  border-width: calc(var(--o) * var(--m) * 1px) calc(var(--r) * var(--m) * 1px) calc(var(--u) * var(--m) * 1px);
+  border-image-slice: var(--o) var(--r) var(--u);
+  border-image-repeat: stretch;
+  border-radius: calc(var(--ra) * var(--m) * 1px);
+  box-shadow: 0 calc(40px * var(--m)) calc(90px * var(--m)) calc(-10px * var(--m)) rgb(0 0 0 / 0.75);
+}
+/* Oberseite des Röhrenmonitors, die nach hinten wegläuft (wir schauen leicht von oben) */
+.monitor-an .mg-deckel {
+  position: absolute;
+  left: calc(var(--r) * var(--m) * -1px + 5%);
+  right: calc(var(--r) * var(--m) * -1px + 5%);
+  bottom: calc(100% + var(--o) * var(--m) * 1px - 3px);
+  height: calc(var(--d) * 64px * var(--m));
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, var(--farbe-dunkel), color-mix(in srgb, var(--farbe), #000 12%));
+}
+.monitor-an .mg-knoepfe {
+  position: absolute;
+  right: calc(var(--r) * var(--m) * 1px);
+  bottom: calc(var(--u) * var(--m) * -0.5px - var(--kh) * var(--m) * 0.5px);
+  width: calc(var(--kb) * var(--m) * 1px);
+  height: auto;
+}
+.monitor-an .mg-led {
+  position: absolute;
+  left: calc(var(--r) * var(--m) * 0.4px);
+  bottom: calc(var(--u) * var(--m) * -0.5px - 3px);
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #4cd18a;
   box-shadow: 0 0 6px 1px #4cd18a;
-  opacity: var(--led);
 }
-
-/* Deckel: die Oberseite des Gehäuses, die nach hinten wegläuft (wir schauen leicht von oben). */
-.monitor-an .monitor-deckel {
+.monitor-an .mg-fuss {
   position: absolute;
-  left: calc(var(--rand) * -1 + 3%);
-  right: calc(var(--rand) * -1 + 3%);
-  bottom: calc(100% + var(--rand) - 2px);
-  height: var(--deckel);
-  clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--rand-farbe), #000 38%),
-    color-mix(in srgb, var(--rand-farbe), #000 12%)
-  );
-}
-
-/* Standfuß: Hals und Sockel */
-.monitor-an .monitor-fuss {
-  position: absolute;
-  top: calc(100% + var(--rand) + var(--kinn) - 2px);
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-}
-.monitor-an .monitor-hals {
-  width: var(--hals-b);
-  height: var(--hals-h);
-  background: linear-gradient(90deg, rgb(0 0 0 / 0.35), rgb(255 255 255 / 0.12) 45%, rgb(0 0 0 / 0.3)), var(--fuss-farbe);
-}
-.monitor-an .monitor-sockel {
-  width: var(--sockel-b);
-  height: var(--sockel-h);
-  border-radius: 6px 6px 50% 50% / 6px 6px 100% 100%;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--fuss-farbe), #fff 20%), var(--fuss-farbe) 40%, color-mix(in srgb, var(--fuss-farbe), #000 30%));
-  box-shadow: 0 10px 24px rgb(0 0 0 / 0.55);
+  z-index: -1;
+  left: 50%;
+  top: calc(100% + var(--u) * var(--m) * 1px - 8px * var(--m));
+  width: calc(var(--fb) * var(--m) * 1px);
+  height: auto;
+  transform: translateX(-50%);
 }
 
 /* Bildschirm */
@@ -151,7 +114,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  border-radius: var(--schirm-radius);
+  border-radius: var(--schirm-radius, 12px);
   background: #0b0b10;
   /* dunkle Kante, wo Glas und Gehäuse aufeinandertreffen */
   box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55);
@@ -167,7 +130,7 @@
 .monitor-an .monitor-glas {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 2;
   pointer-events: none;
   border-radius: var(--schirm-radius);
   background:
@@ -506,10 +469,3 @@
   pointer-events: none;
 }
 
-/* Auf dem Handy kein Standfuß und keine Knöpfe: jeder Millimeter gehört dem Inhalt. */
-@media (max-width: 599px) {
-  .monitor-an .monitor-fuss,
-  .monitor-an .monitor-knoepfe {
-    display: none;
-  }
-}

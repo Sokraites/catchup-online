@@ -1,0 +1,194 @@
+<!doctype html>
+<!--
+  Render-Werkzeug (nur für die Entwicklung): baut die Monitor-Epochen als 3D-Modelle
+  und gibt Rahmen, Knöpfe und Fuß als Bilder mit durchsichtigem Hintergrund aus.
+  Wird von scripts/monitore-rendern.mjs im Browser ohne Fenster aufgerufen.
+-->
+<meta charset="utf-8" />
+<script type="importmap">
+  { "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+<canvas id="c"></canvas>
+<script type="module">
+  import * as THREE from 'three';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+  const konfig = await (await fetch('/src/config/monitore.json')).json();
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(1);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.72;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const umgebung = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+  function szene() {
+    const s = new THREE.Scene();
+    s.environment = umgebung;
+    s.environmentIntensity = 0.45;
+    const haupt = new THREE.DirectionalLight(0xffffff, 1.5);
+    haupt.position.set(-400, 700, 900);
+    s.add(haupt);
+    const fuell = new THREE.DirectionalLight(0xffffff, 0.35);
+    fuell.position.set(500, -200, 600);
+    s.add(fuell);
+    return s;
+  }
+
+  function kunststoff(e, farbe = e.farbe) {
+    return new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(farbe),
+      roughness: e.rauheit ?? 0.5,
+      metalness: e.metall ?? 0,
+      clearcoat: e.klarlack ?? 0,
+      clearcoatRoughness: 0.35,
+    });
+  }
+
+  function rundesRechteck(pfad, x, y, b, h, r) {
+    pfad.moveTo(x + r, y);
+    pfad.lineTo(x + b - r, y);
+    pfad.quadraticCurveTo(x + b, y, x + b, y + r);
+    pfad.lineTo(x + b, y + h - r);
+    pfad.quadraticCurveTo(x + b, y + h, x + b - r, y + h);
+    pfad.lineTo(x + r, y + h);
+    pfad.quadraticCurveTo(x, y + h, x, y + h - r);
+    pfad.lineTo(x, y + r);
+    pfad.quadraticCurveTo(x, y, x + r, y);
+    return pfad;
+  }
+
+  /** Rahmen mit Loch, gerade von vorn. Ein Pixel im Bild = eine Einheit. */
+  function rahmen(e) {
+    const L = konfig.loch;
+    const B = L.b + 2 * e.rand;
+    const H = L.h + e.oben + e.rand + e.kinn;
+    const s = szene();
+    const bevel = Math.min(14, e.rand * 0.4);
+    const aussen = rundesRechteck(new THREE.Shape(), -B / 2 + bevel, -H / 2 + bevel, B - 2 * bevel, H - 2 * bevel, Math.max(1, e.radiusAussen - bevel));
+    // Loch (Bildschirm): oben e.oben, unten e.rand + e.kinn Abstand vom Außenrand
+    const lx = -L.b / 2 - bevel;
+    const ly = -H / 2 + e.rand + e.kinn - bevel;
+    aussen.holes.push(rundesRechteck(new THREE.Path(), lx, ly, L.b + 2 * bevel, L.h + 2 * bevel, e.radiusLoch + bevel));
+    const geo = new THREE.ExtrudeGeometry(aussen, { depth: 40, bevelEnabled: true, bevelThickness: bevel * 1.2, bevelSize: bevel, bevelSegments: 8, curveSegments: 24 });
+    s.add(new THREE.Mesh(geo, kunststoff(e)));
+
+    // Schräge nach innen zum Bildschirm (dunkler, leicht vertieft)
+    if (e.schraege > 0) {
+      const sw = e.schraege;
+      const ring = rundesRechteck(new THREE.Shape(), -L.b / 2 - sw, -H / 2 + e.rand + e.kinn - sw, L.b + 2 * sw, L.h + 2 * sw, e.radiusLoch + sw);
+      ring.holes.push(rundesRechteck(new THREE.Path(), -L.b / 2, -H / 2 + e.rand + e.kinn, L.b, L.h, e.radiusLoch));
+      const rgeo = new THREE.ExtrudeGeometry(ring, { depth: 6, bevelEnabled: true, bevelThickness: sw * 0.9, bevelSize: sw * 0.25, bevelSegments: 6, curveSegments: 24 });
+      const m = new THREE.Mesh(rgeo, kunststoff({ ...e, rauheit: 0.6, klarlack: 0 }, e.lochFarbe));
+      m.position.z = 18;
+      s.add(m);
+    }
+
+    // Kinn in anderer Farbe (z. B. Aluminium unter schwarzem Rahmen)
+    if (e.kinnFarbe) {
+      const kg = new RoundedBoxGeometry(B, e.kinn + e.rand, 46, 6, 4);
+      const km = new THREE.Mesh(kg, kunststoff({ ...e, metall: 0.8, rauheit: 0.35, klarlack: 0.2 }, e.kinnFarbe));
+      km.position.set(0, -H / 2 + (e.kinn + e.rand) / 2, 30);
+      s.add(km);
+    }
+
+    const kamera = new THREE.OrthographicCamera(-B / 2, B / 2, H / 2, -H / 2, 1, 5000);
+    kamera.position.set(0, 0, 1500);
+    kamera.lookAt(0, 0, 0);
+    return { s, kamera, b: B, h: H };
+  }
+
+  /** Knöpfe und Regler für das Kinn. */
+  function knoepfe(e) {
+    const s = szene();
+    const n = e.knoepfe;
+    const d = 16;
+    const abstand = 26;
+    const B = n * abstand + 20;
+    const H = 40;
+    for (let i = 0; i < n; i++) {
+      const g = new THREE.CylinderGeometry(d / 2, d / 2 + 1, 8, 32);
+      const m = new THREE.Mesh(g, kunststoff({ ...e, rauheit: 0.45 }, e.knopfFarbe));
+      m.rotation.x = Math.PI / 2;
+      m.position.set(-B / 2 + 10 + abstand / 2 + i * abstand, 0, 4);
+      s.add(m);
+    }
+    const kamera = new THREE.OrthographicCamera(-B / 2, B / 2, H / 2, -H / 2, 1, 2000);
+    kamera.position.set(0, 0, 500);
+    return { s, kamera, b: B, h: H };
+  }
+
+  /** Standfuß, leicht von oben gesehen. Breite bezogen auf die Rahmenbreite. */
+  function fuss(e) {
+    const s = szene();
+    const L = konfig.loch;
+    const B = L.b + 2 * e.rand;
+    const mat = kunststoff({ ...e, rauheit: e.metall > 0.4 ? 0.3 : e.rauheit }, e.fussFarbe);
+    const teile = [];
+    let hoehe = 0;
+    if (e.fuss.startsWith('schwenk')) {
+      const breit = e.fuss === 'schwenk' ? B * 0.52 : B * 0.42;
+      const sockel = new THREE.Mesh(new THREE.CylinderGeometry(breit / 2, breit / 2 + 6, 26, 64), mat);
+      sockel.scale.z = 0.38;
+      sockel.position.y = -13;
+      const hals = new THREE.Mesh(new THREE.CylinderGeometry(breit * 0.3, breit * 0.36, 22, 64), mat);
+      hals.scale.z = 0.3;
+      hals.position.y = 10;
+      teile.push(sockel, hals);
+      hoehe = 60;
+    } else if (e.fuss === 'hals-oval' || e.fuss === 'hals-rund') {
+      const rund = e.fuss === 'hals-rund';
+      const hals = new THREE.Mesh(new RoundedBoxGeometry(rund ? 64 : 80, 120, 24, 4, 6), mat);
+      hals.position.y = 50;
+      const sockel = new THREE.Mesh(new THREE.CylinderGeometry(rund ? B * 0.17 : B * 0.2, rund ? B * 0.18 : B * 0.21, 14, 64), mat);
+      sockel.scale.z = rund ? 0.55 : 0.42;
+      sockel.position.y = -17;
+      teile.push(hals, sockel);
+      hoehe = 150;
+    } else if (e.fuss === 'alu') {
+      const hals = new THREE.Mesh(new RoundedBoxGeometry(110, 160, 10, 3, 3), mat);
+      hals.rotation.x = -0.22;
+      hals.position.set(0, 60, -14);
+      const sockel = new THREE.Mesh(new RoundedBoxGeometry(B * 0.3, 8, 120, 3, 4), mat);
+      sockel.position.y = -20;
+      teile.push(hals, sockel);
+      hoehe = 180;
+    }
+    teile.forEach((t) => s.add(t));
+    const BB = B * 0.62;
+    const HH = hoehe + 60;
+    const kamera = new THREE.OrthographicCamera(-BB / 2, BB / 2, HH / 2, -HH / 2, 1, 5000);
+    // leicht von oben
+    kamera.position.set(0, 700, 1500);
+    kamera.lookAt(0, hoehe / 2 - 40, 0);
+    kamera.top = HH / 2;
+    kamera.bottom = -HH / 2;
+    kamera.updateProjectionMatrix();
+    return { s, kamera, b: BB, h: HH };
+  }
+
+  function rendere({ s, kamera, b, h }) {
+    canvas.width = Math.round(b);
+    canvas.height = Math.round(h);
+    renderer.setSize(Math.round(b), Math.round(h), false);
+    renderer.setClearColor(0x000000, 0);
+    renderer.render(s, kamera);
+    return { daten: canvas.toDataURL('image/webp', 0.9), b: canvas.width, h: canvas.height };
+  }
+
+  window.rendereAlles = () => {
+    const ergebnis = {};
+    konfig.epochen.forEach((e, i) => {
+      if (!e.rand) return;
+      ergebnis[`rahmen-${i}`] = rendere(rahmen(e));
+      if (e.knoepfe) ergebnis[`knoepfe-${i}`] = rendere(knoepfe(e));
+      if (e.fuss && e.fuss !== 'keiner') ergebnis[`fuss-${i}`] = rendere(fuss(e));
+    });
+    return ergebnis;
+  };
+  window.bereit = true;
+</script>

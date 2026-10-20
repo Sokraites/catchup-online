@@ -53,10 +53,10 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 ## Phase D2 (neu): KI-Mitarbeiter-Unterseite
 
-- [ ] Vier Stufen als Karten mit echtem Text (Praktikant, Azubi, Mitarbeiter, Teamleiter-Niveau)
-- [ ] Handy: seitliches Durchwischen wie bei Bildergalerien
-- [ ] Desktop: beim Scrollen kommen die Stufen von rechts herein
-- [ ] 3D-Figuren pro Stufe, unterschiedlich professionell, mit einladenden Animationen (Three.js, nur auf dieser Seite geladen)
+- [x] Vier Stufen als Karten mit echtem Text (Praktikant, Azubi, Mitarbeiter, Teamleiter-Niveau)
+- [x] Handy: seitliches Durchwischen wie bei Bildergalerien
+- [x] Desktop: beim Scrollen kommen die Stufen von rechts herein
+- [x] 3D-Figuren pro Stufe, unterschiedlich professionell, mit einladenden Animationen (Three.js, nur auf dieser Seite geladen)
 - [ ] Ruhige Variante bei reduzierter Bewegung, Bedienung per Tastatur
 
 ## Phase D3 (neu): Terminbuch
@@ -90,6 +90,7 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 - `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
 - `npm run vorschau`: baut aus `dist/` eine Fassung mit relativen Links in `.vorschau/` (für die private Vorschau).
+- `npm run monitore`: rendert Monitor-Gehäuse und KI-Figuren-Standbilder aus den 3D-Modellen neu.
 - `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.
 
 ## Bekannte Lücken (laufend)

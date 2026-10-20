@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import StartInhalt from '../../components/StartInhalt.astro';
 import BrowserLeisten from '../../components/BrowserLeisten.astro';
+import MonitorGehaeuse from '../../components/MonitorGehaeuse.astro';
 import '../../styles/monitor.css';
 ---
 
@@ -13,12 +14,6 @@ import '../../styles/monitor.css';
   <div class="buehne" data-monitor>
     <div class="monitor">
       <div class="monitor-geraet" data-epoche="0">
-        <div class="monitor-deckel" aria-hidden="true"></div>
-        <div class="monitor-rahmen" aria-hidden="true">
-          <span class="monitor-knoepfe"><i></i><i></i><i></i></span>
-          <span class="monitor-led"></span>
-        </div>
-        <div class="monitor-fuss" aria-hidden="true"><span class="monitor-hals"></span><span class="monitor-sockel"></span></div>
         <div class="monitor-schirm">
           <BrowserLeisten />
           <div class="monitor-flaeche">
@@ -26,6 +21,7 @@ import '../../styles/monitor.css';
           </div>
         </div>
         <div class="monitor-glas" aria-hidden="true"></div>
+        <MonitorGehaeuse />
       </div>
       <p class="monitor-tipp" aria-hidden="true">Scrollen</p>
     </div>

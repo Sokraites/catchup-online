@@ -668,64 +668,303 @@ span.button {
   padding-bottom: 0.5rem;
 }
 
-/* KI-Stufen (Grundfassung ohne Effekte) */
-.stufen {
+/* KI-Stufen: seitlich wischbare Spur, je Stufe Figur in der Mitte, Fähigkeiten drumherum */
+.stufen-bereich {
+  overflow: hidden;
+}
+.stufen-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+}
+.stufen-kopf h2 {
+  margin-bottom: 0;
+}
+.stufen-steuerung {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.stufen-pfeil {
   display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.stufen-pfeil:hover {
+  border-color: var(--accent);
+}
+.stufen-punkte {
+  display: flex;
+}
+.stufen-punkt {
+  width: 28px;
+  height: 44px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  position: relative;
+}
+.stufen-punkt::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background-color 0.2s, transform 0.2s;
+}
+.stufen-punkt[aria-current='true']::after {
+  background: var(--accent-2);
+  transform: scale(1.4);
+}
+.stufen-spur {
+  display: flex;
   gap: 1rem;
-  margin: 2.5rem 0 0;
-  padding: 0;
+  margin: 2rem 0 0;
+  padding: 0 var(--gutter) 0.5rem;
   list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.stufen-spur::-webkit-scrollbar {
+  display: none;
 }
 .stufe {
-  padding: 1.5rem;
-  background: var(--surface);
+  flex: 0 0 calc(100% - 2 * var(--gutter));
+  max-width: 62rem;
+  scroll-snap-align: center;
+  padding: 1.25rem;
+  background: rgb(21 21 30 / 0.85);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) + 6px);
 }
-.stufe h3 {
-  font-size: 1.6rem;
-  margin-bottom: 0.25rem;
+.stufe-titel {
+  text-align: center;
 }
 .stufe-nr {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.25rem;
   color: var(--accent-2);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-}
-.stufe-motto {
-  color: var(--accent-2);
-  font-style: italic;
-}
-.stufe-beispiel {
-  padding: 0.75rem 0.9rem;
-  border-radius: 10px;
-  background: rgb(124 77 255 / 0.1);
-  color: var(--ink);
-  font-size: 0.95rem;
-}
-.stufe-beispiel span {
-  display: block;
-  color: var(--accent-2);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.stufe dl {
-  margin: 1.25rem 0 0;
+.stufe h3 {
+  margin-bottom: 0.25rem;
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
 }
-.stufe dt {
-  margin-top: 1rem;
+.stufe-motto {
+  margin: 0;
+  color: var(--accent-2);
+}
+
+/* Bühne: Figur in der Mitte, Fähigkeiten links und rechts */
+.stufe-buehne {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(140px, 42vw, 300px) minmax(0, 1fr);
+  grid-template-rows: repeat(3, auto);
+  align-items: center;
+  gap: 0.5rem 0.5rem;
+  margin: 1rem 0;
+}
+.figur {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 100%;
+}
+.figur img,
+.figur canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.figur canvas {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.figur.figur-live canvas {
+  opacity: 1;
+}
+.figur.figur-live img {
+  opacity: 0;
+}
+.sprechblase {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: -0.25rem;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(17rem, 80vw);
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+.sprechblase::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-bottom: 0;
+  border-top-color: var(--ink);
+}
+.faehigkeiten {
+  display: contents;
+  list-style: none;
+}
+.faehigkeiten li {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgb(169 139 255 / 0.35);
+  border-radius: 10px;
+  background: rgb(124 77 255 / 0.12);
+  color: var(--ink);
+  font-size: clamp(0.72rem, 2.9vw, 0.9rem);
+  line-height: 1.25;
+  text-align: center;
+  hyphens: auto;
+}
+.faehigkeiten li:nth-child(-n + 3) {
+  grid-column: 1;
+}
+.faehigkeiten li:nth-child(n + 4) {
+  grid-column: 3;
+}
+.faehigkeiten li:nth-child(1),
+.faehigkeiten li:nth-child(4) {
+  grid-row: 1;
+}
+.faehigkeiten li:nth-child(2),
+.faehigkeiten li:nth-child(5) {
+  grid-row: 2;
+}
+.faehigkeiten li:nth-child(3),
+.faehigkeiten li:nth-child(6) {
+  grid-row: 3;
+}
+/* Die mittleren Fähigkeiten etwas nach außen, damit es wie ein Kreis um die Figur wirkt */
+.faehigkeiten li:nth-child(2) {
+  margin-right: 0.75rem;
+}
+.faehigkeiten li:nth-child(5) {
+  margin-left: 0.75rem;
+}
+
+/* Handy: Sprechblase über der Figur, zwei Fähigkeiten darüber, vier darunter */
+@media (max-width: 599px) {
+  .stufe-buehne {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+  }
+  .figur {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: min(62vw, 240px);
+    justify-self: center;
+    margin-top: 3.25rem;
+  }
+  .faehigkeiten li:nth-child(n) {
+    grid-column: auto;
+    grid-row: auto;
+    margin: 0;
+    font-size: 0.82rem;
+  }
+  .faehigkeiten li:nth-child(1) {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .faehigkeiten li:nth-child(2) {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .sprechblase {
+    top: -3.25rem;
+  }
+}
+
+.stufe-kann {
+  color: var(--muted);
+}
+.stufe-unten h4 {
+  margin: 1.25rem 0 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.einsatz {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.einsatz li {
+  position: relative;
+  padding: 0.6rem 0.75rem 0.6rem 2rem;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 0.95rem;
+}
+.einsatz li::before {
+  content: '→';
+  position: absolute;
+  left: 0.75rem;
+  color: var(--accent-2);
+}
+.stufe-fakten {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+}
+.stufe-fakten p {
+  margin: 0;
+}
+.fakt-label {
+  display: block;
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.stufe dd {
-  margin: 0.35rem 0 0;
+.stufe-fakten summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--accent-2);
+  cursor: pointer;
 }
-.stufe dd ul {
+.stufe-fakten details ul {
   margin: 0;
   padding-left: 1.1rem;
 }
@@ -744,14 +983,47 @@ span.button {
 .aufwand span.an {
   background: var(--accent-2);
 }
-@media (min-width: 48rem) {
-  .stufen {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.stufen-tipp {
+  margin: 0.75rem auto 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: center;
 }
-@media (min-width: 72rem) {
-  .stufen {
-    grid-template-columns: repeat(4, 1fr);
+@media (min-width: 60rem) {
+  .stufe {
+    padding: 2rem 2.5rem;
+  }
+  .stufe-buehne {
+    grid-template-columns: minmax(0, 1fr) 300px minmax(0, 1fr);
+    gap: 1rem 2rem;
+  }
+  .stufe-unten {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 0 2.5rem;
+  }
+  .stufe-kann {
+    grid-column: 1 / -1;
+  }
+  .stufe-unten h4 {
+    grid-column: 1;
+  }
+  .einsatz {
+    grid-column: 1;
+  }
+  .stufe-fakten {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    align-self: start;
+  }
+  /* Desktop mit Maus: Die Spur wird vom Seiten-Scroll bewegt (Skript), nicht vom Wischen. */
+  .stufen-gekoppelt .stufen-spur {
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+  .stufen-gekoppelt .stufen-tipp {
+    display: none;
   }
 }
 

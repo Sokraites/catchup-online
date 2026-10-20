@@ -1,0 +1,63 @@
+{
+  "_hinweis": "Maße der Monitor-Epochen in Bild-Pixeln. Daraus rendert scripts/monitore-rendern.mjs die Bilder in public/monitore/, und src/scripts/monitor.ts setzt sie auf der Seite zusammen. Der Bildschirm (Loch) ist bei allen gleich groß, nur Rahmen, Kinn und Fuß ändern sich.",
+  "loch": { "b": 800, "h": 600 },
+  "epochen": [
+    {
+      "name": "Großer Röhrenmonitor",
+      "rand": 74, "oben": 70, "kinn": 70,
+      "radiusAussen": 54, "radiusLoch": 34,
+      "farbe": "#d9cfb3", "rauheit": 0.55, "metall": 0, "klarlack": 0.15,
+      "schraege": 22, "lochFarbe": "#2b2924",
+      "knoepfe": 3, "knopfFarbe": "#cfc5a8",
+      "fuss": "schwenk", "fussFarbe": "#cdc3a6",
+      "deckel": 1, "woelbung": 1
+    },
+    {
+      "name": "Kleinerer Röhrenmonitor",
+      "rand": 56, "oben": 54, "kinn": 52,
+      "radiusAussen": 40, "radiusLoch": 22,
+      "farbe": "#d2d0ca", "rauheit": 0.5, "metall": 0, "klarlack": 0.2,
+      "schraege": 16, "lochFarbe": "#2a2a2a",
+      "knoepfe": 2, "knopfFarbe": "#bdbab3",
+      "fuss": "schwenk-klein", "fussFarbe": "#c4c1ba",
+      "deckel": 0.7, "woelbung": 0.75
+    },
+    {
+      "name": "Flachbildschirm",
+      "rand": 40, "oben": 40, "kinn": 40,
+      "radiusAussen": 16, "radiusLoch": 3,
+      "farbe": "#b9bdc4", "rauheit": 0.38, "metall": 0.55, "klarlack": 0.3,
+      "schraege": 8, "lochFarbe": "#1a1b1e",
+      "knoepfe": 4, "knopfFarbe": "#9ea3ab",
+      "fuss": "hals-oval", "fussFarbe": "#a7acb4",
+      "deckel": 0.12, "woelbung": 0.1
+    },
+    {
+      "name": "Breitbild",
+      "rand": 30, "oben": 30, "kinn": 30,
+      "radiusAussen": 12, "radiusLoch": 2,
+      "farbe": "#141418", "rauheit": 0.14, "metall": 0.1, "klarlack": 1,
+      "schraege": 5, "lochFarbe": "#08080a",
+      "knoepfe": 0, "knopfFarbe": "#2a2a30",
+      "fuss": "hals-rund", "fussFarbe": "#18181c",
+      "deckel": 0.06, "woelbung": 0.05
+    },
+    {
+      "name": "Schmaler Rand",
+      "rand": 12, "oben": 12, "kinn": 30,
+      "radiusAussen": 10, "radiusLoch": 2,
+      "farbe": "#1c1c21", "rauheit": 0.3, "metall": 0.2, "klarlack": 0.6,
+      "schraege": 2, "lochFarbe": "#0a0a0c",
+      "kinnFarbe": "#c3c7ce",
+      "knoepfe": 0, "knopfFarbe": "#2a2a30",
+      "fuss": "alu", "fussFarbe": "#c9cdd4",
+      "deckel": 0, "woelbung": 0.02
+    },
+    {
+      "name": "Heute, randlos",
+      "rand": 0, "oben": 0, "kinn": 0,
+      "fuss": "keiner",
+      "deckel": 0, "woelbung": 0
+    }
+  ]
+}
