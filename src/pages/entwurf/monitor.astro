@@ -19,6 +19,11 @@ import '../../styles/monitor.css';
           <div class="monitor-flaeche">
             <StartInhalt />
           </div>
+          <!-- Unterseite in einem Tab des Monitor-Browsers (vom Skript gefüllt) -->
+          <div class="monitor-tab-seite" data-tab-seite hidden>
+            <p class="tab-kopf"><button type="button" class="tab-zurueck" data-tab-zurueck>← Zurück zur Übersicht</button></p>
+            <div data-tab-inhalt></div>
+          </div>
         </div>
         <div class="monitor-glas" aria-hidden="true"></div>
         <MonitorGehaeuse />
@@ -30,5 +35,7 @@ import '../../styles/monitor.css';
 
 <script>
   import { starteMonitor } from '../../scripts/monitor';
+  import { starteMonitorTabs } from '../../scripts/monitor-tabs';
   starteMonitor();
+  starteMonitorTabs();
 </script>

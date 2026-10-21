@@ -12,14 +12,18 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function starteKiSeite() {
-  const bereich = document.querySelector<HTMLElement>('[data-stufen]');
+/**
+ * @param wurzel Wo die Stufen liegen (Standard: ganze Seite).
+ * @param eingebettet true, wenn die Seite in einem Tab im Monitor steckt: dann immer wischen/blättern, nie anheften.
+ */
+export function starteKiSeite(wurzel: ParentNode = document, eingebettet = false) {
+  const bereich = wurzel.querySelector<HTMLElement>('[data-stufen]');
   if (!bereich) return;
   const spur = bereich.querySelector<HTMLElement>('.stufen-spur')!;
   const stufen = [...spur.querySelectorAll<HTMLElement>('.stufe')];
   const punkte = [...bereich.querySelectorAll<HTMLButtonElement>('[data-stufe-punkt]')];
   const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const gekoppelt = !ruhig && matchMedia('(pointer: fine) and (min-width: 960px)').matches;
+  const gekoppelt = !eingebettet && !ruhig && matchMedia('(pointer: fine) and (min-width: 960px)').matches;
   let aktiv = 0;
   let st: ScrollTrigger | null = null;
 

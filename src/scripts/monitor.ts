@@ -54,6 +54,8 @@ export function starteMonitor() {
 
   function setzeAktiv(i: number) {
     aktiv = i;
+    // Nur der sichtbare Abschnitt nimmt Klicks an (die anderen liegen unsichtbar darüber oder darunter).
+    seiten.forEach((s, n) => s.classList.toggle('monitor-aktiv', n === i));
     const n = Math.min(i, EPOCHEN.length - 1);
     const e = String(n);
     if (geraet.dataset.epoche !== e) {
@@ -143,11 +145,7 @@ export function starteMonitor() {
         if (alt && alt !== neu) tl!.to(alt, { opacity: 0, duration: dreh * 0.5 }, pos + dreh * 0.25);
         if (neu && alt !== neu) tl!.to(neu, { opacity: 1, duration: dreh * 0.5 }, pos + dreh * 0.25);
         tl!.to(geraet, { '--woelbung': EPOCHEN[e].woelbung ?? 0, '--leuchten': e === EPOCHEN.length - 1 ? 1 : 0, duration: dreh }, pos);
-        // Am Desktop kurz herauszoomen. Auf dem Handy bleibt der Bildschirm ausgezogen, nur das Rad dreht sich.
-        if (!handy()) {
-          tl!.to(geraet, { scale: 0.9, duration: dreh * 0.5, ease: 'power1.inOut' }, pos);
-          tl!.to(geraet, { scale: 1, duration: dreh * 0.5, ease: 'power1.inOut' }, pos + dreh * 0.5);
-        }
+        // Der Monitor selbst steht ruhig: Es dreht sich nur der Inhalt, das Gehäuse blendet über.
         pos += dreh;
       }
     });
@@ -235,6 +233,8 @@ export function starteMonitor() {
   // Tastatur: Fokus in einem anderen Abschnitt holt diesen Abschnitt nach vorne.
   schirm.addEventListener('focusin', (e) => {
     const el = e.target as HTMLElement;
+    // Nur bei Tastatur-Fokus springen, nicht wenn jemand mit Maus oder Finger klickt
+    if (!el.matches(':focus-visible')) return;
     const i = seiten.findIndex((s) => s.contains(el));
     if (i >= 0) zeige(i, el);
   });

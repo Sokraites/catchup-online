@@ -28,7 +28,8 @@
   position: relative;
   width: var(--schirm-b);
   height: var(--schirm-h);
-  --leiste-h: 52px;
+  --leiste-basis: 52px;
+  --leiste-h: var(--leiste-basis);
   /* Maßstab: Bild-Pixel des Gehäuses → Bildschirm-Pixel (setzt das Skript je Gerätegröße) */
   --m: 0.72;
   --woelbung: 1;
@@ -39,7 +40,7 @@
 }
 @media (max-width: 599px) {
   .monitor-an .monitor-geraet {
-    --leiste-h: 44px;
+    --leiste-basis: 44px;
   }
 }
 
@@ -171,6 +172,9 @@
 }
 .monitor-an .monitor-flaeche > section:first-child {
   opacity: 1;
+}
+.monitor-an .monitor-flaeche > section:not(.monitor-aktiv) {
+  pointer-events: none;
 }
 .monitor-an .monitor-flaeche > section > .wrap {
   padding-block: clamp(1.25rem, 4vh, 3rem);
@@ -500,3 +504,159 @@
   pointer-events: none;
 }
 
+
+/* ---------- Tabs im Monitor-Browser ---------- */
+.monitor-an .bl-reiter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+.monitor-an .bl-tab-dyn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 11rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  opacity: 0.72;
+  pointer-events: auto;
+}
+.monitor-an .bl-tab-dyn.bl-tab-aktiv {
+  opacity: 1;
+}
+.monitor-an .bl-tab-zu {
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1;
+}
+.monitor-an .bl-tab-zu:hover {
+  background: rgb(0 0 0 / 0.15);
+}
+.monitor-an .browser,
+.monitor-an .browser .bl {
+  pointer-events: none;
+}
+.monitor-an .browser .bl-reiter {
+  pointer-events: auto;
+}
+
+/* Alte Browser hatten keine Reiter: Wir zeigen sie als eigene Zeile, sobald ein zweiter Tab offen ist */
+.monitor-an .bl-reiterzeile {
+  display: none;
+}
+.monitor-an .mit-tabs .bl-reiterzeile {
+  display: flex;
+  height: 20px;
+  padding: 0 4px;
+  align-items: flex-end;
+}
+.monitor-an .mit-tabs[data-epoche='0'],
+.monitor-an .mit-tabs[data-epoche='1'],
+.monitor-an .mit-tabs[data-epoche='2'] {
+  --leiste-h: calc(var(--leiste-basis) + 20px);
+}
+.monitor-an .bl-0 .bl-tab-dyn,
+.monitor-an .bl-1 .bl-tab-dyn {
+  padding: 2px 8px;
+  background: #c0c0c0;
+  color: #000;
+  box-shadow: inset -1px 0 #404040, inset 1px 1px #fff;
+}
+.monitor-an .bl-0 .bl-tab-aktiv,
+.monitor-an .bl-1 .bl-tab-aktiv {
+  background: #d4d0c8;
+  font-weight: 700;
+}
+.monitor-an .bl-2 .bl-reiterzeile {
+  background: #ece9d8;
+}
+.monitor-an .bl-2 .bl-tab-dyn {
+  padding: 2px 10px;
+  border: 1px solid #7f9db9;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #fff, #e3e0d0);
+  color: #000;
+}
+.monitor-an .bl-2 .bl-tab-aktiv {
+  background: #fff;
+  border-top: 2px solid #e68b2c;
+}
+.monitor-an .bl-3 .bl-tab-dyn,
+.monitor-an .bl-4 .bl-tab-dyn,
+.monitor-an .bl-5 .bl-tab-dyn {
+  margin-top: 4px;
+}
+.monitor-an .bl-3 .bl-tab-dyn:not(.bl-tab-aktiv) {
+  background: rgb(255 255 255 / 0.45);
+}
+.monitor-an .bl-4 .bl-tab-dyn:not(.bl-tab-aktiv) {
+  background: transparent;
+}
+.monitor-an .bl-5 .bl-tab-dyn:not(.bl-tab-aktiv) {
+  background: transparent;
+  color: var(--muted);
+}
+
+/* Die Unterseite im Tab: scrollt für sich, die Startseite dahinter bleibt stehen */
+.monitor-tab-seite {
+  display: none;
+}
+.monitor-an .monitor-tab-seite:not([hidden]) {
+  display: block;
+  position: absolute;
+  inset: var(--leiste-h) 0 0 0;
+  z-index: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #0b0b10;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  animation: tab-rein 0.3s ease-out;
+}
+@keyframes tab-rein {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.monitor-an .tab-kopf {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0.5rem var(--gutter);
+  background: rgb(11 11 16 / 0.92);
+  border-bottom: 1px solid var(--line);
+}
+.tab-zurueck {
+  min-height: 40px;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.tab-zurueck:hover {
+  border-color: var(--accent);
+}
+.monitor-an .monitor-tab-seite .hero {
+  padding-block: 2rem 2.5rem;
+}
+.monitor-an .monitor-tab-seite .section {
+  padding-block: 2.5rem;
+}
+html.monitor-tab-offen {
+  overflow: hidden;
+}

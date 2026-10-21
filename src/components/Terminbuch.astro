@@ -123,7 +123,7 @@ import '../styles/terminbuch.css';
 <script>
   // Das Buch wird erst geladen, wenn jemand Interesse zeigt (Zeiger darüber, Fokus, Berührung),
   // und öffnet beim Klick sofort.
-  const ziel = 'a[href="/termin/"], a[href$="/termin/index.html"]';
+  const ziel = 'a[href$="/termin/"], a[href$="/termin/index.html"]';
   let laden: Promise<typeof import('../scripts/terminbuch')> | null = null;
   const vorbereiten = () => (laden ??= import('../scripts/terminbuch'));
   for (const typ of ['pointerover', 'focusin', 'touchstart'] as const) {
