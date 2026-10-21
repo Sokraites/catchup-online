@@ -61,13 +61,14 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 ## Phase D3 (neu): Terminbuch
 
-- [ ] „Termin buchen“ öffnet ein aufschlagendes Buch (Handy und Desktop)
-- [ ] Kalender mit Terminvorschlag, belegte Tage sind sichtbar
-- [ ] Siegelstempel auf dem gewählten Tag
-- [ ] Beim Absenden faltet sich ein Brief und wird mit dem Logo gesiegelt
-- [ ] Animationen bremsen die Eingabe nie aus (genauso schnell wie ein schlichter Kalender)
-- [ ] Ohne JavaScript: schlichte Terminanfrage-Seite
-- [ ] Anbindung: Versand der Anfrage und belegte Tage (abhängig vom Hosting)
+- [x] „Termin buchen“ öffnet ein aufschlagendes Buch (Handy und Desktop)
+- [ ] Kalender mit Terminvorschlag, belegte Tage sind sichtbar (Kalender steht; belegte Tage erst mit Kalender-Anbindung)
+- [x] neu: Blättern auf den aktuellen Monat, heutiger Tag wird von einer Feder rot umkreist
+- [x] Siegelstempel auf dem gewählten Tag
+- [x] Beim Absenden faltet sich ein Brief und wird mit dem Logo gesiegelt
+- [x] Animationen bremsen die Eingabe nie aus (genauso schnell wie ein schlichter Kalender)
+- [x] Ohne JavaScript: schlichte Terminanfrage-Seite
+- [ ] Anbindung: Versand der Anfrage und belegte Tage (abhängig vom Hosting). Bis dahin: vorbereitete E-Mail, ehrlich beschriftet
 
 ## Phase E: Qualität
 

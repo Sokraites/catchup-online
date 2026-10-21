@@ -1,0 +1,131 @@
+---
+/**
+ * Terminbuch: Ein Klick auf „Termin buchen“ öffnet ein Buch. Es blättert auf den aktuellen Monat,
+ * der heutige Tag wird mit roter Tinte umkreist, der gewählte Tag bekommt ein Siegel.
+ * Beim Absenden faltet sich ein Brief und wird mit dem Logo versiegelt.
+ *
+ * Ohne JavaScript führen alle „Termin buchen“-Links auf die Seite /termin/.
+ * Das Formular ist echtes HTML; der Kalender wird vom Skript gezeichnet.
+ * Versand: Bis zur Anbindung ans Hosting wird eine E-Mail vorbereitet (ehrlich so beschriftet).
+ */
+import { site } from '../config/site';
+import { termine } from '../config/termine';
+import Logo from './Logo.astro';
+import '../styles/terminbuch.css';
+---
+
+<dialog
+  class="tb-dialog"
+  aria-labelledby="tb-titel"
+  data-terminbuch
+  data-mail={site.kontakt.email.text}
+  data-regeln={JSON.stringify({ wochentage: termine.wochentage, vorlaufTage: termine.vorlaufTage, monateVoraus: termine.monateVoraus })}
+>
+  <div class="tb-buch">
+    <div class="tb-deckel" aria-hidden="true">
+      <div class="tb-deckel-vorn">
+        <Logo size={64} />
+        <span>{site.name}</span>
+        <small>Terminbuch</small>
+      </div>
+      <div class="tb-deckel-innen"></div>
+    </div>
+
+    <div class="tb-seite tb-links">
+      <div class="tb-monat">
+        <button type="button" class="tb-blaettern" data-tb-zurueck aria-label="Vorheriger Monat">‹</button>
+        <h2 id="tb-titel"><span data-tb-monat>Termin buchen</span></h2>
+        <button type="button" class="tb-blaettern" data-tb-weiter aria-label="Nächster Monat">›</button>
+      </div>
+      <div class="tb-wochentage" aria-hidden="true">
+        <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+      </div>
+      <div class="tb-tage" data-tb-tage role="group" aria-label="Tag wählen"></div>
+      <p class="tb-hinweis">Rot umkreist: heute. Wähle einen freien Tag.</p>
+      <div class="tb-blatt" aria-hidden="true"></div>
+    </div>
+
+    <div class="tb-seite tb-rechts">
+      <form class="tb-formular" data-tb-formular novalidate>
+        <p class="tb-gewaehlt" data-tb-gewaehlt aria-live="polite">Noch kein Tag gewählt.</p>
+        <fieldset class="tb-zeiten">
+          <legend>Uhrzeit</legend>
+          {
+            termine.zeiten.map((z, i) => (
+              <label>
+                <input type="radio" name="zeit" value={z} required checked={i === 0} />
+                <span>{z}</span>
+              </label>
+            ))
+          }
+        </fieldset>
+        <fieldset class="tb-art">
+          <legend>Gesprächsart</legend>
+          {
+            termine.gespraechsarten.map((a, i) => (
+              <label>
+                <input type="radio" name="art" value={a} checked={i === 0} />
+                <span>{a}</span>
+              </label>
+            ))
+          }
+        </fieldset>
+        <label class="tb-feld">
+          <span>Dein Name</span>
+          <input id="tb-name" name="name" autocomplete="name" required />
+        </label>
+        <label class="tb-feld">
+          <span>Telefon oder E-Mail</span>
+          <input id="tb-kontakt" name="kontakt" autocomplete="email" required />
+        </label>
+        <label class="tb-feld">
+          <span>Worum geht es? (optional)</span>
+          <textarea id="tb-nachricht" name="nachricht" rows="2"></textarea>
+        </label>
+        <p class="tb-fehler" data-tb-fehler role="alert"></p>
+        <button class="button tb-senden" type="submit">Termin anfragen</button>
+      </form>
+
+      <div class="tb-danke" data-tb-danke hidden>
+        <h3>Dein Brief ist versiegelt.</h3>
+        <p data-tb-zusammenfassung></p>
+        <p class="tb-ehrlich">
+          Diese Seite ist noch nicht an unser Postfach angebunden. Schick die Anfrage bitte per E-Mail ab, der Text ist
+          schon vorbereitet.
+        </p>
+        <a class="button" data-tb-mail href="#">Per E-Mail senden</a>
+      </div>
+    </div>
+
+    <div class="tb-brief" aria-hidden="true">
+      <div class="tb-brief-teil tb-brief-oben"></div>
+      <div class="tb-brief-teil tb-brief-mitte"><p data-tb-brieftext></p></div>
+      <div class="tb-brief-teil tb-brief-unten"></div>
+      <div class="tb-siegel"><Logo size={34} /></div>
+    </div>
+  </div>
+  <button type="button" class="tb-schliessen" data-tb-schliessen aria-label="Terminbuch schließen">×</button>
+</dialog>
+
+<script>
+  // Das Buch wird erst geladen, wenn jemand Interesse zeigt (Zeiger darüber, Fokus, Berührung),
+  // und öffnet beim Klick sofort.
+  const ziel = 'a[href="/termin/"], a[href$="/termin/index.html"]';
+  let laden: Promise<typeof import('../scripts/terminbuch')> | null = null;
+  const vorbereiten = () => (laden ??= import('../scripts/terminbuch'));
+  for (const typ of ['pointerover', 'focusin', 'touchstart'] as const) {
+    document.addEventListener(
+      typ,
+      (e) => {
+        if ((e.target as Element).closest?.(ziel)) vorbereiten();
+      },
+      { passive: true },
+    );
+  }
+  document.addEventListener('click', async (e) => {
+    const link = (e.target as Element).closest?.(ziel);
+    if (!link || (e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey) return;
+    e.preventDefault();
+    (await vorbereiten()).oeffneTerminbuch();
+  });
+</script>

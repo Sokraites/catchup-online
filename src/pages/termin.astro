@@ -18,7 +18,8 @@ const { telefon, email } = site.kontakt;
       <p class="lead">
         In einem Gespräch erzählst du uns von deinem Betrieb, und wir sagen dir, was deine Webseite für dich tun kann.
       </p>
-      <p class="hinweis">Das Terminbuch mit Kalender folgt in Phase D3. Bis dahin: Anruf oder E-Mail.</p>
+      <p><a class="button" href="/termin/" data-tb-auto>Terminbuch aufschlagen</a></p>
+      <p>Lieber direkt? Ruf an oder schreib uns:</p>
       <ul class="kontakt-liste">
         <li>
           <strong>Telefon:</strong>
@@ -31,3 +32,8 @@ const { telefon, email } = site.kontakt;
     </div>
   </section>
 </Base>
+
+<script>
+  // Auf dieser Seite schlägt sich das Terminbuch gleich von selbst auf.
+  addEventListener('load', () => document.querySelector<HTMLAnchorElement>('[data-tb-auto]')?.click());
+</script>

@@ -91,7 +91,7 @@ export function starteMonitor() {
     const luft = handy() ? 6 : 40;
     const b = Math.min(1100, innerWidth - 2 * (randMax + luft), handy() ? Infinity : (verfuegbarH - gehaeuseHoehe(m)) * 1.7);
     const hLesen = Math.max(260, verfuegbarH - gehaeuseHoehe(m) - (handy() ? 10 : 24));
-    // Querformat wie ein echter Monitor (nur Handy, beim Epochenwechsel und am Anfang)
+    // Querformat wie ein echter Monitor (nur Handy, zum Auftakt)
     const hQuer = Math.min(hLesen, Math.round(b * 0.78));
     const mitQuer = handy() && hQuer < hLesen - 40;
 
@@ -143,11 +143,8 @@ export function starteMonitor() {
         if (alt && alt !== neu) tl!.to(alt, { opacity: 0, duration: dreh * 0.5 }, pos + dreh * 0.25);
         if (neu && alt !== neu) tl!.to(neu, { opacity: 1, duration: dreh * 0.5 }, pos + dreh * 0.25);
         tl!.to(geraet, { '--woelbung': EPOCHEN[e].woelbung ?? 0, '--leuchten': e === EPOCHEN.length - 1 ? 1 : 0, duration: dreh }, pos);
-        // Kurz herauszoomen, damit man das ganze Gerät sieht
-        if (mitQuer) {
-          tl!.to(geraet, { '--schirm-h': `${hQuer}px`, duration: dreh * 0.45, ease: 'power1.inOut' }, pos);
-          tl!.to(geraet, { '--schirm-h': `${hLesen}px`, duration: dreh * 0.45, ease: 'power1.inOut' }, pos + dreh * 0.55);
-        } else {
+        // Am Desktop kurz herauszoomen. Auf dem Handy bleibt der Bildschirm ausgezogen, nur das Rad dreht sich.
+        if (!handy()) {
           tl!.to(geraet, { scale: 0.9, duration: dreh * 0.5, ease: 'power1.inOut' }, pos);
           tl!.to(geraet, { scale: 1, duration: dreh * 0.5, ease: 'power1.inOut' }, pos + dreh * 0.5);
         }

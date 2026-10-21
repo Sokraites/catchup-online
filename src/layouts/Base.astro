@@ -5,6 +5,7 @@ import { graph, organisation } from '../lib/schema';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Kacheln from '../components/Kacheln.astro';
+import Terminbuch from '../components/Terminbuch.astro';
 
 interface Props {
   /** Seitentitel ohne Firmennamen; der Name wird angehängt. */
@@ -62,5 +63,6 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
       <slot />
     </main>
     <Footer />
+    <Terminbuch />
   </body>
 </html>

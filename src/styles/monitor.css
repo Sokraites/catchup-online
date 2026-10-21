@@ -39,7 +39,7 @@
 }
 @media (max-width: 599px) {
   .monitor-an .monitor-geraet {
-    --leiste-h: 34px;
+    --leiste-h: 44px;
   }
 }
 
@@ -429,6 +429,23 @@
 .monitor-an .bl-5 .bl-leiste {
   justify-content: center;
 }
+.monitor-an .bl-5 .bl-tabs {
+  justify-content: flex-start;
+}
+.monitor-an .bl-5 .bl-tab {
+  margin-top: 4px;
+  padding: 5px 14px 3px;
+  border-radius: 8px 8px 0 0;
+  background: rgb(255 255 255 / 0.07);
+  color: var(--ink);
+}
+.monitor-an .bl-5 .bl-tab-neu {
+  background: transparent;
+  color: var(--muted);
+}
+.monitor-an .bl-5 .bl-fenster {
+  margin-left: auto;
+}
 .monitor-an .bl-5 .bl-adresse {
   flex: 0 1 22rem;
   text-align: center;
@@ -438,17 +455,31 @@
   color: var(--ink);
 }
 
-/* Auf dem Handy: nur die Adresszeile, ohne Titel und Reiter */
+/* Auf dem Handy: Titelleiste bzw. Reiter bleiben (Erkennungsmerkmal), Knöpfe in der Adresszeile entfallen */
 @media (max-width: 599px) {
+  .monitor-an .browser {
+    font-size: 10px;
+  }
   .monitor-an .bl-titel,
-  .monitor-an .bl-tabs,
+  .monitor-an .bl-tabs {
+    height: 18px;
+  }
+  .monitor-an .bl-fenster i {
+    width: 13px;
+    height: 12px;
+    font-size: 9px;
+  }
+  .monitor-an .bl-tab {
+    padding: 4px 10px 2px !important;
+  }
   .monitor-an .bl-knopf,
   .monitor-an .bl-rund,
-  .monitor-an .bl-pfeil {
-    display: none;
-  }
+  .monitor-an .bl-pfeil,
   .monitor-an .bl-adresse b {
     display: none;
+  }
+  .monitor-an .bl-adresse {
+    padding: 3px 6px;
   }
 }
 
