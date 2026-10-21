@@ -1,7 +1,7 @@
 // Baut aus dist/ eine Vorschau für den privaten Vorschau-Link (ohne eigene Domain).
 // - Jede Seite ist in sich geschlossen: CSS, Skripte und Schriften stehen direkt in der Datei.
 // - Links sind relativ, Seiten liegen unter site/…
-// - Die Startseite der Vorschau ist der Monitor-Entwurf (auch als Hauptseite index.html).
+// - Die Startseite ist zugleich die Hauptseite der Vorschau (index.html).
 // - Eine kleine Statusanzeige unten links zeigt, ob Skripte laufen und ob „Bewegung reduzieren“ an ist.
 // Ergebnis: .vorschau/index.html, .vorschau/site/…, .vorschau/dateien.json
 //   npm run build && npm run vorschau
@@ -83,7 +83,7 @@ for (const datei of alle('dist')) {
   const rel = relative('dist', datei);
   if (rel.startsWith('_astro/') || rel.startsWith('fonts/') || rel.endsWith('LICENSE.txt')) continue;
   if (rel.endsWith('.html')) {
-    const quelle = rel === 'index.html' ? 'entwurf/monitor/index.html' : rel;
+    const quelle = rel;
     const tiefe = 1 + rel.split('/').length - 1;
     schreibe(`site/${rel}`, seite(quelle, tiefe));
   } else {
@@ -92,10 +92,8 @@ for (const datei of alle('dist')) {
     liste[`site/${rel}`] = join(AUS, 'site', rel);
   }
 }
-// Normale Startseite (ohne Monitor) bleibt erreichbar
-schreibe('site/normal/index.html', seite('index.html', 2));
 // Hauptseite der Vorschau
-schreibe('index.html', seite('entwurf/monitor/index.html', 0, { fragment: true }));
+schreibe('index.html', seite('index.html', 0, { fragment: true }));
 
 writeFileSync(join(AUS, 'dateien.json'), JSON.stringify(liste, null, 2));
 console.log(`${Object.keys(liste).length + 1} Dateien in ${AUS}`);

@@ -1,10 +1,47 @@
 ---
 import Base from '../layouts/Base.astro';
 import StartInhalt from '../components/StartInhalt.astro';
+import BrowserLeisten from '../components/BrowserLeisten.astro';
+import MonitorGehaeuse from '../components/MonitorGehaeuse.astro';
+import '../styles/monitor.css';
 import { faqStart } from '../content/faq';
 import { faqSeite, website } from '../lib/schema';
 ---
 
+<!--
+  Startseite mit Monitor-Zeitreise.
+  Ohne JavaScript oder bei reduzierter Bewegung ist das hier eine ganz normale Seite:
+  Alle Abschnitte stehen als echter Text untereinander.
+-->
 <Base schema={[website(), faqSeite(faqStart)]}>
-  <StartInhalt />
+  <div class="buehne" data-monitor>
+    <div class="monitor">
+      <div class="monitor-geraet" data-epoche="0">
+        <div class="monitor-schirm">
+          <BrowserLeisten />
+          <div class="monitor-flaeche">
+            <StartInhalt />
+          </div>
+          <!-- Unterseite in einem Tab des Monitor-Browsers (vom Skript gefüllt) -->
+          <div class="monitor-tab-seite" data-tab-seite hidden>
+            <p class="tab-kopf">
+              <button type="button" class="tab-zurueck" data-tab-zurueck>← Zurück zur Übersicht</button>
+              <a class="tab-zurueck" data-tab-extern href="/" target="_blank" rel="noopener" hidden>In neuem Tab öffnen ↗</a>
+            </p>
+            <div data-tab-inhalt></div>
+          </div>
+        </div>
+        <div class="monitor-glas" aria-hidden="true"></div>
+        <MonitorGehaeuse />
+      </div>
+      <p class="monitor-tipp" aria-hidden="true">Scrollen</p>
+    </div>
+  </div>
 </Base>
+
+<script>
+  import { starteMonitor } from '../scripts/monitor';
+  import { starteMonitorTabs } from '../scripts/monitor-tabs';
+  starteMonitor();
+  starteMonitorTabs();
+</script>

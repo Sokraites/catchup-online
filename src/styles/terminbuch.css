@@ -672,38 +672,65 @@
 .tb-leaf-schatten[hidden] {
   display: none;
 }
+.tb-streifen {
+  position: absolute;
+  top: 0;
+  transform-style: preserve-3d;
+}
 .tb-leaf-seite {
   position: absolute;
   inset: 0;
   overflow: hidden;
   backface-visibility: hidden;
   background: var(--papier);
+}
+.tb-leaf-seite > .tb-kopie {
+  position: absolute;
+  top: 0;
   padding: 1.5rem 1.5rem 1.25rem;
+  background: var(--papier);
+}
+/* Licht je Streifen: hell, wo sich das Papier zum Betrachter neigt, dunkel, wo es sich abwendet */
+.tb-licht {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgb(255 255 255 / var(--hell, 0)), rgb(255 255 255 / var(--hell, 0))),
+    linear-gradient(rgb(40 25 10 / var(--dunkel, 0)), rgb(40 25 10 / var(--dunkel, 0)));
 }
 .tb-leaf-hinten {
   transform: rotateY(180deg);
 }
-/* Licht und Schatten auf dem Papier, je nachdem wie weit es angehoben ist */
-.tb-leaf-seite::after {
+/* Buchrücken und Seitenstapel: das Buch bekommt Tiefe */
+.tb-buch::before,
+.tb-buch::after {
   content: '';
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: var(--licht, 0);
+  top: 6px;
+  bottom: 6px;
+  width: 7px;
+  z-index: 0;
+  background: repeating-linear-gradient(90deg, #e9dfc6 0 1px, #cfc3a5 1px 2px);
+  border-radius: 2px;
 }
-.tb-leaf[data-kante='links'] .tb-leaf-vorn::after,
-.tb-leaf[data-kante='rechts'] .tb-leaf-hinten::after {
-  background: linear-gradient(90deg, rgb(0 0 0 / 0.22), transparent 35%, rgb(255 255 255 / 0.25) 80%, rgb(0 0 0 / 0.08));
+.tb-buch::before {
+  left: 3px;
 }
-.tb-leaf[data-kante='rechts'] .tb-leaf-vorn::after,
-.tb-leaf[data-kante='links'] .tb-leaf-hinten::after {
-  background: linear-gradient(270deg, rgb(0 0 0 / 0.22), transparent 35%, rgb(255 255 255 / 0.25) 80%, rgb(0 0 0 / 0.08));
+.tb-buch::after {
+  right: 3px;
+}
+.tb-links {
+  box-shadow: inset -18px 0 22px -14px rgb(0 0 0 / 0.35);
+}
+.tb-rechts {
+  box-shadow: inset 18px 0 22px -14px rgb(0 0 0 / 0.3);
 }
 .tb-leaf-schatten {
   position: absolute;
   z-index: 4;
   pointer-events: none;
-  background: linear-gradient(90deg, rgb(0 0 0 / 0.25), transparent 60%);
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.12) var(--breite, 40%), transparent 90%);
   opacity: 0;
 }
 .tb-kopie .tb-monat {
@@ -749,7 +776,7 @@ span.tb-tag.tb-belegt {
 }
 
 @media (max-width: 759px) {
-  .tb-leaf-seite {
+  .tb-leaf-seite > .tb-kopie {
     padding: 1.25rem 1rem;
   }
   .tb-ecke-rechts {

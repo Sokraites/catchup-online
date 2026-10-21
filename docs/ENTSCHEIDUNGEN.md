@@ -38,6 +38,9 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Monitor-Gestaltung | Karten im Monitor kleiner, Gehäuse mit Tiefe nach hinten (Deckel), keine Unterschrift/Jahreszahl, Browserleiste im Stil der jeweiligen Zeit (ohne Logos und Markennamen). Wunsch: möglichst fotorealistisch. | 20.10.2026 |
 | KI-Mitarbeiter-Idee | Läuft im System des Betriebs, kennt freigegebene Unterlagen, per Handy erreichbar (auch abends). Abgrenzung zur Cloud-App: fragen statt suchen, auch Nicht-Cloud-Daten, handelt, Daten bleiben auf Wunsch im Betrieb. Texte als Entwurf umgesetzt. | 20.10.2026 |
 | KI-Seite Aufbau | Je Stufe ein kleiner 3D-Charakter in der Mitte, Fähigkeiten drumherum, Einsatzbeispiele darunter. Handy: seitlich wischen. Desktop: läuft beim Scrollen seitlich durch. Figuren: freundliche Roboter-Kollegen, je Stufe professioneller (Namensschild, Ordner und Kappe, Headset und Krawatte, Anzug mit Tablet und Lichtring); winken, wenn sie ins Bild kommen. Stil vorläufig, Gründer prüft. | 20.10.2026 |
+| Startseite | Die Monitor-Seite ist jetzt die echte Startseite (`/`). Der Entwurf unter `/entwurf/monitor/` entfällt. | 21.10.2026 |
+| Referenzen | **Ändert die Übergabe (keine Referenzen):** Referenzprojekt „Ottos Werkstatt“ (Ferienloft, Dannenfels) aus der Arbeit des Partners. Abschnitt „Projekte“ auf der Startseite; „Projekt ansehen“ öffnet es als Tab im Monitor, „In neuem Tab öffnen“ als echten Browser-Tab. Projektseite unter `/referenzen/ottos-werkstatt/` (Schriften selbst ausgeliefert, nicht für Suchmaschinen). **Vor Livegang: Freigabe des Kunden für Nennung, Fotos und angezeigte Kontaktdaten einholen.** | 21.10.2026 |
+| Terminbuch: Blättern | Blatt wölbt sich beim Umblättern wie Papier (Streifen mit eigenem Licht), Ecke hebt sich je nach Griffhöhe, Buchrücken und Seitenstapel. | 21.10.2026 |
 | Private Vorschau | Erlaubt (20.10.2026): private Vorschau-Seite, nur für den Gründer sichtbar, nicht für Suchmaschinen. |
 | Zwischenstände | Nach Phase B wird ein Entwurf gezeigt, danach ein erster Monitor-Entwurf. | 20.10.2026 |
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |
@@ -49,7 +52,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Thema | Stand |
 |---|---|
 | Hosting-Anbieter und Domain | Gründer bucht selbst (Vorschlag: deutscher Anbieter wie netcup, Hetzner oder all-inkl, Domain beim selben Anbieter). |
-| Monitor-Zeitreise | **Startseiten-Animation so beibehalten (Gründer, 21.10.2026).** Epochen: großer Röhrenmonitor 1990, kleinerer Röhrenmonitor 1997, Flachbildschirm 2004, Breitbild 2010, schmaler Rand 2016, heute randlos. Mit Gehäusekante und Standfuß (Handy ohne Fuß). Bildschirm durchsichtig, Kacheln scheinen durch. Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
+| Monitor-Zeitreise | **Entschieden: Startseiten-Animation so beibehalten (Gründer, 21.10.2026), ist jetzt die Startseite.** Epochen: großer Röhrenmonitor 1990, kleinerer Röhrenmonitor 1997, Flachbildschirm 2004, Breitbild 2010, schmaler Rand 2016, heute randlos. Mit Gehäusekante und Standfuß (Handy ohne Fuß). Bildschirm durchsichtig, Kacheln scheinen durch. Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
 | Wirkung der Kachel-Freischaltung | Vorläufig umgesetzt: Lichtwelle über das Raster, Auge freut sich, Meldung „Du hast den Weg gefunden“ mit Termin-Knopf. Alternativen vorgeschlagen, Gründer wählt. |
 | Kachel-Pfad | Vorschlag umgesetzt: Maus 7/7 → 14/14 → 4/18 → 11/20 → 3/10, Touch 7/7 → 13/2 → 4/3 → 16/6 → 10/4 (Reihe/Spalte). Bestätigung offen. |
 

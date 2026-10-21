@@ -12,7 +12,8 @@
  */
 import { navigation } from '../config/site';
 
-type Tab = { href: string; titel: string; html?: string };
+/** rahmen: Seite mit eigener Gestaltung (z. B. Referenzprojekt), wird als ganze Seite im Tab gezeigt. */
+type Tab = { href: string; titel: string; html?: string; rahmen?: boolean };
 
 export function starteMonitorTabs() {
   const html = document.documentElement;
@@ -88,10 +89,10 @@ export function starteMonitorTabs() {
     return tab.html;
   }
 
-  async function oeffne(href: string) {
+  async function oeffne(href: string, rahmen = false, titel?: string) {
     let i = tabs.findIndex((t) => t.href === href);
     if (i < 0) {
-      tabs.push({ href, titel: titelFuer(href) });
+      tabs.push({ href, titel: titel ?? titelFuer(href), rahmen });
       i = tabs.length - 1;
     }
     await zeigeTab(i, false);
@@ -101,8 +102,24 @@ export function starteMonitorTabs() {
   async function zeigeTab(i: number, adresseErsetzen: boolean) {
     aktiv = i;
     zeichneTabs();
+    const tab = tabs[i];
+    seite!.classList.toggle('mit-rahmen', Boolean(tab.rahmen));
+    const extern = seite!.querySelector<HTMLAnchorElement>('[data-tab-extern]');
+    if (extern) {
+      extern.hidden = !tab.rahmen;
+      extern.href = tab.href;
+    }
     try {
-      inhalt!.innerHTML = await lade(tabs[i]);
+      if (tab.rahmen) {
+        // Eigenständige Seite: als ganze Seite im Monitor zeigen
+        const rahmen = document.createElement('iframe');
+        rahmen.className = 'tab-rahmen';
+        rahmen.src = tab.href;
+        rahmen.title = tab.titel;
+        inhalt!.replaceChildren(rahmen);
+      } else {
+        inhalt!.innerHTML = await lade(tab);
+      }
     } catch {
       // Laden fehlgeschlagen: ganz normal zur Seite wechseln
       location.href = tabs[i].href;
@@ -153,6 +170,10 @@ export function starteMonitorTabs() {
     e.preventDefault();
     // Link zur Startseite (z. B. „Start“ in der Brotkrumen-Leiste): zurück zur Übersicht
     if (pfadFuer(ziel.href) === '') return zeigeUebersicht(true);
+    if (a.hasAttribute('data-tab-rahmen')) {
+      const titel = a.closest('article')?.querySelector('h3')?.textContent?.trim();
+      return oeffne(ziel.href, true, titel);
+    }
     oeffne(ziel.href);
   });
 
@@ -164,7 +185,7 @@ export function starteMonitorTabs() {
     if (!href) return zeigeUebersicht(false);
     const i = tabs.findIndex((t) => t.href === href);
     if (i >= 0) zeigeTab(i, false);
-    else oeffne(href);
+    else oeffne(href, true);
   });
 
   zeichneTabs();

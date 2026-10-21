@@ -186,8 +186,8 @@ function beginne(richtung: 1 | -1): Blaettern | null {
   const ziel = plusMonate(monat, richtung);
   if (!erlaubt(ziel) || aktuell) return null;
   const blatt = leaf();
-  const vorn = blatt.querySelector<HTMLElement>('.tb-leaf-vorn')!;
-  const hinten = blatt.querySelector<HTMLElement>('.tb-leaf-hinten')!;
+  let vorn: HTMLElement;
+  let hinten: HTMLElement;
   let host: HTMLElement;
   let kante: 'links' | 'rechts';
   let von = 0;
@@ -199,15 +199,15 @@ function beginne(richtung: 1 | -1): Blaettern | null {
       host = rechts;
       kante = 'links';
       bis = -180;
-      vorn.replaceChildren(leereKopie());
-      hinten.replaceChildren(kalenderKopie(ziel));
+      vorn = leereKopie();
+      hinten = kalenderKopie(ziel);
     } else {
       // Linke Seite hebt sich, darunter liegt sofort der Vormonat
       host = links;
       kante = 'rechts';
       bis = 180;
-      vorn.replaceChildren(kalenderKopie(monat));
-      hinten.replaceChildren(leereKopie());
+      vorn = kalenderKopie(monat);
+      hinten = leereKopie();
       monat = ziel;
       zeichneMonat();
       kreiseHeute(0);
@@ -217,16 +217,16 @@ function beginne(richtung: 1 | -1): Blaettern | null {
     kante = 'links';
     if (richtung > 0) {
       // Kalenderseite blättert nach links weg, darunter der nächste Monat
-      vorn.replaceChildren(kalenderKopie(monat));
-      hinten.replaceChildren(leereKopie());
+      vorn = kalenderKopie(monat);
+      hinten = leereKopie();
       bis = -180;
       monat = ziel;
       zeichneMonat();
       kreiseHeute(0);
     } else {
       // Vormonat kommt von links herein
-      vorn.replaceChildren(kalenderKopie(ziel));
-      hinten.replaceChildren(leereKopie());
+      vorn = kalenderKopie(ziel);
+      hinten = leereKopie();
       von = -180;
       bis = 0;
     }
@@ -237,6 +237,7 @@ function beginne(richtung: 1 | -1): Blaettern | null {
   blatt.style.height = `${host.offsetHeight}px`;
   blatt.style.transformOrigin = kante === 'links' ? 'left center' : 'right center';
   blatt.dataset.kante = kante;
+  baueStreifen(blatt, host.offsetWidth, host.offsetHeight, kante, vorn, hinten);
   const sch = schatten();
   sch.style.left = blatt.style.left;
   sch.style.top = blatt.style.top;
@@ -249,17 +250,82 @@ function beginne(richtung: 1 | -1): Blaettern | null {
   return aktuell;
 }
 
-/** Stellt das Blatt auf Fortschritt p (0…1) – mit Licht und Schatten, damit es wie Papier wirkt. */
+/** Wohin die Hand greift (0 = oben, 1 = unten): Je weiter außen, desto stärker hebt sich die Ecke. */
+let griffY = 0.6;
+
+/**
+ * Das Blatt besteht aus schmalen Streifen, die aneinanderhängen wie Glieder.
+ * Jeder Streifen dreht sich etwas weiter als der vorige: So wölbt sich das Papier,
+ * die freie Kante läuft voraus, und jeder Streifen bekommt sein eigenes Licht.
+ */
+let streifen: HTMLElement[] = [];
+function baueStreifen(blatt: HTMLElement, b: number, h: number, kante: 'links' | 'rechts', vorn: HTMLElement, hinten: HTMLElement) {
+  blatt.replaceChildren();
+  streifen = [];
+  const n = einseitig() ? 8 : 12;
+  const sb = b / n;
+  let eltern: HTMLElement = blatt;
+  for (let i = 0; i < n; i++) {
+    const st = document.createElement('div');
+    st.className = 'tb-streifen';
+    st.style.width = `${sb + 0.6}px`; // winzige Überlappung, damit keine Lichtspalte entstehen
+    st.style.height = `${h}px`;
+    st.style.transformOrigin = kante === 'links' ? 'left center' : 'right center';
+    if (i === 0) st.style.left = kante === 'links' ? '0px' : `${b - sb}px`;
+    else st.style.left = kante === 'links' ? `${sb}px` : `${-sb}px`;
+    // Ausschnitt der Vorderseite (von der Bindung aus gezählt) und der Rückseite (gespiegelt)
+    const vx = kante === 'links' ? i * sb : b - (i + 1) * sb;
+    const hx = kante === 'links' ? b - (i + 1) * sb : i * sb;
+    for (const [klasse, quelle, x] of [
+      ['tb-leaf-vorn', vorn, vx],
+      ['tb-leaf-hinten', hinten, hx],
+    ] as const) {
+      const flaeche = document.createElement('div');
+      flaeche.className = `tb-leaf-seite ${klasse}`;
+      const kopie = quelle.cloneNode(true) as HTMLElement;
+      kopie.style.width = `${b}px`;
+      kopie.style.height = `${h}px`;
+      kopie.style.left = `${-x}px`;
+      flaeche.append(kopie);
+      const licht = document.createElement('span');
+      licht.className = 'tb-licht';
+      flaeche.append(licht);
+      st.append(flaeche);
+    }
+    eltern.append(st);
+    streifen.push(st);
+    eltern = st;
+  }
+}
+
+/** Stellt das Blatt auf Fortschritt p (0…1) – mit Wölbung, Licht und Schatten, damit es wie Papier wirkt. */
 function setze(p: number) {
   if (!aktuell) return;
   aktuell.p = p;
   const winkel = aktuell.von + (aktuell.bis - aktuell.von) * p;
   const blatt = leaf();
-  // Leichte Wölbung: Papier biegt sich in der Mitte der Bewegung etwas
-  const biegung = Math.sin((Math.abs(winkel) / 180) * Math.PI);
-  blatt.style.transform = `rotateY(${winkel}deg) skewY(${(blatt.dataset.kante === 'links' ? -1 : 1) * biegung * 1.5}deg)`;
-  blatt.style.setProperty('--licht', String(biegung));
-  schatten().style.opacity = String(biegung * 0.6);
+  const hub = Math.sin((Math.abs(winkel) / 180) * Math.PI); // 0 flach … 1 senkrecht
+  const n = streifen.length;
+  // Wölbung: die Bindungsseite bleibt zurück, die freie Kante eilt voraus
+  const woelbung = 0.42 * hub;
+  let bisher = 0;
+  streifen.forEach((st, i) => {
+    const anteil = n > 1 ? i / (n - 1) : 1;
+    const ziel = winkel * (1 - woelbung * (1 - anteil) ** 1.6);
+    const relativ = ziel - bisher;
+    bisher = ziel;
+    st.style.transform = `rotateY(${relativ.toFixed(2)}deg)`;
+    // Licht: Flächen, die sich zum Betrachter neigen, werden heller, abgewandte dunkler
+    const neigung = Math.sin((ziel / 180) * Math.PI);
+    st.style.setProperty('--hell', (Math.max(0, -neigung * (blatt.dataset.kante === 'links' ? 1 : -1)) * 0.22).toFixed(3));
+    st.style.setProperty('--dunkel', (Math.abs(neigung) * 0.28 + hub * 0.06).toFixed(3));
+  });
+  // Ecke hebt sich etwas, je nachdem wo man greift
+  const kippen = (griffY - 0.5) * 7 * hub * (blatt.dataset.kante === 'links' ? 1 : -1);
+  blatt.style.transform = `rotateZ(${kippen.toFixed(2)}deg) translateZ(1px)`;
+  const sch = schatten();
+  sch.style.opacity = String(hub * 0.75);
+  sch.style.setProperty('--breite', `${30 + hub * 50}%`);
 }
 
 function beende(ganz: boolean, dauer = 280) {
@@ -307,7 +373,8 @@ function blaettereAutomatisch(richtung: 1 | -1) {
     kreiseHeute(0);
     return;
   }
-  if (beginne(richtung)) beende(true, 520);
+  griffY = 0.8; // wie mit der Hand an der unteren Ecke gegriffen
+  if (beginne(richtung)) beende(true, 650);
 }
 
 /** Greifen und Ziehen mit Maus oder Finger. */
@@ -327,6 +394,8 @@ function richteZiehenEin() {
       if (!ziel.classList.contains('tb-seite')) return;
     }
     start = { x: e.clientX, y: e.clientY, seite };
+    const r = buch.getBoundingClientRect();
+    griffY = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
     gezogen = false;
     breite = (einseitig() ? links.offsetWidth : buch.offsetWidth) * 0.85;
   });

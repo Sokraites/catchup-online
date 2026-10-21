@@ -4,6 +4,7 @@ import Kontakt from './Kontakt.astro';
 import { site } from '../config/site';
 import { leistungen, ablauf } from '../content/leistungen';
 import { faqStart } from '../content/faq';
+import { referenzen } from '../content/referenzen';
 
 /** Alle Abschnitte der Startseite. Genutzt von der Startseite und vom Monitor-Entwurf. */
 ---
@@ -105,6 +106,38 @@ import { faqStart } from '../content/faq';
         ))
       }
     </ol>
+  </div>
+</section>
+
+<section class="section" id="projekte" aria-labelledby="projekte-titel">
+  <div class="wrap">
+    <p class="eyebrow">Projekte</p>
+    <h2 id="projekte-titel">Unsere Arbeit.</h2>
+    {
+      referenzen.map((r) => (
+        <article class="projekt">
+          <img class="projekt-bild" src={r.bild} alt={r.bildText} width="900" height="675" loading="lazy" decoding="async" />
+          <div class="projekt-text">
+            <p class="projekt-ort">{r.art} · {r.ort}</p>
+            <h3>{r.titel}</h3>
+            <p>{r.text}</p>
+            <ul class="projekt-chips" aria-label="Unsere Leistungen">
+              {r.leistungen.map((l) => (
+                <li>{l}</li>
+              ))}
+            </ul>
+            <div class="projekt-aktionen">
+              <a class="button button-small" href={r.href} data-tab-rahmen>
+                Projekt ansehen
+              </a>
+              <a class="button button-small button-ghost" href={r.href} target="_blank" rel="noopener">
+                In neuem Tab öffnen ↗
+              </a>
+            </div>
+          </div>
+        </article>
+      ))
+    }
   </div>
 </section>
 
