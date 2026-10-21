@@ -64,6 +64,7 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - [x] „Termin buchen“ öffnet ein aufschlagendes Buch (Handy und Desktop)
 - [ ] Kalender mit Terminvorschlag, belegte Tage sind sichtbar (Kalender steht; belegte Tage erst mit Kalender-Anbindung)
 - [x] neu: Blättern auf den aktuellen Monat, heutiger Tag wird von einer Feder rot umkreist
+- [x] neu: Seiten mit Finger oder Maus umblättern (Blatt folgt der Hand), rechte Seite leer bis zur Tageswahl
 - [x] Siegelstempel auf dem gewählten Tag
 - [x] Beim Absenden faltet sich ein Brief und wird mit dem Logo gesiegelt
 - [x] Animationen bremsen die Eingabe nie aus (genauso schnell wie ein schlichter Kalender)

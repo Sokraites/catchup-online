@@ -41,12 +41,17 @@ import '../styles/terminbuch.css';
         <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
       </div>
       <div class="tb-tage" data-tb-tage role="group" aria-label="Tag wählen"></div>
-      <p class="tb-hinweis">Rot umkreist: heute. Wähle einen freien Tag.</p>
+      <p class="tb-hinweis">Rot umkreist: heute. Wähle einen freien Tag. Zum Blättern die Seite greifen und ziehen.</p>
       <div class="tb-blatt" aria-hidden="true"></div>
+      <span class="tb-ecke tb-ecke-links" aria-hidden="true"></span>
     </div>
 
     <div class="tb-seite tb-rechts">
-      <form class="tb-formular" data-tb-formular novalidate>
+      <div class="tb-leer" data-tb-leer>
+        <p>Wähle links einen Tag.</p>
+        <p>Dann trägst du hier deine Angaben ein.</p>
+      </div>
+      <form class="tb-formular" data-tb-formular novalidate hidden>
         <p class="tb-gewaehlt" data-tb-gewaehlt aria-live="polite">Noch kein Tag gewählt.</p>
         <fieldset class="tb-zeiten">
           <legend>Uhrzeit</legend>
@@ -95,7 +100,15 @@ import '../styles/terminbuch.css';
         </p>
         <a class="button" data-tb-mail href="#">Per E-Mail senden</a>
       </div>
+      <span class="tb-ecke tb-ecke-rechts" aria-hidden="true"></span>
     </div>
+
+    <!-- Umblätter-Blatt: folgt beim Ziehen dem Finger bzw. der Maus -->
+    <div class="tb-leaf" aria-hidden="true" hidden>
+      <div class="tb-leaf-seite tb-leaf-vorn"></div>
+      <div class="tb-leaf-seite tb-leaf-hinten"></div>
+    </div>
+    <div class="tb-leaf-schatten" aria-hidden="true" hidden></div>
 
     <div class="tb-brief" aria-hidden="true">
       <div class="tb-brief-teil tb-brief-oben"></div>

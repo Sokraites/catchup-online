@@ -609,3 +609,166 @@
 .tb-danke[hidden] {
   display: none;
 }
+
+/* ---------- Umblättern ---------- */
+.tb-seite {
+  /* Waagerechtes Ziehen gehört dem Umblättern, senkrecht wird weiter gescrollt */
+  touch-action: pan-y;
+}
+.tb-leer {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.25rem;
+  min-height: 100%;
+  color: rgb(44 34 25 / 0.55);
+  font-family: Georgia, serif;
+  font-style: italic;
+  text-align: center;
+}
+.tb-leer p {
+  margin: 0;
+}
+.tb-leer[hidden] {
+  display: none;
+}
+
+/* Eselsohren: hier greift man die Seite */
+.tb-ecke {
+  position: absolute;
+  bottom: 0;
+  width: 44px;
+  height: 44px;
+  cursor: grab;
+  background: linear-gradient(var(--ecke-winkel), transparent 50%, rgb(0 0 0 / 0.08) 50%, var(--papier-dunkel) 75%);
+}
+.tb-ecke-rechts {
+  right: 0;
+  --ecke-winkel: 135deg;
+  border-radius: 0 0 6px 0;
+}
+.tb-ecke-links {
+  left: 0;
+  --ecke-winkel: 225deg;
+  border-radius: 0 0 0 4px;
+}
+.tb-seite:hover .tb-ecke {
+  width: 54px;
+  height: 54px;
+}
+.tb-ecke {
+  transition: width 0.2s, height 0.2s;
+}
+
+/* Das Blatt, das man in der Hand hat */
+.tb-leaf {
+  position: absolute;
+  z-index: 6;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform;
+}
+.tb-leaf[hidden],
+.tb-leaf-schatten[hidden] {
+  display: none;
+}
+.tb-leaf-seite {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  background: var(--papier);
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+.tb-leaf-hinten {
+  transform: rotateY(180deg);
+}
+/* Licht und Schatten auf dem Papier, je nachdem wie weit es angehoben ist */
+.tb-leaf-seite::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--licht, 0);
+}
+.tb-leaf[data-kante='links'] .tb-leaf-vorn::after,
+.tb-leaf[data-kante='rechts'] .tb-leaf-hinten::after {
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.22), transparent 35%, rgb(255 255 255 / 0.25) 80%, rgb(0 0 0 / 0.08));
+}
+.tb-leaf[data-kante='rechts'] .tb-leaf-vorn::after,
+.tb-leaf[data-kante='links'] .tb-leaf-hinten::after {
+  background: linear-gradient(270deg, rgb(0 0 0 / 0.22), transparent 35%, rgb(255 255 255 / 0.25) 80%, rgb(0 0 0 / 0.08));
+}
+.tb-leaf-schatten {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.25), transparent 60%);
+  opacity: 0;
+}
+.tb-kopie .tb-monat {
+  justify-content: center;
+  min-height: 44px;
+}
+span.tb-tag {
+  display: grid;
+  place-items: center;
+}
+span.tb-tag.tb-belegt {
+  color: rgb(44 34 25 / 0.42);
+}
+
+/* Felder „schreiben“ sich auf die rechte Seite */
+.tb-schreibt > * {
+  animation: tb-schreiben 0.45s ease-out both;
+}
+.tb-schreibt > :nth-child(2) {
+  animation-delay: 0.06s;
+}
+.tb-schreibt > :nth-child(3) {
+  animation-delay: 0.12s;
+}
+.tb-schreibt > :nth-child(4) {
+  animation-delay: 0.18s;
+}
+.tb-schreibt > :nth-child(5) {
+  animation-delay: 0.24s;
+}
+.tb-schreibt > :nth-child(n + 6) {
+  animation-delay: 0.3s;
+}
+@keyframes tb-schreiben {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.4;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 759px) {
+  .tb-leaf-seite {
+    padding: 1.25rem 1rem;
+  }
+  .tb-ecke-rechts {
+    display: none;
+  }
+  .tb-leer {
+    min-height: 6rem;
+  }
+}
+.tb-rechts {
+  display: grid;
+}
+/* Beim Ziehen nicht versehentlich Text markieren (Eingabefelder bleiben normal) */
+.tb-buch {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.tb-buch input,
+.tb-buch textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}

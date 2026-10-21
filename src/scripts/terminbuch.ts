@@ -1,19 +1,32 @@
 /**
  * Terminbuch: Kalender, Federkreis um den heutigen Tag, Siegel am gewählten Tag, Brief beim Absenden.
+ *
+ * Umblättern wie in einem echten Buch:
+ * - Desktop (Doppelseite): rechte Seite greifen und nach links ziehen → nächster Monat
+ *   (die Rückseite des Blatts zeigt ihn schon, sobald das Blatt über die Mitte kommt);
+ *   linke Seite nach rechts ziehen → Vormonat (liegt sofort darunter).
+ * - Handy (eine Seite): Kalenderseite nach links ziehen → nächster Monat, nach rechts → Vormonat.
+ * - Pfeile blättern mit derselben Bewegung automatisch.
+ *
  * Grundsatz: Animationen laufen nebenher. Alles ist sofort bedienbar, niemand wartet auf eine Animation.
  */
 
 const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const TAGE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const KURZ = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
 type Regeln = { wochentage: number[]; vorlaufTage: number; monateVoraus: number };
 
 let bereit = false;
 let dialog: HTMLDialogElement;
+let buch: HTMLElement;
+let links: HTMLElement;
+let rechts: HTMLElement;
 let regeln: Regeln;
 let monat: Date; // erster Tag des angezeigten Monats
 let gewaehlt: Date | null = null;
 const ruhig = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const einseitig = () => innerWidth < 760;
 
 const heute = () => {
   const d = new Date();
@@ -22,6 +35,7 @@ const heute = () => {
 };
 const gleich = (a: Date, b: Date) => a.getTime() === b.getTime();
 const langesDatum = (d: Date) => `${TAGE[d.getDay()]}, ${d.getDate()}. ${MONATE[d.getMonth()]} ${d.getFullYear()}`;
+const plusMonate = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, 1);
 
 function frei(d: Date) {
   const frueh = heute();
@@ -32,87 +46,339 @@ function frei(d: Date) {
   return d >= frueh && d <= spaet && regeln.wochentage.includes(wochentag);
 }
 
+/** Darf zu diesem Monat geblättert werden? */
+function erlaubt(m: Date) {
+  const erster = heute();
+  erster.setDate(1);
+  return m >= erster && m <= plusMonate(erster, regeln.monateVoraus);
+}
+
 function einrichten() {
   dialog = document.querySelector<HTMLDialogElement>('[data-terminbuch]')!;
+  buch = dialog.querySelector('.tb-buch')!;
+  links = dialog.querySelector('.tb-links')!;
+  rechts = dialog.querySelector('.tb-rechts')!;
   regeln = JSON.parse(dialog.dataset.regeln!);
-  monat = heute();
-  monat.setDate(1);
+  monat = plusMonate(heute(), 0);
 
   dialog.querySelector('[data-tb-schliessen]')!.addEventListener('click', () => dialog.close());
-  // Klick neben das Buch schließt
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog) dialog.close();
   });
   dialog.addEventListener('close', () => dialog.classList.remove('tb-offen', 'tb-versiegelt'));
-  dialog.querySelector('[data-tb-zurueck]')!.addEventListener('click', () => blaettere(-1));
-  dialog.querySelector('[data-tb-weiter]')!.addEventListener('click', () => blaettere(1));
+  dialog.querySelector('[data-tb-zurueck]')!.addEventListener('click', () => blaettereAutomatisch(-1));
+  dialog.querySelector('[data-tb-weiter]')!.addEventListener('click', () => blaettereAutomatisch(1));
   dialog.querySelector('[data-tb-formular]')!.addEventListener('submit', absenden);
+  richteZiehenEin();
   bereit = true;
 }
 
 export function oeffneTerminbuch() {
   if (!bereit) einrichten();
   dialog.querySelector<HTMLElement>('[data-tb-danke]')!.hidden = true;
-  dialog.querySelector<HTMLElement>('[data-tb-formular]')!.hidden = false;
-  monat = heute();
-  monat.setDate(1);
+  zeigeFormular(Boolean(gewaehlt), false);
+  monat = plusMonate(heute(), 0);
   zeichneMonat();
   dialog.showModal();
-  // Nächstes Bild: Animationen starten (Deckel klappt auf, Seite blättert, Feder kreist)
+  // Nächstes Bild: Deckel klappt auf, Blatt blättert, Feder kreist
   requestAnimationFrame(() => {
     dialog.classList.add('tb-offen');
     kreiseHeute(ruhig() ? 0 : 650);
   });
 }
 
-function blaettere(richtung: number) {
-  const ziel = new Date(monat);
-  ziel.setMonth(ziel.getMonth() + richtung);
-  const grenzeVorn = heute();
-  grenzeVorn.setDate(1);
-  const grenzeHinten = new Date(grenzeVorn);
-  grenzeHinten.setMonth(grenzeHinten.getMonth() + regeln.monateVoraus);
-  if (ziel < grenzeVorn || ziel > grenzeHinten) return;
-  monat = ziel;
-  // Ein Blatt dreht sich über die Seite, darunter steht schon der neue Monat.
-  const blatt = dialog.querySelector<HTMLElement>('.tb-blatt')!;
-  blatt.classList.remove('tb-blatt-vor', 'tb-blatt-zurueck');
-  void blatt.offsetWidth;
-  if (!ruhig()) blatt.classList.add(richtung > 0 ? 'tb-blatt-vor' : 'tb-blatt-zurueck');
-  zeichneMonat();
-  kreiseHeute(ruhig() ? 0 : 350);
+/* ---------- Kalender ---------- */
+
+/** Baut das Monatsraster. Interaktiv = Tage als Knöpfe; sonst stille Kopie fürs Umblätter-Blatt. */
+function baueRaster(ziel: HTMLElement, m: Date, interaktiv: boolean) {
+  ziel.replaceChildren();
+  const versatz = (m.getDay() + 6) % 7; // Montag = 0
+  for (let i = 0; i < versatz; i++) ziel.append(document.createElement('span'));
+  const letzter = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+  for (let t = 1; t <= letzter; t++) {
+    const d = new Date(m.getFullYear(), m.getMonth(), t);
+    const istHeute = gleich(d, heute());
+    const istFrei = frei(d);
+    const tag = document.createElement(interaktiv ? 'button' : 'span');
+    tag.className = 'tb-tag';
+    tag.textContent = String(t);
+    if (istHeute) tag.classList.add('tb-heute');
+    if (!istFrei) tag.classList.add('tb-belegt');
+    if (interaktiv) {
+      const k = tag as HTMLButtonElement;
+      k.type = 'button';
+      k.disabled = !istFrei;
+      k.setAttribute('aria-label', `${langesDatum(d)}${istHeute ? ', heute' : ''}${istFrei ? '' : ', nicht verfügbar'}`);
+      k.addEventListener('click', () => {
+        if (gezogen) return; // Klick am Ende einer Ziehbewegung ignorieren
+        waehle(d, k);
+      });
+    }
+    if (gewaehlt && gleich(d, gewaehlt)) {
+      if (interaktiv) tag.setAttribute('aria-pressed', 'true');
+      tag.append(siegel(false));
+    }
+    ziel.append(tag);
+  }
 }
 
 function zeichneMonat() {
   dialog.querySelector('[data-tb-monat]')!.textContent = `${MONATE[monat.getMonth()]} ${monat.getFullYear()}`;
-  const tage = dialog.querySelector<HTMLElement>('[data-tb-tage]')!;
-  tage.replaceChildren();
-  const versatz = (monat.getDay() + 6) % 7; // Montag = 0
-  for (let i = 0; i < versatz; i++) tage.append(document.createElement('span'));
-  const letzter = new Date(monat.getFullYear(), monat.getMonth() + 1, 0).getDate();
-  for (let t = 1; t <= letzter; t++) {
-    const d = new Date(monat.getFullYear(), monat.getMonth(), t);
-    const knopf = document.createElement('button');
-    knopf.type = 'button';
-    knopf.className = 'tb-tag';
-    knopf.textContent = String(t);
-    const istHeute = gleich(d, heute());
-    const istFrei = frei(d);
-    knopf.disabled = !istFrei;
-    knopf.setAttribute('aria-label', `${langesDatum(d)}${istHeute ? ', heute' : ''}${istFrei ? '' : ', nicht verfügbar'}`);
-    if (istHeute) knopf.classList.add('tb-heute');
-    if (gewaehlt && gleich(d, gewaehlt)) {
-      knopf.setAttribute('aria-pressed', 'true');
-      knopf.append(siegel(false));
-    }
-    knopf.addEventListener('click', () => waehle(d, knopf));
-    tage.append(knopf);
-  }
+  baueRaster(dialog.querySelector<HTMLElement>('[data-tb-tage]')!, monat, true);
+  dialog.querySelector<HTMLButtonElement>('[data-tb-zurueck]')!.disabled = !erlaubt(plusMonate(monat, -1));
+  dialog.querySelector<HTMLButtonElement>('[data-tb-weiter]')!.disabled = !erlaubt(plusMonate(monat, 1));
 }
+
+/** Stille Kopie einer Kalenderseite für das Blatt. */
+function kalenderKopie(m: Date) {
+  const seite = document.createElement('div');
+  seite.className = 'tb-kopie';
+  const kopf = document.createElement('div');
+  kopf.className = 'tb-monat';
+  kopf.innerHTML = `<span></span><h2>${MONATE[m.getMonth()]} ${m.getFullYear()}</h2><span></span>`;
+  const woche = document.createElement('div');
+  woche.className = 'tb-wochentage';
+  woche.innerHTML = KURZ.map((k) => `<span>${k}</span>`).join('');
+  const raster = document.createElement('div');
+  raster.className = 'tb-tage';
+  baueRaster(raster, m, false);
+  // Heute bleibt auch auf der Kopie umkreist
+  const heuteZelle = raster.querySelector('.tb-heute');
+  const kreis = links.querySelector('.tb-kreis svg');
+  if (heuteZelle && kreis) {
+    const k = document.createElement('span');
+    k.className = 'tb-kreis';
+    const svg = kreis.cloneNode(true) as SVGElement;
+    svg.querySelector('path')!.style.strokeDashoffset = '0';
+    k.append(svg);
+    heuteZelle.append(k);
+  }
+  seite.append(kopf, woche, raster);
+  return seite;
+}
+
+/** Leere rechte Buchseite für das Blatt. */
+function leereKopie() {
+  const seite = document.createElement('div');
+  seite.className = 'tb-kopie tb-kopie-leer';
+  return seite;
+}
+
+/* ---------- Umblättern ---------- */
+
+type Blaettern = {
+  richtung: 1 | -1;
+  ziel: Date;
+  /** Winkel am Anfang und Ende (Grad). */
+  von: number;
+  bis: number;
+  /** Fortschritt 0…1 */
+  p: number;
+};
+
+let aktuell: Blaettern | null = null;
+let gezogen = false;
+const leaf = () => dialog.querySelector<HTMLElement>('.tb-leaf')!;
+const schatten = () => dialog.querySelector<HTMLElement>('.tb-leaf-schatten')!;
+
+/** Legt das Blatt bereit: über welche Seite, an welcher Kante es hängt, was vorn und hinten steht. */
+function beginne(richtung: 1 | -1): Blaettern | null {
+  const ziel = plusMonate(monat, richtung);
+  if (!erlaubt(ziel) || aktuell) return null;
+  const blatt = leaf();
+  const vorn = blatt.querySelector<HTMLElement>('.tb-leaf-vorn')!;
+  const hinten = blatt.querySelector<HTMLElement>('.tb-leaf-hinten')!;
+  let host: HTMLElement;
+  let kante: 'links' | 'rechts';
+  let von = 0;
+  let bis: number;
+
+  if (!einseitig()) {
+    if (richtung > 0) {
+      // Rechte Seite hebt sich an der Bindung, Rückseite zeigt den neuen Monat
+      host = rechts;
+      kante = 'links';
+      bis = -180;
+      vorn.replaceChildren(leereKopie());
+      hinten.replaceChildren(kalenderKopie(ziel));
+    } else {
+      // Linke Seite hebt sich, darunter liegt sofort der Vormonat
+      host = links;
+      kante = 'rechts';
+      bis = 180;
+      vorn.replaceChildren(kalenderKopie(monat));
+      hinten.replaceChildren(leereKopie());
+      monat = ziel;
+      zeichneMonat();
+      kreiseHeute(0);
+    }
+  } else {
+    host = links;
+    kante = 'links';
+    if (richtung > 0) {
+      // Kalenderseite blättert nach links weg, darunter der nächste Monat
+      vorn.replaceChildren(kalenderKopie(monat));
+      hinten.replaceChildren(leereKopie());
+      bis = -180;
+      monat = ziel;
+      zeichneMonat();
+      kreiseHeute(0);
+    } else {
+      // Vormonat kommt von links herein
+      vorn.replaceChildren(kalenderKopie(ziel));
+      hinten.replaceChildren(leereKopie());
+      von = -180;
+      bis = 0;
+    }
+  }
+  blatt.style.left = `${host.offsetLeft}px`;
+  blatt.style.top = `${host.offsetTop}px`;
+  blatt.style.width = `${host.offsetWidth}px`;
+  blatt.style.height = `${host.offsetHeight}px`;
+  blatt.style.transformOrigin = kante === 'links' ? 'left center' : 'right center';
+  blatt.dataset.kante = kante;
+  const sch = schatten();
+  sch.style.left = blatt.style.left;
+  sch.style.top = blatt.style.top;
+  sch.style.width = blatt.style.width;
+  sch.style.height = blatt.style.height;
+  blatt.hidden = false;
+  sch.hidden = false;
+  aktuell = { richtung, ziel, von, bis, p: 0 };
+  setze(0);
+  return aktuell;
+}
+
+/** Stellt das Blatt auf Fortschritt p (0…1) – mit Licht und Schatten, damit es wie Papier wirkt. */
+function setze(p: number) {
+  if (!aktuell) return;
+  aktuell.p = p;
+  const winkel = aktuell.von + (aktuell.bis - aktuell.von) * p;
+  const blatt = leaf();
+  // Leichte Wölbung: Papier biegt sich in der Mitte der Bewegung etwas
+  const biegung = Math.sin((Math.abs(winkel) / 180) * Math.PI);
+  blatt.style.transform = `rotateY(${winkel}deg) skewY(${(blatt.dataset.kante === 'links' ? -1 : 1) * biegung * 1.5}deg)`;
+  blatt.style.setProperty('--licht', String(biegung));
+  schatten().style.opacity = String(biegung * 0.6);
+}
+
+function beende(ganz: boolean, dauer = 280) {
+  const b = aktuell;
+  if (!b) return;
+  const start = b.p;
+  const ziel = ganz ? 1 : 0;
+  const t0 = performance.now();
+  const d = ruhig() ? 0 : Math.max(120, dauer * Math.abs(ziel - start));
+  const schritt = (jetzt: number) => {
+    const t = d ? Math.min(1, (jetzt - t0) / d) : 1;
+    const e = 1 - (1 - t) ** 3;
+    setze(start + (ziel - start) * e);
+    if (t < 1) requestAnimationFrame(schritt);
+    else abschliessen(ganz);
+  };
+  requestAnimationFrame(schritt);
+}
+
+function abschliessen(ganz: boolean) {
+  const b = aktuell!;
+  aktuell = null;
+  leaf().hidden = true;
+  schatten().hidden = true;
+  const vorwaerts = b.richtung > 0;
+  const dopp = !einseitig();
+  if (ganz) {
+    // Monat, der jetzt aufgeschlagen sein soll
+    monat = b.ziel;
+  } else {
+    // Abgebrochen: zurück zum Monat vor dem Ziehen
+    monat = plusMonate(b.ziel, -b.richtung);
+  }
+  // Nur neu zeichnen, wenn der sichtbare Monat nicht schon stimmt
+  if ((dopp && vorwaerts) || (!dopp && !vorwaerts) || !ganz) zeichneMonat();
+  kreiseHeute(ruhig() || !ganz ? 0 : 60);
+}
+
+function blaettereAutomatisch(richtung: 1 | -1) {
+  if (ruhig()) {
+    const ziel = plusMonate(monat, richtung);
+    if (!erlaubt(ziel)) return;
+    monat = ziel;
+    zeichneMonat();
+    kreiseHeute(0);
+    return;
+  }
+  if (beginne(richtung)) beende(true, 520);
+}
+
+/** Greifen und Ziehen mit Maus oder Finger. */
+function richteZiehenEin() {
+  let start: { x: number; y: number; seite: 'links' | 'rechts' } | null = null;
+  let breite = 1;
+
+  const greifbar = (el: Element) => !el.closest('input, textarea, select, label, fieldset, a, .tb-blaettern, .tb-danke');
+
+  buch.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || aktuell) return;
+    const ziel = e.target as Element;
+    const seite = ziel.closest('.tb-rechts') ? 'rechts' : ziel.closest('.tb-links') ? 'links' : null;
+    if (!seite || !greifbar(ziel)) return;
+    if (!einseitig() && seite === 'rechts' && !dialog.querySelector<HTMLElement>('[data-tb-formular]')!.hidden && !ziel.closest('.tb-ecke')) {
+      // Rechts liegt das Formular: dort nur am Eselsohr greifen
+      if (!ziel.classList.contains('tb-seite')) return;
+    }
+    start = { x: e.clientX, y: e.clientY, seite };
+    gezogen = false;
+    breite = (einseitig() ? links.offsetWidth : buch.offsetWidth) * 0.85;
+  });
+
+  addEventListener('pointermove', (e) => {
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (!aktuell) {
+      // Erst ab einer deutlichen waagerechten Bewegung blättern (sonst ist es ein Klick oder Scrollen)
+      if (Math.abs(dx) < 10 || Math.abs(dx) < Math.abs(dy)) {
+        if (Math.abs(dy) > 14) start = null;
+        return;
+      }
+      let richtung: 1 | -1;
+      if (!einseitig()) {
+        if (start.seite === 'rechts' && dx < 0) richtung = 1;
+        else if (start.seite === 'links' && dx > 0) richtung = -1;
+        else return;
+      } else {
+        richtung = dx < 0 ? 1 : -1;
+      }
+      if (!beginne(richtung)) {
+        start = null;
+        return;
+      }
+      gezogen = true;
+    }
+    setze(Math.max(0, Math.min(1, Math.abs(dx) / breite)));
+  });
+
+  const loslassen = (e: PointerEvent) => {
+    if (!start) return;
+    const s = start;
+    start = null;
+    if (!aktuell) return;
+    void e;
+    void s;
+    // Über ein gutes Drittel gezogen: Seite fällt um. Sonst legt sie sich zurück.
+    beende(aktuell.p > 0.35);
+    // Der Klick, der auf das Loslassen folgt, soll keinen Tag auswählen
+    setTimeout(() => (gezogen = false), 0);
+  };
+  addEventListener('pointerup', loslassen);
+  addEventListener('pointercancel', loslassen);
+}
+
+/* ---------- Feder, Siegel, Formular ---------- */
 
 /** Rote Tinte: Kreis um den heutigen Tag, die Feder fährt mit. */
 function kreiseHeute(verzoegerung: number) {
-  const zelle = dialog.querySelector<HTMLElement>('.tb-heute');
+  const zelle = links.querySelector<HTMLElement>('.tb-heute');
   if (!zelle) return;
   zelle.querySelector('.tb-kreis')?.remove();
   const b = zelle.clientWidth;
@@ -139,31 +405,37 @@ function kreiseHeute(verzoegerung: number) {
   linie.setAttribute('d', pfad);
   svg.append(linie);
   huelle.append(svg);
+  zelle.append(huelle);
+  const laenge = linie.getTotalLength();
+  linie.style.strokeDasharray = `${laenge}`;
+  if (ruhig() || verzoegerung === 0) {
+    linie.style.strokeDashoffset = '0';
+    return;
+  }
+  linie.style.strokeDashoffset = `${laenge}`;
   const feder = document.createElement('span');
   feder.className = 'tb-feder';
   feder.style.offsetPath = `path('${pfad}')`;
   feder.innerHTML =
     '<svg viewBox="0 0 40 40" width="34" height="34"><path d="M37 3C24 5 12 14 7 27l-3 9 4-3c3-6 7-10 12-13-4 4-7 8-9 13 12-4 22-15 26-30z" fill="#f6efe0" stroke="#5a4636" stroke-width="1.2"/><path d="M4 36 20 20" stroke="#5a4636" stroke-width="1.2"/></svg>';
   huelle.append(feder);
-  zelle.append(huelle);
-  const laenge = linie.getTotalLength();
-  linie.style.strokeDasharray = `${laenge}`;
-  linie.style.strokeDashoffset = ruhig() ? '0' : `${laenge}`;
-  if (ruhig()) {
-    feder.remove();
-    return;
-  }
   const dauer = 900;
-  linie.animate([{ strokeDashoffset: laenge }, { strokeDashoffset: 0 }], { duration: dauer, delay: verzoegerung, easing: 'ease-in-out', fill: 'forwards' });
-  feder.animate(
-    [
-      { offsetDistance: '0%', opacity: 0 },
-      { offsetDistance: '3%', opacity: 1 },
-      { offsetDistance: '97%', opacity: 1 },
-      { offsetDistance: '100%', opacity: 0 },
-    ],
-    { duration: dauer, delay: verzoegerung, easing: 'ease-in-out', fill: 'both' },
-  );
+  linie
+    .animate([{ strokeDashoffset: laenge }, { strokeDashoffset: 0 }], { duration: dauer, delay: verzoegerung, easing: 'ease-in-out', fill: 'forwards' })
+    .finished.then(() => (linie.style.strokeDashoffset = '0'))
+    .catch(() => {});
+  feder
+    .animate(
+      [
+        { offsetDistance: '0%', opacity: 0 },
+        { offsetDistance: '3%', opacity: 1 },
+        { offsetDistance: '97%', opacity: 1 },
+        { offsetDistance: '100%', opacity: 0 },
+      ],
+      { duration: dauer, delay: verzoegerung, easing: 'ease-in-out', fill: 'both' },
+    )
+    .finished.then(() => feder.remove())
+    .catch(() => {});
 }
 
 function siegel(animiert: boolean) {
@@ -184,9 +456,23 @@ function siegel(animiert: boolean) {
   return s;
 }
 
+/** Rechte Seite: leer, bis ein Tag gewählt ist; dann „schreiben“ sich die Felder hinein. */
+function zeigeFormular(an: boolean, schreiben: boolean) {
+  const form = dialog.querySelector<HTMLFormElement>('[data-tb-formular]')!;
+  const leer = dialog.querySelector<HTMLElement>('[data-tb-leer]')!;
+  const war = !form.hidden;
+  form.hidden = !an;
+  leer.hidden = an;
+  if (an && !war && schreiben && !ruhig()) {
+    form.classList.remove('tb-schreibt');
+    void form.offsetWidth;
+    form.classList.add('tb-schreibt');
+  }
+}
+
 function waehle(d: Date, knopf: HTMLButtonElement) {
   gewaehlt = d;
-  dialog.querySelectorAll('.tb-tag[aria-pressed]').forEach((k) => {
+  dialog.querySelectorAll('.tb-links .tb-tag[aria-pressed]').forEach((k) => {
     k.removeAttribute('aria-pressed');
     k.querySelector('.tb-tagsiegel')?.remove();
   });
@@ -194,8 +480,9 @@ function waehle(d: Date, knopf: HTMLButtonElement) {
   knopf.append(siegel(true));
   dialog.querySelector('[data-tb-gewaehlt]')!.textContent = `Gewählt: ${langesDatum(d)}`;
   dialog.querySelector('[data-tb-fehler]')!.textContent = '';
+  zeigeFormular(true, true);
   // Auf dem Handy liegt das Formular unter dem Kalender: dorthin weiterführen.
-  if (innerWidth < 760) dialog.querySelector('.tb-rechts')!.scrollIntoView({ behavior: ruhig() ? 'auto' : 'smooth', block: 'start' });
+  if (einseitig()) rechts.scrollIntoView({ behavior: ruhig() ? 'auto' : 'smooth', block: 'start' });
 }
 
 function absenden(e: Event) {
@@ -207,7 +494,7 @@ function absenden(e: Event) {
   const kontakt = String(daten.get('kontakt') ?? '').trim();
   if (!gewaehlt) {
     fehler.textContent = 'Bitte wähle zuerst einen Tag im Kalender.';
-    dialog.querySelector<HTMLButtonElement>('.tb-tag:not(:disabled)')?.focus();
+    dialog.querySelector<HTMLButtonElement>('.tb-links .tb-tag:not(:disabled)')?.focus();
     return;
   }
   if (!name || !kontakt) {
