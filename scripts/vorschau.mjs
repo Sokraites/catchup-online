@@ -81,7 +81,7 @@ function schreibe(ziel, inhalt) {
 
 for (const datei of alle('dist')) {
   const rel = relative('dist', datei);
-  if (rel.startsWith('_astro/') || rel.startsWith('fonts/') || rel.endsWith('LICENSE.txt')) continue;
+  if (rel.startsWith('_astro/') || rel.startsWith('fonts/') || rel.endsWith('LICENSE.txt') || /\.(br|gz)$/.test(rel)) continue;
   if (rel.endsWith('.html')) {
     const quelle = rel;
     const tiefe = 1 + rel.split('/').length - 1;

@@ -43,13 +43,13 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 ## Phase D: Monitor und Scroll-Erlebnis
 
-- [ ] Monitor zentral dargestellt (zunächst statisch, alle Geräte)
-- [ ] Seiteninhalt im Monitor ist echter, lesbarer Text
-- [ ] Scrollgesteuerter Inhaltswechsel im Monitor
-- [ ] Zusammenspiel von Kacheln und Monitor abgestimmt
-- [ ] Idee „Monitor durch die Geschichte des Digitalen“ bewertet und entschieden
+- [x] Monitor zentral dargestellt (zunächst statisch, alle Geräte)
+- [x] Seiteninhalt im Monitor ist echter, lesbarer Text
+- [x] Scrollgesteuerter Inhaltswechsel im Monitor
+- [x] Zusammenspiel von Kacheln und Monitor abgestimmt
+- [x] Idee „Monitor durch die Geschichte des Digitalen“ bewertet und entschieden
   - [x] Entwurf gebaut: `/entwurf/monitor/` (Rad-Wechsel, Epochen 1995 bis heute, normaler Scroll, Tastatur, ruhige Variante)
-  - [ ] Gründer hat den Entwurf auf Handy und Desktop angesehen und entschieden
+  - [x] Gründer hat den Entwurf auf Handy und Desktop angesehen und entschieden (beibehalten, ist jetzt Startseite)
 
 ## Phase D2 (neu): KI-Mitarbeiter-Unterseite
 
@@ -57,7 +57,7 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - [x] Handy: seitliches Durchwischen wie bei Bildergalerien
 - [x] Desktop: beim Scrollen kommen die Stufen von rechts herein
 - [x] 3D-Figuren pro Stufe, unterschiedlich professionell, mit einladenden Animationen (Three.js, nur auf dieser Seite geladen)
-- [ ] Ruhige Variante bei reduzierter Bewegung, Bedienung per Tastatur
+- [x] Ruhige Variante bei reduzierter Bewegung, Bedienung per Tastatur
 
 ## Phase D3 (neu): Terminbuch
 
@@ -73,12 +73,12 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 ## Phase E: Qualität
 
-- [ ] Test auf Smartphone-Breite, Tablet-Breite und Desktop
-- [ ] Leistungsmessung (Lighthouse mobil sowie Largest Contentful Paint, Interaction to Next Paint, Cumulative Layout Shift)
-- [ ] Barrierefreiheit geprüft (Tastatur, Kontrast, Alternativtexte)
-- [ ] Seite ohne JavaScript lesbar
-- [ ] Abgleich mit Zielbild (Abschnitte 1 und 4) und Liste der Lücken
-- [ ] Abschlussbericht: Was fehlt noch vor dem Livegang
+- [x] Test auf Smartphone-Breite, Tablet-Breite und Desktop
+- [x] Leistungsmessung (Lighthouse mobil sowie Largest Contentful Paint, Interaction to Next Paint, Cumulative Layout Shift)
+- [x] Barrierefreiheit geprüft (Tastatur, Kontrast, Alternativtexte)
+- [x] Seite ohne JavaScript lesbar
+- [x] Abgleich mit Zielbild (Abschnitte 1 und 4) und Liste der Lücken
+- [x] Abschlussbericht: Was fehlt noch vor dem Livegang (siehe `docs/QUALITAET.md`)
 
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
@@ -93,6 +93,8 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
 - `npm run vorschau`: baut aus `dist/` eine Fassung mit relativen Links in `.vorschau/` (für die private Vorschau).
 - `npm run monitore`: rendert Monitor-Gehäuse und KI-Figuren-Standbilder aus den 3D-Modellen neu.
+- `npm run komprimieren`: komprimierte Fassungen für schnellere Auslieferung (nach dem Bauen).
+- `sh scripts/messen.sh`: Lighthouse-Messung im Handy-Modus; `node scripts/reaktion.mjs`: Reaktionszeit auf Eingaben.
 - `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.
 
 ## Bekannte Lücken (laufend)

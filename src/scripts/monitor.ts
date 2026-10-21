@@ -226,8 +226,9 @@ export function starteMonitor() {
     const i = seiten.findIndex((s) => s === ziel || s.contains(ziel));
     if (i < 0) return;
     e.preventDefault();
-    zeige(i);
     history.replaceState(null, '', a.hash);
+    // Erst den Klick sichtbar beantworten, dann springen: Der Sprung berechnet die ganze Animation neu.
+    setTimeout(() => zeige(i), 0);
   });
 
   // Tastatur: Fokus in einem anderen Abschnitt holt diesen Abschnitt nach vorne.

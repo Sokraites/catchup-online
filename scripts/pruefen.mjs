@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 
 const axe = readFileSync(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
-const basis = 'http://localhost:4321';
+const basis = process.env.BASIS ?? 'http://localhost:4321';
 const fotos = process.argv[2];
 const seiten = ['/', '/webseiten-erstellen/', '/webseiten-modernisieren/', '/auffindbarkeit/', '/ki-mitarbeiter/', '/termin/', '/impressum/', '/datenschutz/'];
 const geraete = {

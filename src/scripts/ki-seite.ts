@@ -7,10 +7,7 @@
  * - Die 3D-Figuren (Three.js) werden erst geladen, wenn die Stufen in Sichtweite kommen.
  *   Bis dahin, ohne 3D-Unterstützung oder bei reduzierter Bewegung bleibt das Standbild stehen.
  */
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import type { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 /**
  * @param wurzel Wo die Stufen liegen (Standard: ganze Seite).
@@ -35,10 +32,16 @@ export function starteKiSeite(wurzel: ParentNode = document, eingebettet = false
   function gehe(i: number) {
     i = Math.max(0, Math.min(stufen.length - 1, i));
     if (st) {
-      scrollTo({ top: st.start + (st.end - st.start) * (i / (stufen.length - 1)), behavior: ruhig ? 'auto' : 'smooth' });
+      scrollTo({
+        top: st.start + (st.end - st.start) * (i / (stufen.length - 1)),
+        behavior: ruhig ? 'auto' : 'smooth',
+      });
     } else {
       const ziel = stufen[i];
-      spur.scrollTo({ left: ziel.offsetLeft - (spur.clientWidth - ziel.clientWidth) / 2, behavior: ruhig ? 'auto' : 'smooth' });
+      spur.scrollTo({
+        left: ziel.offsetLeft - (spur.clientWidth - ziel.clientWidth) / 2,
+        behavior: ruhig ? 'auto' : 'smooth',
+      });
     }
     markiere(i);
   }
@@ -49,20 +52,29 @@ export function starteKiSeite(wurzel: ParentNode = document, eingebettet = false
 
   if (gekoppelt) {
     // Desktop: Seiten-Scroll schiebt die Spur seitlich, solange der Bereich oben angeheftet ist.
+    // Die Scroll-Bibliothek wird nur am Desktop geladen, wo sie gebraucht wird.
     bereich.classList.add('stufen-gekoppelt');
-    const weg = () => Math.max(0, spur.scrollWidth - spur.clientWidth);
-    const tween = gsap.to(spur, { x: () => -weg(), ease: 'none' });
-    st = ScrollTrigger.create({
-      animation: tween,
-      trigger: bereich,
-      // Passt der Bereich nicht ganz auf den Bildschirm, wird erst angeheftet, wenn sein Ende sichtbar ist.
-      start: () => (bereich.offsetHeight > innerHeight ? 'bottom bottom' : 'top top'),
-      end: () => `+=${weg()}`,
-      pin: true,
-      scrub: true,
-      invalidateOnRefresh: true,
-      onUpdate: (s) => markiere(Math.round(s.progress * (stufen.length - 1))),
-      snap: { snapTo: 1 / (stufen.length - 1), duration: { min: 0.2, max: 0.5 }, delay: 0.1, ease: 'power2.out' },
+    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([{ gsap }, { ScrollTrigger }]) => {
+      gsap.registerPlugin(ScrollTrigger);
+      const weg = () => Math.max(0, spur.scrollWidth - spur.clientWidth);
+      const tween = gsap.to(spur, { x: () => -weg(), ease: 'none' });
+      st = ScrollTrigger.create({
+        animation: tween,
+        trigger: bereich,
+        // Passt der Bereich nicht ganz auf den Bildschirm, wird erst angeheftet, wenn sein Ende sichtbar ist.
+        start: () => (bereich.offsetHeight > innerHeight ? 'bottom bottom' : 'top top'),
+        end: () => `+=${weg()}`,
+        pin: true,
+        scrub: true,
+        invalidateOnRefresh: true,
+        onUpdate: (s) => markiere(Math.round(s.progress * (stufen.length - 1))),
+        snap: {
+          snapTo: 1 / (stufen.length - 1),
+          duration: { min: 0.2, max: 0.5 },
+          delay: 0.1,
+          ease: 'power2.out',
+        },
+      });
     });
   } else {
     // Handy und Tablet: Wischen; aktive Stufe aus der Scrollposition der Spur.
@@ -77,7 +89,11 @@ export function starteKiSeite(wurzel: ParentNode = document, eingebettet = false
           const mitte = spur.scrollLeft + spur.clientWidth / 2;
           let beste = 0;
           stufen.forEach((s, i) => {
-            if (Math.abs(s.offsetLeft + s.clientWidth / 2 - mitte) < Math.abs(stufen[beste].offsetLeft + stufen[beste].clientWidth / 2 - mitte)) beste = i;
+            if (
+              Math.abs(s.offsetLeft + s.clientWidth / 2 - mitte) <
+              Math.abs(stufen[beste].offsetLeft + stufen[beste].clientWidth / 2 - mitte)
+            )
+              beste = i;
           });
           markiere(beste);
         });
@@ -108,9 +124,11 @@ function starteFiguren(bereich: HTMLElement, stufen: HTMLElement[]) {
         // Ohne 3D bleibt das Standbild stehen.
       }
     },
-    { rootMargin: '400px' },
+    // Erst laden, wenn die Stufen wirklich ins Bild kommen – das 3D-Programm ist der größte Brocken der Seite.
+    { rootMargin: '0px' },
   );
-  vorab.observe(bereich);
+  // Beobachtet wird die erste Figur: Erst wenn sie ins Bild kommt, lohnt sich das Laden.
+  vorab.observe(stufen[0].querySelector('.figur') ?? bereich);
 }
 
 type Figuren = typeof import('./ki-figuren.js');
@@ -142,14 +160,25 @@ function belebe(THREE: typeof import('three'), figuren: Figuren, stufen: HTMLEle
     const canvas = stufe.querySelector<HTMLCanvasElement>('canvas[data-figur]')!;
     let renderer: import('three').WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'low-power',
+      });
     } catch {
       return null;
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     renderer.setClearColor(0x000000, 0);
     const buehne = figuren.baueBuehne(i, renderer);
-    const eintrag: Belebt = { renderer, buehne, canvas, sichtbar: false, winkSeit: -10 };
+    const eintrag: Belebt = {
+      renderer,
+      buehne,
+      canvas,
+      sichtbar: false,
+      winkSeit: -10,
+    };
     belebt.set(stufe, eintrag);
     passeAn(eintrag);
     return eintrag;

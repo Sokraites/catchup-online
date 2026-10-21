@@ -9,7 +9,8 @@
     "bilder": "node scripts/bilder.mjs",
     "pruefen": "node scripts/pruefen.mjs",
     "vorschau": "node scripts/vorschau.mjs",
-    "monitore": "node scripts/monitore-rendern.mjs"
+    "monitore": "node scripts/monitore-rendern.mjs",
+    "komprimieren": "node scripts/komprimieren.mjs"
   },
   "dependencies": {
     "astro": "7.3.5",
@@ -25,6 +26,7 @@
     "@fontsource/young-serif": "5.3.0",
     "axe-core": "4.14.0",
     "esbuild": "0.28.2",
+    "lighthouse": "13.5.0",
     "playwright": "1.56.1"
   }
 }

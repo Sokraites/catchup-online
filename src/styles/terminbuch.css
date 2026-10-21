@@ -586,6 +586,10 @@
     width: 100%;
     max-height: 100dvh;
   }
+  /* Platz für den Schließen-Knopf, damit er die Monatspfeile nicht überdeckt */
+  .tb-links .tb-monat {
+    padding-right: 48px;
+  }
   .tb-schliessen {
     position: fixed;
     top: max(10px, env(safe-area-inset-top, 0px));
