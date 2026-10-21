@@ -62,7 +62,7 @@ Alle Seiten sind ohne JavaScript vollständig lesbar (geprüft): Die Startseite 
 - Auf echten Handys nicht getestet (nur nachgestellt). Bitte Checkliste unten durchgehen.
 - 3D läuft hier über einen Software-Ersatz; auf echten Geräten mit Grafikchip ist es flüssiger, aber ungetestet.
 - Die Startseite liegt beim Hauptinhalt genau auf 2,5 s; mit langsamem Hosting könnte es knapp darüber liegen.
-- Kachelpfad: Kacheln außerhalb kleiner Bildschirme (Handy quer) sind nicht erreichbar.
+- Kachelpfad auf dem Handy: zählt erst, wenn der Monitor hochkant steht (im flachen Querformat zu Beginn passen die Pfad-Kacheln nicht hinein). Antippen einer Pfad-Kachel über einer Karte öffnet die Karte; kurzes Wischen schaltet frei, ohne etwas zu öffnen.
 - Terminbuch: belegte Tage und echter Versand fehlen (erst mit Hosting).
 - Messung der Anfragen: nur vorbereitet.
 
@@ -82,9 +82,9 @@ Alle Seiten sind ohne JavaScript vollständig lesbar (geprüft): Die Startseite 
 1. Startseite öffnen: Sieht man zuerst einen Röhrenmonitor?
 2. Scrollen: Fühlt es sich wie normales Scrollen an? Stört das Einrasten?
 3. Wechselt der Monitor sichtbar die Epoche, ohne zu ruckeln?
-4. Mit dem Finger über den Bildschirm streichen: Funkelt es? Leuchtet Kachel 7/7 dauerhaft?
+4. Erst ein Stück scrollen (Monitor hochkant), dann mit kurzem Wischen über die Kacheln streichen: Funkelt es? Leuchtet Kachel 7/7 dauerhaft? Lässt sich der Pfad bis 5/5 freischalten?
 5. Eine Leistungskarte antippen: Öffnet sich ein Tab im Monitor? Kommt man zurück?
-6. „Projekt ansehen“ und „In neuem Tab öffnen“ beim Referenzprojekt.
+6. „Projekt ansehen“ beim Referenzprojekt: Erscheint es im Monitor-Tab?
 7. „Termin buchen“: Klappt das Buch auf? Kreist die Feder den heutigen Tag ein?
 8. Kalenderseite mit dem Finger umblättern: Fühlt sich das Blatt wie Papier an?
 9. Tag wählen, Felder ausfüllen, absenden: Faltet sich der Brief?

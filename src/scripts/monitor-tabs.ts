@@ -104,11 +104,6 @@ export function starteMonitorTabs() {
     zeichneTabs();
     const tab = tabs[i];
     seite!.classList.toggle('mit-rahmen', Boolean(tab.rahmen));
-    const extern = seite!.querySelector<HTMLAnchorElement>('[data-tab-extern]');
-    if (extern) {
-      extern.hidden = !tab.rahmen;
-      extern.href = tab.href;
-    }
     try {
       if (tab.rahmen) {
         // Eigenständige Seite: als ganze Seite im Monitor zeigen

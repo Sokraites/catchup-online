@@ -125,9 +125,13 @@ export function starteKacheln() {
     return out;
   }
 
+  /** Der Pfad zählt erst, wenn alle seine Kacheln ganz auf dem Bildschirm liegen
+   *  (auf dem Handy nicht im flachen Querformat zu Beginn, sonst verrutscht das Raster danach). */
+  const pfadPasst = () => pfad().every(([r, s]) => r < Math.floor(bh / groesse) && s < Math.floor(bb / groesse));
+
   function beruehre(kachel: [number, number], jetzt: number) {
     leuchtet.set(`${kachel[0]},${kachel[1]}`, jetzt);
-    const ziel = pfad()[freigeschaltet];
+    const ziel = pfadPasst() ? pfad()[freigeschaltet] : undefined;
     if (ziel && ziel[0] === kachel[0] && ziel[1] === kachel[1]) {
       freigeschaltet++;
       pulsSeit = jetzt;

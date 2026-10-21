@@ -61,7 +61,7 @@ function seite(quelle, tiefe, { fragment = false } = {}) {
   });
   html = html.replace(/url\(\/((?:monitore|ki)\/)/g, `url(${zurWurzel}site/$1`);
   html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">');
-  html = html.replace(/<\/body>/, `${STATUS}</body>`);
+  if (!quelle.startsWith("referenzen/")) html = html.replace(/<\/body>/, `${STATUS}</body>`);
   if (fragment) {
     // Hauptseite: Die Vorschau-Umgebung setzt das Grundgerüst selbst.
     html = html
