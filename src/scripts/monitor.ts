@@ -25,7 +25,13 @@ const FUSS = bilder as Record<string, { b: number; h: number }>;
 const DREH_WEG = 0.8;
 const DREH_WINKEL = 72;
 
-export function starteMonitor() {
+/** Steuerung von außen (Tabs im Monitor): andere Abschnitte ins Rad legen. */
+export type MonitorSteuerung = {
+  /** Legt die Abschnitte einer Unterseite ins Rad (null = wieder die Startseite) und scrollt an ihren Anfang bzw. nach `zurueckNach`. */
+  wechsleSeiten(neu: HTMLElement[] | null, zurueckNach?: number): void;
+};
+
+export function starteMonitor(): MonitorSteuerung | undefined {
   const buehne = document.querySelector<HTMLElement>('[data-monitor]');
   if (!buehne) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -36,7 +42,8 @@ export function starteMonitor() {
   const schirm = buehne.querySelector<HTMLElement>('.monitor-schirm')!;
   const monitor = buehne.querySelector<HTMLElement>('.monitor')!;
   const flaeche = buehne.querySelector<HTMLElement>('.monitor-flaeche')!;
-  const seiten = [...flaeche.children].filter((e): e is HTMLElement => e.tagName === 'SECTION');
+  const startSeiten = [...flaeche.children].filter((e): e is HTMLElement => e.tagName === 'SECTION');
+  let seiten = startSeiten;
   const gehaeuse = new Map([...buehne.querySelectorAll<HTMLElement>('.mg')].map((el) => [Number(el.dataset.mg), el]));
 
   html.classList.add('monitor-an');
@@ -75,7 +82,8 @@ export function starteMonitor() {
     );
   }
 
-  function baue() {
+  /** @param halten an derselben Stelle im Inhalt bleiben (z. B. nach dem Aufklappen einer Frage) */
+  function baue(halten = true) {
     const relVorher = scrollY - buehnenStart();
     const abschnittVorher = aktiv;
     const versatzVorher = relVorher - (starts[abschnittVorher] ?? 0);
@@ -195,10 +203,10 @@ export function starteMonitor() {
       },
     });
 
-    setzeAktiv(abschnittBei(Math.max(0, relVorher)));
+    setzeAktiv(halten ? abschnittBei(Math.max(0, relVorher)) : 0);
 
     // Nach einem Neuaufbau (z. B. Frage aufgeklappt) an derselben Stelle bleiben.
-    if (relVorher > 0 && starts.length) {
+    if (halten && relVorher > 0 && starts.length) {
       const ziel = buehnenStart() + starts[abschnittVorher] + Math.min(Math.max(0, versatzVorher), innen[abschnittVorher]);
       scrollTo({ top: ziel, behavior: 'instant' as ScrollBehavior });
     }
@@ -254,8 +262,20 @@ export function starteMonitor() {
     }, 150);
   });
 
+  function wechsleSeiten(neu: HTMLElement[] | null, zurueckNach?: number) {
+    seiten.forEach((s) => s.remove());
+    seiten = neu ?? startSeiten;
+    flaeche.append(...seiten);
+    aktiv = 0;
+    baue(false);
+    // Unterseite beginnt im Lesezustand (ohne den Querformat-Auftakt), die Startseite dort, wo man war.
+    scrollTo({ top: zurueckNach ?? buehnenStart() + starts[0], behavior: 'instant' as ScrollBehavior });
+    ScrollTrigger.update();
+  }
+
   breiteZuletzt = innerWidth;
   // Erst bauen, wenn die Schriften da sind, sonst stimmen die Höhen nicht.
-  document.fonts.ready.then(baue);
+  document.fonts.ready.then(() => baue());
   baue();
+  return { wechsleSeiten };
 }

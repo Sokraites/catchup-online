@@ -803,3 +803,43 @@ span.tb-tag.tb-belegt {
   user-select: text;
   -webkit-user-select: text;
 }
+
+/* ---------- Handy: Monate seitlich wischen ---------- */
+.tb-spur {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Seitlich wischen blättert, senkrecht scrollt das Buch */
+  touch-action: pan-x pan-y;
+}
+.tb-spur::-webkit-scrollbar {
+  display: none;
+}
+.tb-spur[hidden],
+.tb-tage[hidden],
+.tb-wochentage[hidden] {
+  display: none;
+}
+.tb-spur-platz {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.tb-spur-seite {
+  position: relative;
+  height: 100%;
+  background: var(--papier);
+}
+.tb-mit-spur .tb-seite {
+  touch-action: auto;
+}
+.tb-mit-spur .tb-ecke-links {
+  display: none;
+}
+.tb-leaf-seite > .tb-kopie-spur {
+  padding: 0;
+}

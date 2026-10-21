@@ -1,21 +1,26 @@
 /**
  * Tabs im Monitor-Browser.
  *
- * Ein Klick auf einen Link im Monitor öffnet oben in der Browserleiste einen neuen Tab,
- * und die Unterseite erscheint im Bildschirm. Über die Tabs geht es zurück zur Übersicht.
+ * Ein Klick auf einen Link im Monitor oder in der Kopfleiste öffnet oben in der Browserleiste
+ * einen neuen Tab, und die Unterseite erscheint im Bildschirm. Über die Tabs geht es zurück zur Übersicht.
  *
  * - Die Unterseite wird von ihrer echten Adresse geladen (dieselbe Seite, die Google sieht).
+ * - Ihre Abschnitte kommen ins Monitor-Rad: Sie scrollt mit demselben Rad- und Epochen-Effekt wie die Startseite.
  * - Die Adresszeile zeigt den Pfad, die Browser-Zurück-Taste schließt den Tab wieder.
  * - Die Tabs in der Leiste sind Bedienhilfe für Maus und Finger; für Tastatur und Vorlesehilfen
  *   gibt es in der Unterseite den Knopf „Zurück zur Übersicht“.
  * - Ohne Monitor (ohne JavaScript, reduzierte Bewegung) sind es ganz normale Links.
  */
 import { navigation } from '../config/site';
+import type { MonitorSteuerung } from './monitor';
 
-/** rahmen: Seite mit eigener Gestaltung (z. B. Referenzprojekt), wird als ganze Seite im Tab gezeigt. */
-type Tab = { href: string; titel: string; html?: string; rahmen?: boolean };
+/**
+ * rahmen: Seite mit eigener Gestaltung (z. B. Referenzprojekt), wird als ganze Seite im Tab gezeigt.
+ * abschnitte: geladene Abschnitte der Unterseite (bleiben erhalten, solange der Tab offen ist).
+ */
+type Tab = { href: string; titel: string; abschnitte?: HTMLElement[]; rahmen?: boolean; belebt?: boolean };
 
-export function starteMonitorTabs() {
+export function starteMonitorTabs(monitor: MonitorSteuerung | undefined) {
   const html = document.documentElement;
   if (!html.classList.contains('monitor-an')) return;
   const schirm = document.querySelector<HTMLElement>('.monitor-schirm');
@@ -23,11 +28,15 @@ export function starteMonitorTabs() {
   const seite = document.querySelector<HTMLElement>('[data-tab-seite]');
   const inhalt = document.querySelector<HTMLElement>('[data-tab-inhalt]');
   const flaeche = document.querySelector<HTMLElement>('.monitor-flaeche');
-  if (!schirm || !geraet || !seite || !inhalt || !flaeche) return;
+  if (!monitor || !schirm || !geraet || !seite || !inhalt || !flaeche) return;
 
   const startAdresse = location.href;
   const tabs: Tab[] = [];
   let aktiv = -1; // -1 = Übersicht
+  /** Liegt gerade eine Unterseite im Rad (statt der Startseite)? */
+  let imRad = false;
+  /** Scrollposition der Startseite, bevor der erste Tab aufging */
+  let startScroll = 0;
 
   const titelFuer = (href: string, doc?: Document) => {
     const pfad = new URL(href).pathname;
@@ -69,10 +78,15 @@ export function starteMonitorTabs() {
     });
     const pfad = aktiv >= 0 ? pfadFuer(tabs[aktiv].href) : '';
     document.querySelectorAll('[data-pfad]').forEach((p) => (p.textContent = pfad));
+    // Kopfleiste: offener Tab ist die aktuelle Seite
+    document.querySelectorAll<HTMLAnchorElement>('.main-nav a').forEach((a) => {
+      if (aktiv >= 0 && a.href === tabs[aktiv].href) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
   }
 
   async function lade(tab: Tab) {
-    if (tab.html) return tab.html;
+    if (tab.abschnitte) return tab.abschnitte;
     const antwort = await fetch(tab.href);
     const doc = new DOMParser().parseFromString(await antwort.text(), 'text/html');
     const main = doc.querySelector('main');
@@ -85,8 +99,20 @@ export function starteMonitorTabs() {
       }
     });
     tab.titel = titelFuer(tab.href, doc);
-    tab.html = main.innerHTML;
-    return tab.html;
+    const abschnitte = [...main.children].filter((e): e is HTMLElement => e.tagName === 'SECTION');
+    if (!abschnitte.length) throw new Error('keine Abschnitte');
+    // Für Tastatur und Vorlesehilfen: Zurück-Knopf am Anfang der Unterseite
+    const kopf = document.createElement('p');
+    kopf.className = 'tab-kopf tab-kopf-rad';
+    const zurueck = document.createElement('button');
+    zurueck.type = 'button';
+    zurueck.className = 'tab-zurueck';
+    zurueck.textContent = '← Zurück zur Übersicht';
+    zurueck.addEventListener('click', () => zeigeUebersicht(true));
+    kopf.append(zurueck);
+    (abschnitte[0].firstElementChild ?? abschnitte[0]).prepend(kopf);
+    tab.abschnitte = abschnitte.map((a) => document.adoptNode(a));
+    return tab.abschnitte;
   }
 
   async function oeffne(href: string, rahmen = false, titel?: string) {
@@ -95,25 +121,45 @@ export function starteMonitorTabs() {
       tabs.push({ href, titel: titel ?? titelFuer(href), rahmen });
       i = tabs.length - 1;
     }
-    await zeigeTab(i, false);
+    // Erst den Verlauf-Eintrag anlegen: So merkt sich der Browser die Stelle auf der Startseite.
     history.pushState({ monitorTab: href }, '', href);
+    await zeigeTab(i, false);
   }
 
   async function zeigeTab(i: number, adresseErsetzen: boolean) {
+    if (aktiv < 0 && !imRad) startScroll = scrollY;
     aktiv = i;
     zeichneTabs();
     const tab = tabs[i];
-    seite!.classList.toggle('mit-rahmen', Boolean(tab.rahmen));
     try {
       if (tab.rahmen) {
-        // Eigenständige Seite: als ganze Seite im Monitor zeigen
+        // Eigenständige Seite: als ganze Seite im Monitor zeigen (eigener Bildlauf, die Seite dahinter steht)
+        seite!.classList.add('mit-rahmen');
         const rahmen = document.createElement('iframe');
         rahmen.className = 'tab-rahmen';
         rahmen.src = tab.href;
         rahmen.title = tab.titel;
         inhalt!.replaceChildren(rahmen);
+        seite!.hidden = false;
+        flaeche!.style.visibility = 'hidden';
+        html.classList.add('monitor-tab-offen');
+        seite!.querySelector<HTMLElement>('[data-tab-zurueck]')?.focus({ preventScroll: true });
       } else {
-        inhalt!.innerHTML = await lade(tab);
+        // Unterseite ins Rad legen: gleiche Drehung und Epochen wie die Startseite
+        const abschnitte = await lade(tab);
+        if (aktiv !== i) return; // inzwischen ein anderer Tab gewählt
+        seite!.hidden = true;
+        inhalt!.replaceChildren();
+        flaeche!.style.visibility = '';
+        html.classList.remove('monitor-tab-offen');
+        monitor!.wechsleSeiten(abschnitte);
+        imRad = true;
+        abschnitte[0].querySelector<HTMLElement>('.tab-zurueck')?.focus({ preventScroll: true });
+        // Die KI-Seite bringt eigene Bewegung mit (Stufen und Figuren)
+        if (!tab.belebt && abschnitte.some((a) => a.matches('[data-stufen]') || a.querySelector('[data-stufen]'))) {
+          tab.belebt = true;
+          import('./ki-seite').then(({ starteKiSeite }) => starteKiSeite(flaeche!, true));
+        }
       }
     } catch {
       // Laden fehlgeschlagen: ganz normal zur Seite wechseln
@@ -121,24 +167,19 @@ export function starteMonitorTabs() {
       return;
     }
     zeichneTabs();
-    seite!.hidden = false;
-    flaeche!.style.visibility = 'hidden';
-    seite!.scrollTop = 0;
-    // Während eine Unterseite offen ist, scrollt nur sie, nicht die Startseite dahinter.
-    html.classList.add('monitor-tab-offen');
     if (adresseErsetzen) history.replaceState({ monitorTab: tabs[i].href }, '', tabs[i].href);
-    seite!.querySelector<HTMLElement>('[data-tab-zurueck]')?.focus({ preventScroll: true });
-    // Die KI-Seite bringt eigene Bewegung mit (Stufen und Figuren)
-    if (inhalt!.querySelector('[data-stufen]')) {
-      import('./ki-seite').then(({ starteKiSeite }) => starteKiSeite(inhalt!, true));
-    }
   }
 
   function zeigeUebersicht(adresseErsetzen: boolean) {
     aktiv = -1;
     seite!.hidden = true;
+    inhalt!.replaceChildren();
     flaeche!.style.visibility = '';
     html.classList.remove('monitor-tab-offen');
+    if (imRad) {
+      imRad = false;
+      monitor!.wechsleSeiten(null, startScroll);
+    }
     zeichneTabs();
     if (adresseErsetzen) history.replaceState(null, '', startAdresse);
   }
@@ -157,7 +198,8 @@ export function starteMonitorTabs() {
   document.addEventListener('click', (e) => {
     if (e.defaultPrevented || (e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey || (e as MouseEvent).shiftKey) return;
     const a = (e.target as Element).closest<HTMLAnchorElement>('a[href]');
-    if (!a || !schirm!.contains(a) || a.target) return;
+    // Links im Bildschirm und in der Kopfleiste (Menü, Logo); „Termin buchen“ bleibt beim Terminbuch.
+    if (!a || !(schirm!.contains(a) || a.closest('.site-header')) || a.target) return;
     const roh = a.getAttribute('href') ?? '';
     if (roh.startsWith('#') || /^(mailto|tel):/.test(roh)) return;
     const ziel = new URL(a.href);
@@ -180,7 +222,7 @@ export function starteMonitorTabs() {
     if (!href) return zeigeUebersicht(false);
     const i = tabs.findIndex((t) => t.href === href);
     if (i >= 0) zeigeTab(i, false);
-    else oeffne(href, true);
+    else oeffne(href, href.includes('/referenzen/'));
   });
 
   zeichneTabs();

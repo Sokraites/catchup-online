@@ -83,9 +83,9 @@ Alle Seiten sind ohne JavaScript vollständig lesbar (geprüft): Die Startseite 
 2. Scrollen: Fühlt es sich wie normales Scrollen an? Stört das Einrasten?
 3. Wechselt der Monitor sichtbar die Epoche, ohne zu ruckeln?
 4. Erst ein Stück scrollen (Monitor hochkant), dann mit kurzem Wischen über die Kacheln streichen: Funkelt es? Leuchtet Kachel 7/7 dauerhaft? Lässt sich der Pfad bis 5/5 freischalten?
-5. Eine Leistungskarte antippen: Öffnet sich ein Tab im Monitor? Kommt man zurück?
+5. Eine Leistungskarte oder einen Menüpunkt oben antippen: Öffnet sich ein Tab im Monitor? Dreht die Unterseite beim Scrollen wie die Startseite? Kommt man zurück an dieselbe Stelle?
 6. „Projekt ansehen“ beim Referenzprojekt: Erscheint es im Monitor-Tab?
 7. „Termin buchen“: Klappt das Buch auf? Kreist die Feder den heutigen Tag ein?
-8. Kalenderseite mit dem Finger umblättern: Fühlt sich das Blatt wie Papier an?
+8. Kalenderseite seitlich wischen: Wölbt sich das Blatt, rastet der nächste Monat ein? Pfeile ebenso?
 9. Tag wählen, Felder ausfüllen, absenden: Faltet sich der Brief?
 10. KI-Seite: seitlich wischen, winken die Figuren?

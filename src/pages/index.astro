@@ -41,6 +41,5 @@ import { faqSeite, website } from '../lib/schema';
 <script>
   import { starteMonitor } from '../scripts/monitor';
   import { starteMonitorTabs } from '../scripts/monitor-tabs';
-  starteMonitor();
-  starteMonitorTabs();
+  starteMonitorTabs(starteMonitor());
 </script>

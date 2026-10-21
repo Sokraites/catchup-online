@@ -5,7 +5,9 @@
  * - Desktop (Doppelseite): rechte Seite greifen und nach links ziehen → nächster Monat
  *   (die Rückseite des Blatts zeigt ihn schon, sobald das Blatt über die Mitte kommt);
  *   linke Seite nach rechts ziehen → Vormonat (liegt sofort darunter).
- * - Handy (eine Seite): Kalenderseite nach links ziehen → nächster Monat, nach rechts → Vormonat.
+ * - Handy (eine Seite): Die Monate liegen in einer Wisch-Spur (normales seitliches Scrollen mit Einrasten,
+ *   wie bei den KI-Stufen). Das Wischen steuert das Blatt: Die obere Seite wölbt sich und blättert um,
+ *   darunter liegt schon der nächste Monat. Weil der Browser das Wischen selbst übernimmt, hakt nichts.
  * - Pfeile blättern mit derselben Bewegung automatisch.
  *
  * Grundsatz: Animationen laufen nebenher. Alles ist sofort bedienbar, niemand wartet auf eine Animation.
@@ -70,6 +72,15 @@ function einrichten() {
   dialog.querySelector('[data-tb-weiter]')!.addEventListener('click', () => blaettereAutomatisch(1));
   dialog.querySelector('[data-tb-formular]')!.addEventListener('submit', absenden);
   richteZiehenEin();
+  addEventListener('resize', () => {
+    if (!dialog.open) return;
+    if (einseitig() !== mitSpur()) {
+      richteAnsichtEin();
+      zeichneMonat();
+      kreiseHeute(0);
+    }
+    if (mitSpur()) zeigeSpurSeite(spurMonate.findIndex((m) => gleich(m, monat)), false);
+  });
   bereit = true;
 }
 
@@ -78,8 +89,10 @@ export function oeffneTerminbuch() {
   dialog.querySelector<HTMLElement>('[data-tb-danke]')!.hidden = true;
   zeigeFormular(Boolean(gewaehlt), false);
   monat = plusMonate(heute(), 0);
+  richteAnsichtEin();
   zeichneMonat();
   dialog.showModal();
+  if (mitSpur()) stelleSpur();
   // Nächstes Bild: Deckel klappt auf, Blatt blättert, Feder kreist
   requestAnimationFrame(() => {
     dialog.classList.add('tb-offen');
@@ -124,7 +137,7 @@ function baueRaster(ziel: HTMLElement, m: Date, interaktiv: boolean) {
 
 function zeichneMonat() {
   dialog.querySelector('[data-tb-monat]')!.textContent = `${MONATE[monat.getMonth()]} ${monat.getFullYear()}`;
-  baueRaster(dialog.querySelector<HTMLElement>('[data-tb-tage]')!, monat, true);
+  if (!mitSpur()) baueRaster(dialog.querySelector<HTMLElement>('[data-tb-tage]')!, monat, true);
   dialog.querySelector<HTMLButtonElement>('[data-tb-zurueck]')!.disabled = !erlaubt(plusMonate(monat, -1));
   dialog.querySelector<HTMLButtonElement>('[data-tb-weiter]')!.disabled = !erlaubt(plusMonate(monat, 1));
 }
@@ -302,7 +315,11 @@ function baueStreifen(blatt: HTMLElement, b: number, h: number, kante: 'links' |
 function setze(p: number) {
   if (!aktuell) return;
   aktuell.p = p;
-  const winkel = aktuell.von + (aktuell.bis - aktuell.von) * p;
+  stelleBlatt(aktuell.von + (aktuell.bis - aktuell.von) * p);
+}
+
+/** Stellt das Blatt auf einen Winkel (0 flach … -180 ganz umgeblättert). */
+function stelleBlatt(winkel: number) {
   const blatt = leaf();
   const hub = Math.sin((Math.abs(winkel) / 180) * Math.PI); // 0 flach … 1 senkrecht
   const n = streifen.length;
@@ -365,6 +382,11 @@ function abschliessen(ganz: boolean) {
 }
 
 function blaettereAutomatisch(richtung: 1 | -1) {
+  if (mitSpur()) {
+    const i = spurMonate.findIndex((m) => gleich(m, monat)) + richtung;
+    if (i >= 0 && i < spurMonate.length) zeigeSpurSeite(i, !ruhig());
+    return;
+  }
   if (ruhig()) {
     const ziel = plusMonate(monat, richtung);
     if (!erlaubt(ziel)) return;
@@ -385,7 +407,8 @@ function richteZiehenEin() {
   const greifbar = (el: Element) => !el.closest('input, textarea, select, label, fieldset, a, .tb-blaettern, .tb-danke');
 
   buch.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || aktuell) return;
+    // Handy: Blättern übernimmt die Wisch-Spur
+    if (e.button !== 0 || aktuell || mitSpur()) return;
     const ziel = e.target as Element;
     const seite = ziel.closest('.tb-rechts') ? 'rechts' : ziel.closest('.tb-links') ? 'links' : null;
     if (!seite || !greifbar(ziel)) return;
@@ -441,6 +464,154 @@ function richteZiehenEin() {
   };
   addEventListener('pointerup', loslassen);
   addEventListener('pointercancel', loslassen);
+}
+
+/* ---------- Handy: Monate seitlich wischen ---------- */
+
+let spur: HTMLElement | null = null;
+let spurSeiten: HTMLElement[] = [];
+let spurMonate: Date[] = [];
+/** Aus welcher Seite das Blatt gerade gebaut ist (-1 = keins) */
+let spurBlatt = -1;
+let spurGeplant = false;
+let hinweisText = '';
+const mitSpur = () => Boolean(spur && !spur.hidden);
+
+/** Handy: Wisch-Spur mit allen buchbaren Monaten. Desktop: Doppelseite mit Ziehen. */
+function richteAnsichtEin() {
+  const tage = links.querySelector<HTMLElement>('[data-tb-tage]')!;
+  const woche = links.querySelector<HTMLElement>('.tb-wochentage')!;
+  const hinweis = links.querySelector<HTMLElement>('.tb-hinweis')!;
+  const leer = dialog.querySelector<HTMLElement>('[data-tb-leer] p')!;
+  hinweisText ||= hinweis.textContent ?? '';
+  leer.textContent = einseitig() ? 'Wähle oben einen Tag.' : 'Wähle links einen Tag.';
+  if (!einseitig()) {
+    if (spur) spur.hidden = true;
+    tage.hidden = false;
+    woche.hidden = false;
+    dialog.classList.remove('tb-mit-spur');
+    hinweis.textContent = hinweisText;
+    return;
+  }
+  if (!spur) {
+    spur = document.createElement('div');
+    spur.className = 'tb-spur';
+    spur.addEventListener('scroll', () => {
+      if (spurGeplant) return;
+      spurGeplant = true;
+      requestAnimationFrame(stelleSpur);
+    }, { passive: true });
+    tage.after(spur);
+  }
+  spur.hidden = false;
+  tage.hidden = true;
+  tage.replaceChildren();
+  woche.hidden = true;
+  dialog.classList.add('tb-mit-spur');
+  hinweis.textContent = 'Rot umkreist: heute. Wähle einen freien Tag. Zum Blättern seitlich wischen.';
+  const erster = heute();
+  erster.setDate(1);
+  spurMonate = [];
+  for (let m = erster; erlaubt(m); m = plusMonate(m, 1)) spurMonate.push(m);
+  // Platzhalter rasten ein (bleiben unbewegt), die Seite darin liegt still wie in einem Buch.
+  const plaetze = spurMonate.map((m, i) => {
+    const platz = document.createElement('div');
+    platz.className = 'tb-spur-platz';
+    const seite = document.createElement('div');
+    seite.className = 'tb-spur-seite';
+    seite.setAttribute('role', 'group');
+    seite.setAttribute('aria-label', `${MONATE[m.getMonth()]} ${m.getFullYear()}`);
+    seite.style.zIndex = String(spurMonate.length - i);
+    const w = woche.cloneNode(true) as HTMLElement;
+    w.hidden = false;
+    const raster = document.createElement('div');
+    raster.className = 'tb-tage';
+    baueRaster(raster, m, true);
+    seite.append(w, raster);
+    platz.append(seite);
+    return platz;
+  });
+  spurSeiten = plaetze.map((p) => p.firstElementChild as HTMLElement);
+  spur.replaceChildren(...plaetze);
+  spurBlatt = -1;
+  const i = Math.max(0, spurMonate.findIndex((m) => gleich(m, monat)));
+  spur.scrollLeft = i * spur.clientWidth;
+}
+
+function zeigeSpurSeite(i: number, sanft: boolean) {
+  if (!spur || i < 0) return;
+  spur.scrollTo({ left: i * spur.clientWidth, behavior: sanft ? 'smooth' : 'auto' });
+}
+
+/**
+ * Folgt der Wisch-Spur: Die Seiten bleiben übereinander liegen wie in einem Buch.
+ * Die gerade umgeblätterte Seite wird durch das gewölbte Blatt ersetzt, das sich mit dem Finger dreht.
+ */
+function stelleSpur() {
+  spurGeplant = false;
+  if (!spur || !mitSpur()) return;
+  const b = spur.clientWidth || 1;
+  const pos = Math.max(0, Math.min(spurSeiten.length - 1, spur.scrollLeft / b));
+  let i = Math.floor(pos);
+  let p = pos - i;
+  if (p < 0.004) p = 0;
+  if (p > 0.996) {
+    i += 1;
+    p = 0;
+  }
+  const still = ruhig();
+  spurSeiten.forEach((s, n) => {
+    const q = Math.max(-1, Math.min(1, pos - n));
+    // Seite bleibt an ihrem Platz liegen (die Spur schiebt sie sonst weg)
+    s.style.transform = still ? '' : `translateX(${(q * b).toFixed(1)}px)`;
+    s.style.visibility = still || (q > -1 && q <= 0) || (n === i && p === 0) ? '' : 'hidden';
+    s.inert = n !== Math.round(pos);
+  });
+  // Monat im Kopf und Pfeile folgen der Seite, die gerade oben liegt
+  const sichtbar = spurMonate[Math.round(pos)];
+  if (sichtbar && !gleich(sichtbar, monat)) {
+    monat = sichtbar;
+    zeichneMonat();
+  }
+  if (still) return;
+  const blatt = leaf();
+  if (p > 0) {
+    if (spurBlatt !== i) baueSpurBlatt(i);
+    blatt.hidden = false;
+    schatten().hidden = false;
+    stelleBlatt(-180 * p);
+  } else if (spurBlatt !== -1) {
+    blatt.hidden = true;
+    schatten().hidden = true;
+    spurBlatt = -1;
+  }
+}
+
+/** Baut das gewölbte Blatt aus einer Monatsseite der Spur. */
+function baueSpurBlatt(i: number) {
+  const r = spur!.getBoundingClientRect();
+  const rb = buch.getBoundingClientRect();
+  const b = r.width;
+  const h = r.height;
+  const vorn = document.createElement('div');
+  vorn.className = 'tb-kopie tb-kopie-spur';
+  const kopie = spurSeiten[i].cloneNode(true) as HTMLElement;
+  kopie.querySelectorAll('.tb-feder').forEach((f) => f.remove());
+  kopie.querySelectorAll<SVGPathElement>('.tb-kreis path').forEach((pfad) => (pfad.style.strokeDashoffset = '0'));
+  vorn.append(...kopie.childNodes);
+  const blatt = leaf();
+  const sch = schatten();
+  for (const el of [blatt, sch]) {
+    el.style.left = `${r.left - rb.left}px`;
+    el.style.top = `${r.top - rb.top}px`;
+    el.style.width = `${b}px`;
+    el.style.height = `${h}px`;
+  }
+  blatt.style.transformOrigin = 'left center';
+  blatt.dataset.kante = 'links';
+  griffY = 0.85; // wie mit dem Daumen unten an der Ecke
+  baueStreifen(blatt, b, h, 'links', vorn, leereKopie());
+  spurBlatt = i;
 }
 
 /* ---------- Feder, Siegel, Formular ---------- */
