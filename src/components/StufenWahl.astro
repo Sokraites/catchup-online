@@ -1,0 +1,32 @@
+---
+/**
+ * Wahl der Darstellung („Schwierigkeitsgrad“): beim ersten Besuch als Hinweis unten,
+ * danach jederzeit über den Schalter oben rechts (StufenSchalter.astro).
+ * Blockiert nichts: Die Seite bleibt dahinter lesbar und bedienbar.
+ * Ohne JavaScript bleibt der Hinweis aus, die Seite ist dann ohnehin ruhig.
+ */
+import { stufen } from '../config/stufen';
+---
+
+<section class="stufen-banner" aria-labelledby="darstellung-titel" data-stufen-banner hidden>
+  <div class="stufen-banner-kopf">
+    <h2 id="darstellung-titel">Wie viel Show darf’s sein?</h2>
+    <button type="button" class="stufen-zu" data-stufen-zu aria-label="Hinweis schließen, Darstellung so lassen">×</button>
+  </div>
+  <p class="stufen-banner-text">Wähle deinen Schwierigkeitsgrad. Der Inhalt bleibt gleich, nur die Darstellung ändert sich. Ändern kannst du das jederzeit oben rechts.</p>
+  <div class="stufen-optionen">
+    {
+      stufen.map((s, i) => (
+        <button type="button" class="stufen-option" data-stufe-waehlen={s.id}>
+          <span class="stufen-balken" aria-hidden="true" data-grad={i + 1}>
+            <i /><i /><i />
+          </span>
+          <span class="stufen-option-titel">{s.titel}</span>
+          <span class="stufen-option-kurz">{s.kurz}</span>
+          <span class="stufen-option-text">{s.text}</span>
+        </button>
+      ))
+    }
+  </div>
+  <p class="stufen-banner-fuss">Wir merken uns nur deine Wahl auf diesem Gerät. Kein Cookie, keine Weitergabe.</p>
+</section>

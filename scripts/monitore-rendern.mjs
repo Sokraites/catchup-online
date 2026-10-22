@@ -2,13 +2,14 @@
 // - Monitore (Rahmen, Knöpfe, Fuß) aus scripts/render/monitore.html → public/monitore/*.webp
 //   Maße aus src/config/monitore.json, Bildgrößen nach src/config/monitore-bilder.json
 // - KI-Figuren (Standbilder) aus scripts/render/figuren.html → public/ki/*.webp
+// - Große Szenen (Zeitreise, Leistungen) aus scripts/render/szenen.html → public/bilder/*.webp
 //   npm run monitore
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 
-const typen = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json' };
+const typen = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2' };
 const server = createServer(async (req, res) => {
   try {
     const pfad = join(process.cwd(), decodeURIComponent(new URL(req.url, 'http://x').pathname));
@@ -29,7 +30,7 @@ const page = await browser.newPage();
 page.on('pageerror', (e) => console.error('Fehler im Render-Werkzeug:', e.message));
 async function rendere(seite, ordner) {
   await page.goto(`http://localhost:${port}/scripts/render/${seite}`);
-  await page.waitForFunction(() => window.bereit, null, { timeout: 60000 });
+  await page.waitForFunction(() => window.bereit, null, { timeout: 120000 });
   const bilder = await page.evaluate(() => window.rendereAlles());
   await mkdir(ordner, { recursive: true });
   const masse = {};
@@ -40,9 +41,14 @@ async function rendere(seite, ordner) {
   console.log(`${Object.keys(bilder).length} Bilder in ${ordner}/`);
   return masse;
 }
-const masse = await rendere('monitore.html', 'public/monitore');
-// Bildgrößen für die Seite (damit nichts springt, bevor die Bilder geladen sind)
-await writeFile('src/config/monitore-bilder.json', JSON.stringify(masse, null, 2) + '\n');
-await rendere('figuren.html', 'public/ki');
+// Nur die großen Bilder: node scripts/monitore-rendern.mjs szenen
+if (process.argv[2] !== 'szenen') {
+  const masse = await rendere('monitore.html', 'public/monitore');
+  // Bildgrößen für die Seite (damit nichts springt, bevor die Bilder geladen sind)
+  await writeFile('src/config/monitore-bilder.json', JSON.stringify(masse, null, 2) + '\n');
+  await rendere('figuren.html', 'public/ki');
+}
+// Große Bilder für die Darstellung „Leicht“
+await rendere('szenen.html', 'public/bilder');
 await browser.close();
 server.close();

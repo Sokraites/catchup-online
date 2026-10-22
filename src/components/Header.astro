@@ -2,6 +2,7 @@
 import { site, navigation } from '../config/site';
 import Logo from './Logo.astro';
 import Auge from './Auge.astro';
+import StufenSchalter from './StufenSchalter.astro';
 
 const current = Astro.url.pathname;
 ---
@@ -27,5 +28,6 @@ const current = Astro.url.pathname;
       </ul>
     </nav>
     <a class="button button-small header-cta" href="/termin/">Termin buchen</a>
+    <StufenSchalter />
   </div>
 </header>

@@ -47,4 +47,5 @@ export const navigation = [
   { href: '/webseiten-modernisieren/', label: 'Modernisierung' },
   { href: '/auffindbarkeit/', label: 'Gefunden werden' },
   { href: '/ki-mitarbeiter/', label: 'KI-Mitarbeiter' },
+  { href: '/software-nach-mass/', label: 'Software nach Maß' },
 ] as const;

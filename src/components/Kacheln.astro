@@ -17,5 +17,7 @@
 
 <script>
   import { starteKacheln } from '../scripts/kacheln';
-  starteKacheln();
+  import { verspielt } from '../scripts/stufe';
+  // Kachel-Rätsel mit Auge: nur in der Stufe „schwer“
+  if (verspielt()) starteKacheln();
 </script>

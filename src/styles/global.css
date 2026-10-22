@@ -1168,3 +1168,398 @@ span.button {
     scroll-behavior: auto !important;
   }
 }
+
+/* Nur für Vorlesehilfen sichtbar */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Darstellungs-Stufen ---------- */
+
+/* Stufe „leicht“ wirkt wie „Bewegung reduzieren“ */
+html[data-stufe='leicht'] *,
+html[data-stufe='leicht'] *::before,
+html[data-stufe='leicht'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+/* Kachel-Rätsel und Auge nur in der Stufe „schwer“ */
+html:not([data-stufe='schwer']) .auge,
+html:not([data-stufe='schwer']) canvas.kacheln,
+html:not([data-stufe='schwer']) .pfad-meldung {
+  display: none !important;
+}
+
+/* Balken-Symbol: 1, 2 oder 3 gefüllte Balken */
+.stufen-balken {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+.stufen-balken i {
+  width: 5px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.stufen-balken i:nth-child(1) {
+  height: 8px;
+}
+.stufen-balken i:nth-child(2) {
+  height: 13px;
+}
+.stufen-balken i:nth-child(3) {
+  height: 18px;
+}
+.stufen-balken[data-grad='1'] i:nth-child(-n + 1),
+.stufen-balken[data-grad='2'] i:nth-child(-n + 2),
+.stufen-balken[data-grad='3'] i:nth-child(-n + 3) {
+  background: var(--accent-2);
+}
+
+/* Schalter oben rechts */
+.stufe-schalter {
+  position: relative;
+}
+.stufe-schalter[hidden] {
+  display: none;
+}
+.stufe-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.stufe-knopf:hover,
+.stufe-knopf[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+.stufe-menue {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  gap: 0.35rem;
+  width: min(16rem, calc(100vw - 2 * var(--gutter)));
+  padding: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.5);
+}
+.stufe-menue[hidden] {
+  display: none;
+}
+.stufe-menue-titel {
+  margin: 0 0 0.25rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+.stufe-menue-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.stufe-menue-option strong,
+.stufe-menue-option small {
+  display: block;
+}
+.stufe-menue-option small {
+  color: var(--muted);
+}
+.stufe-menue-option:hover,
+.stufe-menue-option.ist-aktiv {
+  border-color: var(--accent);
+  background: rgb(124 77 255 / 0.12);
+}
+
+/* Hinweis beim ersten Besuch: unten, blockiert nichts */
+.stufen-banner {
+  position: fixed;
+  z-index: 70;
+  left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  bottom: max(var(--gutter), env(safe-area-inset-bottom, 0px));
+  max-width: 56rem;
+  margin-inline: auto;
+  padding: 1.25rem;
+  background: rgb(27 27 38 / 0.97);
+  border: 1px solid var(--accent);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.6), 0 0 0 6px rgb(124 77 255 / 0.12);
+  animation: stufen-rein 0.4s ease-out both;
+}
+.stufen-banner[hidden] {
+  display: none;
+}
+@keyframes stufen-rein {
+  from {
+    transform: translateY(calc(100% + 24px));
+  }
+}
+.stufen-banner-kopf {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.stufen-banner h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 5vw, 1.75rem);
+}
+.stufen-zu {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: -0.5rem -0.5rem 0 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.stufen-zu:hover {
+  color: var(--ink);
+}
+.stufen-banner-text {
+  margin: 0.5rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.stufen-optionen {
+  display: grid;
+  gap: 0.6rem;
+}
+@media (min-width: 44rem) {
+  .stufen-optionen {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.stufen-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.15rem 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.stufen-option:hover,
+.stufen-option:focus-visible {
+  border-color: var(--accent);
+  background: rgb(124 77 255 / 0.12);
+}
+.stufen-option.ist-aktiv {
+  border-color: var(--accent-2);
+}
+.stufen-option .stufen-balken {
+  grid-row: span 2;
+}
+.stufen-option-titel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.stufen-option-kurz {
+  color: var(--accent-2);
+  font-size: 0.85rem;
+}
+.stufen-option-text {
+  grid-column: 1 / -1;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+@media (max-width: 43.99rem) {
+  /* Handy: kompakt, damit die Seite dahinter sichtbar bleibt */
+  .stufen-option-text {
+    display: none;
+  }
+  .stufen-banner {
+    padding: 1rem;
+  }
+}
+.stufen-banner-fuss {
+  margin: 0.85rem 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+/* ---------- Große Bilder (ruhige Darstellung: Leicht, ohne Skript, reduzierte Bewegung) ---------- */
+.monitor-an .bild-ruhig {
+  display: none;
+}
+.hero-bild {
+  display: block;
+  margin-top: clamp(2rem, 6vw, 3.5rem);
+}
+.hero-bild img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: 0 30px 90px rgb(124 77 255 / 0.18);
+}
+.card-bild {
+  display: block;
+  width: calc(100% + 3rem);
+  max-width: none;
+  height: auto;
+  margin: -1.5rem -1.5rem 1.25rem;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: 1px solid var(--line);
+}
+/* Figur-Standbild: quadratisch, auf lila Schein */
+.card-bild[src*='/ki/'] {
+  object-fit: contain;
+  background: radial-gradient(circle at 50% 60%, rgb(124 77 255 / 0.35), transparent 65%), #0d0d13;
+}
+.idee-bild,
+.seiten-bild {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.seiten-bild {
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+}
+.idee-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+  padding: 0;
+  list-style: none;
+}
+.idee-chips li {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+#idee .actions {
+  margin-top: 1.5rem;
+}
+@media (min-width: 64rem) {
+  .cards > .card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Kopfleiste: Logo, Termin-Knopf und Stufen-Schalter brechen nie um, das Menü gibt nach */
+.brand,
+.header-cta,
+.stufe-schalter {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+@media (min-width: 60rem) {
+  .main-nav {
+    min-width: 0;
+  }
+}
+/* Schalter zeigt in der Kopfleiste nur das Balken-Symbol (Name steht im Menü und im Tooltip) */
+.stufe-knopf-text {
+  display: none;
+}
+.stufe-knopf {
+  padding: 0;
+}
+@media (min-width: 60rem) {
+  .nav-list a {
+    padding-inline: 0.45rem;
+    font-size: 0.92rem;
+  }
+}
+/* Mittlere Breite: Menü in eigener Zeile wie auf dem Handy, damit nichts abgeschnitten wird */
+@media (min-width: 60rem) and (max-width: 79.99rem) {
+  .header-inner {
+    flex-wrap: wrap;
+    padding-block: 0.5rem 0;
+  }
+  .main-nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
+/* Stufe „leicht“: nur das Nötigste. Die Abschnitte bleiben im HTML (Google, Vorlesehilfen über die Unterseiten). */
+html[data-stufe='leicht'] #nutzen,
+html[data-stufe='leicht'] #auffindbarkeit {
+  display: none;
+}
+
+/* Handy: Hinweis kompakt, drei Knöpfe nebeneinander */
+@media (max-width: 43.99rem) {
+  .stufen-optionen {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  .stufen-option {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 0.75rem 0.4rem;
+    text-align: center;
+  }
+  .stufen-option .stufen-balken {
+    grid-row: auto;
+    margin-bottom: 0.3rem;
+  }
+  .stufen-option-titel {
+    font-size: 1.05rem;
+  }
+  .stufen-option-kurz {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+  .stufen-banner-text {
+    margin-bottom: 0.75rem;
+    font-size: 0.88rem;
+  }
+  .stufen-banner-fuss {
+    font-size: 0.72rem;
+  }
+}

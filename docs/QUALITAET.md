@@ -13,6 +13,9 @@ Werkzeug: `sh scripts/messen.sh`.
 | Neue Webseite | 99 | 100 | 100 | 1,7 s | 0 |
 | KI-Mitarbeiter | 99 | 100 | 100 | 2,1 s | 0 |
 | Termin | 99 | 100 | 100 | 1,8 s | 0 |
+| Startseite, Stufe Leicht (22.10.) | 96 | 100 | 100 | 2,5 s | 0,002 |
+| Startseite, Stufe Schwer (22.10.) | 94 | 100 | 100 | 2,5 s | 0,047 |
+| Software nach Maß (22.10.) | 99 | 100 | 100 | 1,9 s | 0,002 |
 
 Reaktionszeit auf Eingaben (INP, Ziel ≤ 200 ms), Handy mit 4-fach gedrosseltem Prozessor.
 Werkzeug: `node scripts/reaktion.mjs`.
@@ -88,4 +91,7 @@ Alle Seiten sind ohne JavaScript vollständig lesbar (geprüft): Die Startseite 
 7. „Termin buchen“: Klappt das Buch auf? Kreist die Feder den heutigen Tag ein?
 8. Kalenderseite seitlich wischen: Wölbt sich das Blatt, rastet der nächste Monat ein? Pfeile ebenso?
 9. Tag wählen, Felder ausfüllen, absenden: Faltet sich der Brief?
-10. KI-Seite: seitlich wischen, winken die Figuren?
+10. KI-Seite: seitlich wischen, winken die Figuren (nur Stufe Schwer)?
+11. Erster Besuch: Erscheint unten „Wie viel Show darf’s sein?“? Leicht wählen: Lädt die Seite ruhig mit großen Bildern neu?
+12. Oben rechts (Balken-Symbol) die Stufe wechseln: Bleibt die Wahl beim nächsten Besuch erhalten?
+13. Terminbuch: Ecke unten rechts antippen blättert um?

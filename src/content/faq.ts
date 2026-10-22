@@ -27,6 +27,11 @@ export const faqStart: Frage[] = [
       'Sie wird sogar zuerst für das Handy gebaut, weil viele deiner Kunden genau dort nach dir suchen. Auf Tablet und Computer sieht sie danach genauso gut aus.',
   },
   {
+    frage: 'Baut ihr auch Software, die es nur für meinen Betrieb gibt?',
+    antwort:
+      'Ja, wenn es sich für dich lohnt. Wir hören uns zuerst an, wo dir Zeit verloren geht. Gibt es dafür schon ein gutes fertiges Programm, empfehlen wir dir das. Wenn nicht, bauen wir eine eigene Lösung: erst klein zum Ausprobieren, dann Schritt für Schritt größer.',
+  },
+  {
     frage: 'Werde ich danach auch bei ChatGPT und Co. gefunden?',
     antwort:
       'Garantieren kann das niemand, der ehrlich ist. Aber wir bauen deine Seite so, dass KI-Assistenten klar verstehen, wer du bist, was du anbietest und wo. Das ist die beste Voraussetzung, um empfohlen zu werden.',

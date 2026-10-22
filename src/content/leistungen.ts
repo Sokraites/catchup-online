@@ -9,6 +9,8 @@ export const leistungen = [
     titel: 'Neue Webseite',
     kurz: 'Von Grund auf gebaut: schnell, klar und auf dem Handy zu Hause. Damit Besucher sofort verstehen, was du anbietest, und dich direkt erreichen.',
     schemaName: 'Webseiten erstellen',
+    bild: '/bilder/neue-webseite.webp',
+    bildText: 'Moderner Bildschirm und Handy zeigen dieselbe neue Webseite eines Betriebs.',
   },
   {
     href: '/webseiten-modernisieren/',
@@ -16,6 +18,8 @@ export const leistungen = [
     titel: 'Modernisierung',
     kurz: 'Deine Seite ist in die Jahre gekommen? Wir behalten, was funktioniert, und machen Gestaltung und Aufbau fit für heute.',
     schemaName: 'Webseiten modernisieren',
+    bild: '/bilder/modernisierung.webp',
+    bildText: 'Alter Röhrenmonitor mit einer Webseite von früher, daneben ein moderner Bildschirm mit der erneuerten Seite.',
   },
   {
     href: '/auffindbarkeit/',
@@ -23,6 +27,8 @@ export const leistungen = [
     titel: 'Gefunden werden',
     kurz: 'Bei Google und bei KI-Assistenten wie ChatGPT und Claude. Damit Kunden aus der Region bei dir landen und nicht beim Mitbewerber.',
     schemaName: 'Suchmaschinenoptimierung und Sichtbarkeit in KI-Suchen',
+    bild: '/bilder/gefunden.webp',
+    bildText: 'Handy mit einer Suche nach einer Schreinerei in der Nähe: Der eigene Betrieb steht oben, ein KI-Assistent empfiehlt ihn.',
   },
   {
     href: '/ki-mitarbeiter/',
@@ -30,6 +36,17 @@ export const leistungen = [
     titel: 'KI-Mitarbeiter',
     kurz: 'Ein digitaler Kollege für wiederkehrende Aufgaben. Vom Praktikanten bis zur Teamleitung, so viel Verantwortung, wie du ihm gibst.',
     schemaName: 'KI-Mitarbeiter für Betriebe',
+    bild: '/ki/figur-2.webp',
+    bildText: 'Freundliche Roboter-Figur mit Headset als digitaler Kollege.',
+  },
+  {
+    href: '/software-nach-mass/',
+    nummer: '05',
+    titel: 'Software nach Maß',
+    kurz: 'Wenn es keine fertige Lösung gibt, die wirklich passt: Wir bauen genau das Werkzeug, das deinem Betrieb Arbeit abnimmt.',
+    schemaName: 'Individuelle Software für Betriebe',
+    bild: '/bilder/loesung.webp',
+    bildText: 'Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick.',
   },
 ] as const;
 

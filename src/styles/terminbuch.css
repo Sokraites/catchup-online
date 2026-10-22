@@ -607,6 +607,15 @@
     display: none;
   }
 }
+/* Stufe „leicht“: Buch öffnet ohne Animation */
+html[data-stufe='leicht'] .tb-buch,
+html[data-stufe='leicht'] .tb-offen .tb-deckel,
+html[data-stufe='leicht'] .tb-offen .tb-blatt {
+  animation: none;
+}
+html[data-stufe='leicht'] .tb-offen .tb-deckel {
+  display: none;
+}
 
 /* Ausgeblendete Teile (Formular nach dem Absenden, Bestätigung davor) wirklich ausblenden */
 .tb-formular[hidden],

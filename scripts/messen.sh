@@ -4,8 +4,8 @@
 #   sh scripts/messen.sh [adresse]
 BASIS=${1:-http://localhost:4322}
 mkdir -p docs/messung
-for seite in "" "webseiten-erstellen/" "ki-mitarbeiter/" "termin/"; do
-  name=$(echo "start-${seite}" | tr '/' '-' | sed 's/-*$//')
+for seite in "" "?stufe=leicht" "?stufe=schwer" "webseiten-erstellen/" "ki-mitarbeiter/" "software-nach-mass/" "termin/"; do
+  name=$(echo "start-${seite}" | tr '/?=' '---' | sed 's/-*$//')
   npx lighthouse "$BASIS/$seite" --quiet --chrome-flags="--headless=new --no-sandbox --use-angle=swiftshader" \
     --form-factor=mobile --output=json --output-path="docs/messung/$name.json" \
     --only-categories=performance,accessibility,best-practices,seo >/dev/null 2>&1

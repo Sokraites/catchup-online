@@ -1,0 +1,27 @@
+---
+/** Schalter oben rechts: zeigt die gewählte Darstellung und öffnet die Auswahl. Braucht JavaScript. */
+import { stufen } from '../config/stufen';
+---
+
+<div class="stufe-schalter" data-stufe-schalter hidden>
+  <button type="button" class="stufe-knopf" aria-expanded="false" aria-controls="stufe-menue" title="Schwierigkeitsgrad ändern" data-stufe-knopf>
+    <span class="stufen-balken" aria-hidden="true" data-grad="2"><i></i><i></i><i></i></span>
+    <span class="visually-hidden">Schwierigkeitsgrad: <span data-stufe-name>Mittel</span>, ändern</span>
+  </button>
+  <div class="stufe-menue" id="stufe-menue" data-stufe-menue hidden>
+    <p class="stufe-menue-titel">Schwierigkeitsgrad</p>
+    {
+      stufen.map((s, i) => (
+        <button type="button" class="stufe-menue-option" data-stufe-waehlen={s.id} aria-pressed="false">
+          <span class="stufen-balken" aria-hidden="true" data-grad={i + 1}>
+            <i /><i /><i />
+          </span>
+          <span>
+            <strong>{s.titel}</strong>
+            <small>{s.kurz}</small>
+          </span>
+        </button>
+      ))
+    }
+  </div>
+</div>

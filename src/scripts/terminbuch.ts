@@ -13,6 +13,8 @@
  * Grundsatz: Animationen laufen nebenher. Alles ist sofort bedienbar, niemand wartet auf eine Animation.
  */
 
+import { ruhig } from './stufe';
+
 const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const TAGE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 const KURZ = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
@@ -27,7 +29,6 @@ let rechts: HTMLElement;
 let regeln: Regeln;
 let monat: Date; // erster Tag des angezeigten Monats
 let gewaehlt: Date | null = null;
-const ruhig = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const einseitig = () => innerWidth < 760;
 
 const heute = () => {

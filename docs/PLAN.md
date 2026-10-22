@@ -80,6 +80,16 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 - [x] Abgleich mit Zielbild (Abschnitte 1 und 4) und Liste der Lücken
 - [x] Abschlussbericht: Was fehlt noch vor dem Livegang (siehe `docs/QUALITAET.md`)
 
+## Phase E2: Darstellungs-Stufen und Software nach Maß (22.10.2026)
+
+- [x] Drei Stufen (Leicht, Mittel, Schwer): Hinweis beim ersten Besuch, Schalter oben rechts, Wechsel lädt neu
+- [x] Leicht: ruhige Seite mit großen, selbst gerenderten Bildern, nur das Nötigste
+- [x] Mittel: Monitor-Zeitreise und Terminbuch; Schwer: zusätzlich Kachel-Rätsel und lebendige 3D-Figuren
+- [x] Abschnitt „Welche digitale Lösung würde dir wirklich weiterhelfen?“ und Unterseite „Software nach Maß“
+- [x] Tabs in der Vorschau stabil (vorher Fehler nach einigen Tabs)
+- [x] Terminbuch Handy: Eselsohr zum Antippen, eigene Blätter-Animation für die Pfeile
+- [x] Datenschutz-Entwurf: lokaler Eintrag für die gewählte Stufe beschrieben
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
@@ -92,7 +102,7 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 
 - `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
 - `npm run vorschau`: baut aus `dist/` eine Fassung mit relativen Links in `.vorschau/` (für die private Vorschau).
-- `npm run monitore`: rendert Monitor-Gehäuse und KI-Figuren-Standbilder aus den 3D-Modellen neu.
+- `npm run monitore`: rendert Monitor-Gehäuse, KI-Figuren-Standbilder und die großen Bilder (`public/bilder/`) aus den 3D-Modellen neu. Nur die großen Bilder: `node scripts/monitore-rendern.mjs szenen`.
 - `npm run komprimieren`: komprimierte Fassungen für schnellere Auslieferung (nach dem Bauen).
 - `sh scripts/messen.sh`: Lighthouse-Messung im Handy-Modus; `node scripts/reaktion.mjs`: Reaktionszeit auf Eingaben.
 - `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.

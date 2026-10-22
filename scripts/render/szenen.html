@@ -1,0 +1,691 @@
+<!doctype html>
+<!--
+  Render-Werkzeug (nur Entwicklung): große Bilder für die Darstellung „Leicht“.
+  Ganze 3D-Monitore, Handy und Tablet in einer Szene, die Bildschirme zeigen
+  selbst gezeichnete Beispielseiten im Stil der jeweiligen Zeit (keine fremden Marken).
+  Wird von scripts/monitore-rendern.mjs aufgerufen.
+-->
+<meta charset="utf-8" />
+<script type="importmap">
+  { "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+<canvas id="c"></canvas>
+<script type="module">
+  import * as THREE from 'three';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+  const konfig = await (await fetch('/src/config/monitore.json')).json();
+  for (const [name, datei] of [['SG', 'space-grotesk'], ['IN', 'inter']]) {
+    const f = new FontFace(name, `url(/public/fonts/${datei}.woff2)`);
+    document.fonts.add(await f.load());
+  }
+
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(1);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.8;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const umgebung = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+  const FARBE = { grund: '#0D0D13', flaeche: '#15151E', linie: '#272735', text: '#EDECF6', grau: '#9C9AB1', akzent: '#7C4DFF', hell: '#A98BFF' };
+
+  /* ---------- Bildschirminhalte ---------- */
+
+  function leinwand(b, h, malen) {
+    const c = document.createElement('canvas');
+    c.width = b;
+    c.height = h;
+    const x = c.getContext('2d');
+    malen(x, b, h);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 8;
+    return t;
+  }
+  const rr = (x, px, py, b, h, r) => {
+    x.beginPath();
+    x.roundRect(px, py, b, h, r);
+  };
+  const balken = (x, px, py, b, h, farbe, r = h / 2) => {
+    x.fillStyle = farbe;
+    rr(x, px, py, b, h, r);
+    x.fill();
+  };
+
+  /** Heutige Seite im Handy-Format. */
+  function handySeite(b = 380, h = 800) {
+    return leinwand(b, h, (x) => {
+      x.fillStyle = FARBE.grund;
+      x.fillRect(0, 0, b, h);
+      const g = x.createRadialGradient(b, 0, 10, b, 0, 460);
+      g.addColorStop(0, 'rgba(124,77,255,.6)');
+      g.addColorStop(1, 'rgba(124,77,255,0)');
+      x.fillStyle = g;
+      x.fillRect(0, 0, b, h);
+      x.fillStyle = FARBE.text;
+      x.font = '700 22px SG';
+      x.fillText('Dein Betrieb', 24, 62);
+      balken(x, b - 62, 38, 38, 38, 'rgba(255,255,255,.08)', 10);
+      x.fillStyle = FARBE.hell;
+      x.font = '600 14px IN';
+      x.fillText('AUS DER REGION', 24, 150);
+      x.fillStyle = FARBE.text;
+      x.font = '700 44px SG';
+      ['Gemacht,', 'um gefunden', 'zu werden.'].forEach((z, i) => x.fillText(z, 24, 205 + i * 50));
+      x.fillStyle = FARBE.grau;
+      x.font = '400 17px IN';
+      x.fillText('Schnell, fürs Handy, klar.', 24, 365);
+      balken(x, 24, 392, b - 48, 54, FARBE.akzent);
+      x.fillStyle = '#fff';
+      x.font = '600 18px IN';
+      x.textAlign = 'center';
+      x.fillText('Jetzt anfragen', b / 2, 425);
+      x.textAlign = 'left';
+      [0, 1].forEach((i) => {
+        x.fillStyle = FARBE.flaeche;
+        rr(x, 24, 480 + i * 150, b - 48, 132, 16);
+        x.fill();
+        balken(x, 44, 502 + i * 150, 36, 36, 'rgba(124,77,255,.4)', 9);
+        balken(x, 44, 556 + i * 150, 190, 12, '#3a3a4c', 6);
+        balken(x, 44, 580 + i * 150, 240, 9, '#2c2c3c', 5);
+      });
+    });
+  }
+
+  /** Beispielseite eines Betriebs im Stil einer Epoche (0 = 1990 … 5 = heute). */
+  function seite(stil, b = 800, h = 600) {
+    return leinwand(b, h, (x) => {
+      const s = b / 800;
+      x.scale(s, s);
+      const B = 800;
+      const H = h / s;
+      if (stil === 0) {
+        x.fillStyle = '#c0c0c0';
+        x.fillRect(0, 0, B, H);
+        x.fillStyle = '#000';
+        x.font = 'bold 54px Times New Roman, serif';
+        x.textAlign = 'center';
+        x.fillText('Willkommen!', B / 2, 110);
+        x.font = '26px Times New Roman, serif';
+        x.fillText('auf der Homepage von Ihrem Betrieb', B / 2, 160);
+        x.fillStyle = '#808080';
+        x.fillRect(80, 195, B - 160, 3);
+        x.fillStyle = '#0000ee';
+        x.font = '28px Times New Roman, serif';
+        ['Über uns', 'Unsere Leistungen', 'Anfahrt', 'Gästebuch'].forEach((t, i) => {
+          x.fillText(t, B / 2, 260 + i * 56);
+          const w = x.measureText(t).width;
+          x.fillRect(B / 2 - w / 2, 266 + i * 56, w, 2);
+        });
+        x.fillStyle = '#000';
+        x.font = 'italic 20px Times New Roman, serif';
+        x.fillText('Diese Seite befindet sich im Aufbau.', B / 2, H - 50);
+      } else if (stil === 1) {
+        x.fillStyle = '#fdf6d8';
+        x.fillRect(0, 0, B, H);
+        x.fillStyle = '#ecdfa8';
+        for (let i = 0; i < B; i += 40) for (let j = 0; j < H; j += 40) if ((i + j) % 80 === 0) x.fillRect(i, j, 40, 40);
+        const g = x.createLinearGradient(0, 0, B, 0);
+        g.addColorStop(0, '#000080');
+        g.addColorStop(1, '#1084d0');
+        x.fillStyle = g;
+        x.fillRect(0, 0, B, 110);
+        x.fillStyle = '#ffff00';
+        x.font = 'bold 48px Arial, sans-serif';
+        x.fillText('IHR BETRIEB', 30, 72);
+        x.fillStyle = '#000080';
+        x.fillRect(0, 110, 200, H);
+        x.fillStyle = '#fff';
+        x.font = 'bold 22px Arial, sans-serif';
+        ['Start', 'Leistungen', 'Team', 'Kontakt'].forEach((t, i) => x.fillText('» ' + t, 20, 170 + i * 50));
+        x.fillStyle = '#000';
+        x.font = 'bold 30px Arial, sans-serif';
+        x.fillText('Neu: Jetzt auch im Internet!', 230, 170);
+        x.font = '20px Arial, sans-serif';
+        for (let i = 0; i < 6; i++) x.fillRect(230, 205 + i * 34, 500 - (i % 3) * 70, 12);
+      } else if (stil === 2) {
+        x.fillStyle = '#eef3f7';
+        x.fillRect(0, 0, B, H);
+        const g = x.createLinearGradient(0, 0, 0, 130);
+        g.addColorStop(0, '#7cc7f3');
+        g.addColorStop(0.5, '#2b8ed6');
+        g.addColorStop(0.51, '#1c78bd');
+        g.addColorStop(1, '#3a9be0');
+        x.fillStyle = g;
+        x.fillRect(0, 0, B, 130);
+        x.fillStyle = '#fff';
+        x.font = 'bold 46px Verdana, sans-serif';
+        x.fillText('Ihr Betrieb', 40, 82);
+        ['Start', 'Angebot', 'Kontakt'].forEach((t, i) => {
+          const gg = x.createLinearGradient(0, 150, 0, 190);
+          gg.addColorStop(0, '#a6e36a');
+          gg.addColorStop(1, '#5aa923');
+          x.fillStyle = gg;
+          rr(x, 40 + i * 180, 152, 160, 44, 22);
+          x.fill();
+          x.fillStyle = '#fff';
+          x.font = 'bold 20px Verdana, sans-serif';
+          x.fillText(t, 70 + i * 180, 182);
+        });
+        x.fillStyle = '#fff';
+        rr(x, 40, 225, B - 80, H - 265, 16);
+        x.fill();
+        x.fillStyle = '#c6d4df';
+        for (let i = 0; i < 6; i++) x.fillRect(70, 260 + i * 36, 640 - (i % 2) * 120, 14);
+      } else if (stil === 3) {
+        x.fillStyle = '#ffffff';
+        x.fillRect(0, 0, B, H);
+        x.fillStyle = '#2c3e50';
+        x.fillRect(0, 0, B, 70);
+        x.fillStyle = '#fff';
+        x.font = '600 30px Arial, sans-serif';
+        x.fillText('Ihr Betrieb', 30, 46);
+        x.fillStyle = '#1abc9c';
+        x.fillRect(0, 70, B, 230);
+        x.fillStyle = '#fff';
+        x.font = 'bold 44px Arial, sans-serif';
+        x.fillText('Qualität aus der Region', 50, 175);
+        balken(x, 50, 210, 210, 52, '#e67e22', 4);
+        [0, 1, 2].forEach((i) => {
+          x.fillStyle = '#ecf0f1';
+          x.fillRect(40 + i * 250, 330, 220, 220);
+          x.fillStyle = ['#3498db', '#9b59b6', '#e74c3c'][i];
+          x.fillRect(40 + i * 250, 330, 220, 90);
+        });
+      } else if (stil === 4) {
+        x.fillStyle = '#fafafa';
+        x.fillRect(0, 0, B, H);
+        const g = x.createLinearGradient(0, 0, B, 300);
+        g.addColorStop(0, '#ffb199');
+        g.addColorStop(1, '#ff0844');
+        x.fillStyle = g;
+        x.fillRect(0, 0, B, 300);
+        x.fillStyle = 'rgba(255,255,255,.95)';
+        x.font = '300 52px Helvetica, Arial, sans-serif';
+        x.fillText('Handwerk,', 50, 140);
+        x.font = '600 52px Helvetica, Arial, sans-serif';
+        x.fillText('neu gedacht.', 50, 200);
+        [0, 1, 2, 3].forEach((i) => {
+          x.fillStyle = '#e9e9ee';
+          rr(x, 40 + (i % 2) * 370, 330 + Math.floor(i / 2) * 130, 350, 110, 10);
+          x.fill();
+        });
+      } else {
+        // Heute: unser eigener Stil
+        x.fillStyle = FARBE.grund;
+        x.fillRect(0, 0, B, H);
+        const g = x.createRadialGradient(B * 0.8, 40, 10, B * 0.8, 40, 520);
+        g.addColorStop(0, 'rgba(124,77,255,.55)');
+        g.addColorStop(1, 'rgba(124,77,255,0)');
+        x.fillStyle = g;
+        x.fillRect(0, 0, B, H);
+        x.strokeStyle = 'rgba(255,255,255,.05)';
+        for (let i = 0; i < B; i += 40) {
+          x.beginPath();
+          x.moveTo(i, 0);
+          x.lineTo(i, H);
+          x.stroke();
+        }
+        for (let j = 0; j < H; j += 40) {
+          x.beginPath();
+          x.moveTo(0, j);
+          x.lineTo(B, j);
+          x.stroke();
+        }
+        x.fillStyle = FARBE.text;
+        x.font = '700 26px SG';
+        x.fillText('Dein Betrieb', 40, 54);
+        balken(x, B - 200, 26, 160, 42, FARBE.akzent);
+        x.fillStyle = '#fff';
+        x.font = '600 18px IN';
+        x.fillText('Termin buchen', B - 182, 53);
+        x.fillStyle = FARBE.hell;
+        x.font = '600 18px IN';
+        x.fillText('AUS DER REGION', 40, 150);
+        x.fillStyle = FARBE.text;
+        x.font = '700 62px SG';
+        x.fillText('Gemacht, um', 40, 225);
+        x.fillText('gefunden zu werden.', 40, 295);
+        x.fillStyle = FARBE.grau;
+        x.font = '400 22px IN';
+        x.fillText('Schnell, fürs Handy, klar in der Sprache.', 40, 345);
+        balken(x, 40, 380, 200, 54, FARBE.akzent);
+        x.fillStyle = '#fff';
+        x.font = '600 20px IN';
+        x.fillText('Jetzt anfragen', 66, 414);
+        [0, 1, 2].forEach((i) => {
+          x.fillStyle = FARBE.flaeche;
+          rr(x, 40 + i * 245, 470, 225, H - 490, 14);
+          x.fill();
+          x.strokeStyle = FARBE.linie;
+          x.stroke();
+          balken(x, 60 + i * 245, 495, 34, 34, 'rgba(124,77,255,.35)', 8);
+          balken(x, 60 + i * 245, 545, 150, 12, '#3a3a4c', 6);
+        });
+      }
+    });
+  }
+
+  /** Suchergebnis und KI-Antwort auf dem Handy (ohne echte Marken). */
+  function suche(b = 360, h = 760) {
+    return leinwand(b, h, (x) => {
+      x.fillStyle = '#f6f6f8';
+      x.fillRect(0, 0, b, h);
+      balken(x, 18, 50, b - 36, 48, '#fff', 24);
+      x.strokeStyle = '#d8d8e0';
+      x.lineWidth = 1.5;
+      rr(x, 18, 50, b - 36, 48, 24);
+      x.stroke();
+      x.fillStyle = '#555';
+      x.font = '500 17px IN';
+      x.fillText('Schreinerei in meiner Nähe', 42, 80);
+      // erstes Ergebnis hervorgehoben
+      x.fillStyle = '#fff';
+      rr(x, 14, 122, b - 28, 190, 18);
+      x.fill();
+      x.strokeStyle = FARBE.akzent;
+      x.lineWidth = 3;
+      x.stroke();
+      x.fillStyle = '#1a1a22';
+      x.font = '700 22px SG';
+      x.fillText('Dein Betrieb', 34, 162);
+      x.fillStyle = '#5c5c6e';
+      x.font = '400 15px IN';
+      x.fillText('Schreinerei · Donnersbergkreis', 34, 188);
+      x.fillText('Heute geöffnet', 34, 212);
+      balken(x, 34, 236, 118, 44, FARBE.akzent);
+      balken(x, 162, 236, 100, 44, '#ecebf5');
+      x.fillStyle = '#fff';
+      x.font = '600 16px IN';
+      x.fillText('Anrufen', 62, 264);
+      x.fillStyle = '#3b2a8a';
+      x.fillText('Route', 188, 264);
+      for (let i = 0; i < 3; i++) {
+        balken(x, 30, 340 + i * 74, 200 - i * 20, 14, '#cfcfd8', 7);
+        balken(x, 30, 364 + i * 74, 280 - i * 30, 10, '#e2e2e8', 5);
+      }
+      // KI-Antwort
+      x.fillStyle = '#1b1b26';
+      rr(x, 14, h - 220, b - 28, 190, 20);
+      x.fill();
+      balken(x, 30, h - 200, 30, 30, FARBE.akzent, 15);
+      x.fillStyle = '#fff';
+      x.font = '600 15px IN';
+      x.fillText('KI-Assistent', 70, h - 180);
+      x.fillStyle = '#d8d6ea';
+      x.font = '400 16px IN';
+      ['Ich empfehle dir „Dein Betrieb“:', 'Maßanfertigung, Termine', 'online buchbar, ganz in', 'deiner Nähe.'].forEach((t, i) => x.fillText(t, 30, h - 140 + i * 24));
+    });
+  }
+
+  /** Eigene Software: Übersicht eines Betriebs auf dem Tablet. */
+  function anwendung(b = 1000, h = 700) {
+    return leinwand(b, h, (x) => {
+      x.fillStyle = '#101018';
+      x.fillRect(0, 0, b, h);
+      x.fillStyle = '#17172200';
+      x.fillStyle = '#161621';
+      x.fillRect(0, 0, 190, h);
+      x.fillStyle = FARBE.text;
+      x.font = '700 22px SG';
+      x.fillText('Betrieb', 28, 50);
+      ['Übersicht', 'Aufträge', 'Angebote', 'Termine', 'Kunden'].forEach((t, i) => {
+        if (i === 0) balken(x, 14, 82, 162, 40, 'rgba(124,77,255,.3)', 10);
+        x.fillStyle = i === 0 ? '#fff' : FARBE.grau;
+        x.font = '500 17px IN';
+        x.fillText(t, 30, 108 + i * 52);
+      });
+      x.fillStyle = FARBE.text;
+      x.font = '700 30px SG';
+      x.fillText('Guten Morgen!', 225, 62);
+      // Kacheln mit Balken (ohne Zahlen)
+      [0, 1, 2].forEach((i) => {
+        x.fillStyle = FARBE.flaeche;
+        rr(x, 225 + i * 252, 95, 232, 130, 16);
+        x.fill();
+        balken(x, 245 + i * 252, 120, 90, 12, '#3a3a4c', 6);
+        balken(x, 245 + i * 252, 150, 150 - i * 30, 30, i === 0 ? FARBE.akzent : '#2c2c3c', 8);
+      });
+      x.fillStyle = FARBE.flaeche;
+      rr(x, 225, 245, 480, 420, 16);
+      x.fill();
+      x.fillStyle = FARBE.text;
+      x.font = '600 19px IN';
+      x.fillText('Aufträge diese Woche', 248, 285);
+      const farben = ['#7C4DFF', '#3ddc97', '#ffb547', '#7C4DFF', '#3ddc97'];
+      for (let i = 0; i < 5; i++) {
+        balken(x, 248, 315 + i * 66, 30, 30, '#242433', 8);
+        balken(x, 292, 318 + i * 66, 200 - (i % 3) * 40, 12, '#3f3f52', 6);
+        balken(x, 292, 336 + i * 66, 140, 9, '#2c2c3c', 5);
+        balken(x, 590, 318 + i * 66, 90, 26, farben[i] + '44', 13);
+      }
+      x.fillStyle = FARBE.flaeche;
+      rr(x, 725, 245, 245, 420, 16);
+      x.fill();
+      x.fillStyle = FARBE.text;
+      x.fillText('Auslastung', 748, 285);
+      for (let i = 0; i < 6; i++) {
+        const hh = [120, 190, 150, 240, 200, 170][i];
+        const g = x.createLinearGradient(0, 630 - hh, 0, 630);
+        g.addColorStop(0, FARBE.hell);
+        g.addColorStop(1, FARBE.akzent);
+        x.fillStyle = g;
+        rr(x, 750 + i * 35, 630 - hh, 22, hh, 6);
+        x.fill();
+      }
+    });
+  }
+
+  /* ---------- Modelle ---------- */
+
+  function kunststoff(e, farbe = e.farbe) {
+    return new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(farbe),
+      roughness: e.rauheit ?? 0.5,
+      metalness: e.metall ?? 0,
+      clearcoat: e.klarlack ?? 0,
+      clearcoatRoughness: 0.35,
+    });
+  }
+  function rundesRechteck(pfad, x, y, b, h, r) {
+    pfad.moveTo(x + r, y);
+    pfad.lineTo(x + b - r, y);
+    pfad.quadraticCurveTo(x + b, y, x + b, y + r);
+    pfad.lineTo(x + b, y + h - r);
+    pfad.quadraticCurveTo(x + b, y + h, x + b - r, y + h);
+    pfad.lineTo(x + r, y + h);
+    pfad.quadraticCurveTo(x, y + h, x, y + h - r);
+    pfad.lineTo(x, y + r);
+    pfad.quadraticCurveTo(x, y, x + r, y);
+    return pfad;
+  }
+  const schatten = (o) => o.traverse((m) => m.isMesh && ((m.castShadow = true), (m.receiveShadow = true)));
+
+  function bildschirm(textur, b, h) {
+    const g = new THREE.Group();
+    const flaeche = new THREE.Mesh(new THREE.PlaneGeometry(b, h), new THREE.MeshBasicMaterial({ map: textur, toneMapped: false }));
+    const glas = new THREE.Mesh(
+      new THREE.PlaneGeometry(b, h),
+      new THREE.MeshPhysicalMaterial({ color: 0x000000, transparent: true, opacity: 0.18, roughness: 0.06, clearcoat: 1, metalness: 0 }),
+    );
+    glas.position.z = 1.5;
+    g.add(flaeche, glas);
+    return g;
+  }
+
+  /** Ganzer Monitor einer Epoche, steht mit dem Fuß auf y = 0. */
+  function monitor(i) {
+    const e = konfig.epochen[i];
+    const L = konfig.loch;
+    const g = new THREE.Group();
+    if (!e.rand) {
+      // heute: dünnes, randloses Display auf schlankem Fuß
+      const b = 960, h = 600;
+      const korpus = new THREE.Mesh(new RoundedBoxGeometry(b + 10, h + 10, 12, 4, 6), kunststoff({ rauheit: 0.25, metall: 0.6, klarlack: 0.8 }, '#202026'));
+      g.add(korpus);
+      const s = bildschirm(seite(5, 960, 600), b, h);
+      s.position.z = 6.5;
+      g.add(s);
+      const mat = kunststoff({ rauheit: 0.25, metall: 0.9 }, '#cfd3da');
+      const hals = new THREE.Mesh(new RoundedBoxGeometry(120, 260, 12, 3, 4), mat);
+      hals.position.set(0, -h / 2 - 60, -40);
+      hals.rotation.x = -0.18;
+      const sockel = new THREE.Mesh(new RoundedBoxGeometry(320, 10, 190, 3, 4), mat);
+      sockel.position.set(0, -h / 2 - 190, -20);
+      g.add(hals, sockel);
+    } else {
+      const B = L.b + 2 * e.rand;
+      const H = L.h + e.oben + e.rand + e.kinn;
+      const bevel = Math.min(14, e.rand * 0.4);
+      const aussen = rundesRechteck(new THREE.Shape(), -B / 2 + bevel, -H / 2 + bevel, B - 2 * bevel, H - 2 * bevel, Math.max(1, e.radiusAussen - bevel));
+      const lx = -L.b / 2 - bevel;
+      const ly = -H / 2 + e.rand + e.kinn - bevel;
+      aussen.holes.push(rundesRechteck(new THREE.Path(), lx, ly, L.b + 2 * bevel, L.h + 2 * bevel, e.radiusLoch + bevel));
+      const geo = new THREE.ExtrudeGeometry(aussen, { depth: 40, bevelEnabled: true, bevelThickness: bevel * 1.2, bevelSize: bevel, bevelSegments: 6, curveSegments: 20 });
+      g.add(new THREE.Mesh(geo, kunststoff(e)));
+      if (e.schraege > 0) {
+        const sw = e.schraege;
+        const ring = rundesRechteck(new THREE.Shape(), -L.b / 2 - sw, -H / 2 + e.rand + e.kinn - sw, L.b + 2 * sw, L.h + 2 * sw, e.radiusLoch + sw);
+        ring.holes.push(rundesRechteck(new THREE.Path(), -L.b / 2, -H / 2 + e.rand + e.kinn, L.b, L.h, e.radiusLoch));
+        const rgeo = new THREE.ExtrudeGeometry(ring, { depth: 6, bevelEnabled: true, bevelThickness: sw * 0.9, bevelSize: sw * 0.25, bevelSegments: 4, curveSegments: 20 });
+        const m = new THREE.Mesh(rgeo, kunststoff({ ...e, rauheit: 0.6, klarlack: 0 }, e.lochFarbe));
+        m.position.z = 18;
+        g.add(m);
+      }
+      if (e.kinnFarbe) {
+        const km = new THREE.Mesh(new RoundedBoxGeometry(B, e.kinn + e.rand, 46, 4, 4), kunststoff({ ...e, metall: 0.8, rauheit: 0.35, klarlack: 0.2 }, e.kinnFarbe));
+        km.position.set(0, -H / 2 + (e.kinn + e.rand) / 2, 22);
+        g.add(km);
+      }
+      const s = bildschirm(seite(i), L.b, L.h);
+      s.position.set(0, -H / 2 + e.rand + e.kinn + L.h / 2, 20);
+      g.add(s);
+      // Rückseite: Röhre (nach hinten schmaler) oder flaches Gehäuse
+      const tiefe = e.deckel > 0.3 ? 560 * e.deckel : 40 + 300 * e.deckel;
+      const ruecken = new THREE.BoxGeometry(B * 0.92, H * 0.9, tiefe, 1, 1, 1);
+      if (e.deckel > 0.3) {
+        const p = ruecken.attributes.position;
+        for (let k = 0; k < p.count; k++) if (p.getZ(k) < 0) p.setXYZ(k, p.getX(k) * 0.55, p.getY(k) * 0.6 + H * 0.05, p.getZ(k));
+        ruecken.computeVertexNormals();
+      }
+      const rm = new THREE.Mesh(ruecken, kunststoff(e));
+      rm.position.z = -tiefe / 2 + 4;
+      g.add(rm);
+      // Fuß
+      const mat = kunststoff({ ...e, rauheit: e.metall > 0.4 ? 0.3 : e.rauheit }, e.fussFarbe);
+      if (e.fuss.startsWith('schwenk')) {
+        const breit = e.fuss === 'schwenk' ? B * 0.5 : B * 0.42;
+        const sockel = new THREE.Mesh(new THREE.CylinderGeometry(breit / 2, breit / 2 + 6, 26, 64), mat);
+        sockel.scale.z = 0.8;
+        sockel.position.set(0, -H / 2 - 50, -tiefe * 0.3);
+        const hals = new THREE.Mesh(new THREE.CylinderGeometry(breit * 0.3, breit * 0.36, 40, 64), mat);
+        hals.scale.z = 0.6;
+        hals.position.set(0, -H / 2 - 22, -tiefe * 0.3);
+        g.add(sockel, hals);
+      } else if (e.fuss.startsWith('hals')) {
+        const rund = e.fuss === 'hals-rund';
+        const hals = new THREE.Mesh(new RoundedBoxGeometry(rund ? 70 : 90, 170, 30, 3, 8), mat);
+        hals.position.set(0, -H / 2 - 60, -30);
+        const sockel = new THREE.Mesh(new THREE.CylinderGeometry(B * 0.2, B * 0.21, 14, 64), mat);
+        sockel.scale.z = 0.7;
+        sockel.position.set(0, -H / 2 - 150, -30);
+        g.add(hals, sockel);
+      } else if (e.fuss === 'alu') {
+        const hals = new THREE.Mesh(new RoundedBoxGeometry(120, 240, 12, 3, 4), mat);
+        hals.position.set(0, -H / 2 - 70, -50);
+        hals.rotation.x = -0.2;
+        const sockel = new THREE.Mesh(new RoundedBoxGeometry(B * 0.3, 10, 200, 3, 4), mat);
+        sockel.position.set(0, -H / 2 - 185, -30);
+        g.add(hals, sockel);
+      }
+    }
+    schatten(g);
+    // Auf den Boden stellen
+    const box = new THREE.Box3().setFromObject(g);
+    g.position.y = -box.min.y;
+    const huelle = new THREE.Group();
+    huelle.add(g);
+    huelle.userData.breite = box.max.x - box.min.x;
+    return huelle;
+  }
+
+  function geraet(textur, b, h, dicke, rand, radius) {
+    const g = new THREE.Group();
+    const korpus = new THREE.Mesh(new RoundedBoxGeometry(b + 2 * rand, h + 2 * rand, dicke, 6, radius), kunststoff({ rauheit: 0.22, metall: 0.5, klarlack: 1 }, '#17171c'));
+    g.add(korpus);
+    const s = bildschirm(textur, b, h);
+    s.position.z = dicke / 2 + 0.5;
+    g.add(s);
+    schatten(g);
+    return g;
+  }
+
+  /* ---------- Szenen ---------- */
+
+  /** nebel: [Beginn, Ende] in Abstand zur Kamera – der Boden verläuft nach hinten ins Dunkel. */
+  function buehne(nebel = [2600, 6200]) {
+    const s = new THREE.Scene();
+    s.background = new THREE.Color(FARBE.grund);
+    s.fog = new THREE.Fog(FARBE.grund, nebel[0], nebel[1]);
+    s.environment = umgebung;
+    s.environmentIntensity = 0.75;
+    const haupt = new THREE.DirectionalLight(0xffffff, 1.6);
+    haupt.position.set(-1200, 2200, 1800);
+    haupt.castShadow = true;
+    haupt.shadow.mapSize.set(2048, 2048);
+    Object.assign(haupt.shadow.camera, { left: -4000, right: 4000, top: 3000, bottom: -3000, near: 10, far: 9000 });
+    haupt.shadow.radius = 6;
+    s.add(haupt);
+    // lila Gegenlicht von hinten oben: Kanten leuchten, der Boden bleibt ruhig
+    const lila = new THREE.DirectionalLight(0x8a5cff, 1.4);
+    lila.position.set(600, 1600, -3000);
+    s.add(lila);
+    const boden = new THREE.Mesh(new THREE.PlaneGeometry(30000, 30000), new THREE.MeshStandardMaterial({ color: 0x14141c, roughness: 0.55, metalness: 0.2 }));
+    boden.rotation.x = -Math.PI / 2;
+    boden.receiveShadow = true;
+    s.add(boden);
+    // lila Schein hinter den Geräten
+    const schein = leinwand(512, 512, (x) => {
+      const gr = x.createRadialGradient(256, 256, 0, 256, 256, 256);
+      gr.addColorStop(0, 'rgba(124,77,255,.55)');
+      gr.addColorStop(1, 'rgba(124,77,255,0)');
+      x.fillStyle = gr;
+      x.fillRect(0, 0, 512, 512);
+    });
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(9000, 4200), new THREE.MeshBasicMaterial({ map: schein, transparent: true, depthWrite: false, toneMapped: false }));
+    halo.position.set(400, 1300, -2600);
+    halo.material.fog = false;
+    s.add(halo);
+    return s;
+  }
+
+  function kameraAuf(b, h, fov, pos, ziel) {
+    const k = new THREE.PerspectiveCamera(fov, b / h, 10, 30000);
+    k.position.set(...pos);
+    k.lookAt(...ziel);
+    return k;
+  }
+
+  function rendere(s, k, b, h, q = 0.86) {
+    canvas.width = b;
+    canvas.height = h;
+    renderer.setSize(b, h, false);
+    renderer.render(s, k);
+    return { daten: canvas.toDataURL('image/webp', q), b, h };
+  }
+
+  /** Alle Epochen nebeneinander, von alt (hinten links) nach neu (vorn rechts). */
+  function zeitreise(hoch) {
+    if (hoch) {
+      // Hochformat: drei Stationen, alt hinten, heute vorn
+      const s = buehne([3000, 7600]);
+      [
+        [0, -520, -2300, 0.3],
+        [2, 560, -1150, -0.2],
+        [5, -120, 0, 0.12],
+      ].forEach(([i, x, z, r]) => {
+        const m = monitor(i);
+        m.position.set(x, 0, z);
+        m.rotation.y = r;
+        s.add(m);
+      });
+      return rendere(s, kameraAuf(900, 1200, 36, [250, 1250, 3200], [0, 620, -1000]), 900, 1200);
+    }
+    const s = buehne([5200, 11000]);
+    const n = konfig.epochen.length;
+    for (let i = 0; i < n; i++) {
+      const m = monitor(i);
+      // sanfter Bogen: die Mitte etwas weiter hinten
+      const t = i - (n - 1) / 2;
+      m.position.set(t * 1060, 0, Math.abs(t) * 120 - 300);
+      m.rotation.y = -t * 0.09;
+      s.add(m);
+    }
+    return rendere(s, kameraAuf(1600, 820, 36, [0, 1350, 5400], [0, 470, 0]), 1600, 820);
+  }
+
+  function neueWebseite() {
+    const s = buehne();
+    const m = monitor(5);
+    m.position.set(-200, 0, 0);
+    m.rotation.y = 0.18;
+    s.add(m);
+    const handy = geraet(handySeite(), 380, 800, 40, 18, 46);
+    handy.scale.setScalar(0.62);
+    handy.position.set(560, 0.62 * 418, 380);
+    handy.rotation.set(-0.06, -0.32, 0);
+    s.add(handy);
+    return rendere(s, kameraAuf(1200, 800, 32, [200, 820, 2700], [80, 380, 0]), 1200, 800);
+  }
+
+  function modernisierung() {
+    const s = buehne();
+    const alt = monitor(0);
+    alt.position.set(-640, 0, -150);
+    alt.rotation.y = 0.32;
+    const neu = monitor(5);
+    neu.position.set(640, 0, 150);
+    neu.rotation.y = -0.22;
+    s.add(alt, neu);
+    // Lichtpfeil von alt nach neu
+    const pfeil = leinwand(512, 128, (x) => {
+      const g = x.createLinearGradient(0, 0, 512, 0);
+      g.addColorStop(0, 'rgba(169,139,255,0)');
+      g.addColorStop(1, 'rgba(169,139,255,1)');
+      x.fillStyle = g;
+      x.fillRect(0, 54, 440, 20);
+      x.beginPath();
+      x.moveTo(430, 24);
+      x.lineTo(510, 64);
+      x.lineTo(430, 104);
+      x.fill();
+    });
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(420, 105), new THREE.MeshBasicMaterial({ map: pfeil, transparent: true, toneMapped: false }));
+    p.position.set(30, 560, 500);
+    s.add(p);
+    return rendere(s, kameraAuf(1200, 800, 34, [0, 900, 3300], [0, 430, 0]), 1200, 800);
+  }
+
+  function gefunden() {
+    const s = buehne();
+    const handy = geraet(suche(), 360, 760, 38, 16, 44);
+    handy.position.set(120, 396, 0);
+    handy.rotation.set(-0.1, -0.38, 0);
+    s.add(handy);
+    const hinten = monitor(4);
+    hinten.position.set(-820, 0, -1000);
+    hinten.rotation.y = 0.35;
+    s.add(hinten);
+    return rendere(s, kameraAuf(1200, 800, 34, [300, 760, 2200], [-200, 430, -200]), 1200, 800);
+  }
+
+  function loesung() {
+    const s = buehne();
+    // Tablet lehnt schräg auf dem Tisch, daneben das Handy mit derselben Anwendung
+    const tablet = geraet(anwendung(), 1000, 700, 26, 30, 40);
+    tablet.rotation.set(-0.42, 0.22, 0);
+    tablet.position.set(-80, 370, -60);
+    s.add(tablet);
+    const handy = geraet(handySeite(), 380, 800, 40, 18, 46);
+    handy.scale.setScalar(0.5);
+    handy.position.set(660, 0.5 * 418, 300);
+    handy.rotation.set(-0.08, -0.45, 0);
+    s.add(handy);
+    return rendere(s, kameraAuf(1200, 800, 34, [150, 1150, 2500], [60, 330, 0]), 1200, 800);
+  }
+
+  window.rendereAlles = () => ({
+    'zeitreise-breit': zeitreise(false),
+    'zeitreise-hoch': zeitreise(true),
+    'neue-webseite': neueWebseite(),
+    modernisierung: modernisierung(),
+    gefunden: gefunden(),
+    loesung: loesung(),
+  });
+  window.bereit = true;
+</script>

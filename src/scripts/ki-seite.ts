@@ -8,6 +8,7 @@
  *   Bis dahin, ohne 3D-Unterstützung oder bei reduzierter Bewegung bleibt das Standbild stehen.
  */
 import type { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ruhig as ruhigeStufe, verspielt } from './stufe';
 
 /**
  * @param wurzel Wo die Stufen liegen (Standard: ganze Seite).
@@ -19,7 +20,7 @@ export function starteKiSeite(wurzel: ParentNode = document, eingebettet = false
   const spur = bereich.querySelector<HTMLElement>('.stufen-spur')!;
   const stufen = [...spur.querySelectorAll<HTMLElement>('.stufe')];
   const punkte = [...bereich.querySelectorAll<HTMLButtonElement>('[data-stufe-punkt]')];
-  const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ruhig = ruhigeStufe();
   const gekoppelt = !eingebettet && !ruhig && matchMedia('(pointer: fine) and (min-width: 960px)').matches;
   let aktiv = 0;
   let st: ScrollTrigger | null = null;
@@ -108,7 +109,8 @@ export function starteKiSeite(wurzel: ParentNode = document, eingebettet = false
   });
   markiere(0);
 
-  if (!ruhig) starteFiguren(bereich, stufen);
+  // Lebendige 3D-Figuren nur in der Stufe „schwer“, sonst bleiben die Standbilder
+  if (verspielt()) starteFiguren(bereich, stufen);
 }
 
 /** Lädt Three.js erst, wenn die Stufen in die Nähe kommen, und lässt die Figuren leben. */

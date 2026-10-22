@@ -6,6 +6,8 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Kacheln from '../components/Kacheln.astro';
 import Terminbuch from '../components/Terminbuch.astro';
+import StufenWahl from '../components/StufenWahl.astro';
+import { standardStufe, stufenSchluessel } from '../config/stufen';
 
 interface Props {
   /** Seitentitel ohne Firmennamen; der Name wird angehängt. */
@@ -29,6 +31,22 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Darstellungs-Stufe sofort setzen, damit nichts umspringt (leicht, mittel, schwer) -->
+    <script is:inline define:vars={{ schluessel: stufenSchluessel, standard: standardStufe }}>
+      var h = document.documentElement;
+      var s = null;
+      try {
+        s = new URLSearchParams(location.search).get('stufe');
+        if (s) localStorage.setItem(schluessel, s);
+        else s = localStorage.getItem(schluessel);
+      } catch (e) {}
+      if (!s && window.name.indexOf(schluessel + ':') === 0) s = window.name.slice(schluessel.length + 1);
+      if (!/^(leicht|mittel|schwer)$/.test(s || '')) {
+        s = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'leicht' : standard;
+        h.dataset.stufeOffen = '';
+      }
+      h.dataset.stufe = s;
+    </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -64,5 +82,10 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
     </main>
     <Footer />
     <Terminbuch />
+    <StufenWahl />
+    <script>
+      import { starteStufenWahl } from '../scripts/stufe';
+      starteStufenWahl();
+    </script>
   </body>
 </html>

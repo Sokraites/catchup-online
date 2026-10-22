@@ -1,0 +1,80 @@
+---
+import Leistung from '../layouts/Leistung.astro';
+import { site } from '../config/site';
+---
+
+<Leistung
+  title="Software nach Maß für Betriebe im Donnersbergkreis"
+  description={`Individuelle Software für Betriebe im ${site.region.schwerpunkt}: Angebote, Termine, Aufträge und Kundenbereiche, genau so, wie dein Betrieb arbeitet.`}
+  eyebrow="Software nach Maß"
+  h1="Welche digitale Lösung würde dir wirklich weiterhelfen?"
+  lead="Manchmal passt kein fertiges Programm. Dann bauen wir das Werkzeug, das dir im Alltag Arbeit abnimmt: einfach zu bedienen, auf dem Handy und am Rechner."
+  schemaName="Individuelle Software für Betriebe"
+>
+  <section class="section" aria-labelledby="beispiele-titel">
+    <div class="wrap">
+      <img
+        class="seiten-bild"
+        src="/bilder/loesung.webp"
+        alt="Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick."
+        width="1200"
+        height="800"
+        loading="lazy"
+        decoding="async"
+      />
+      <p class="eyebrow">Beispiele</p>
+      <h2 id="beispiele-titel">Wo Betriebe oft Zeit verlieren.</h2>
+      <ul class="benefits">
+        <li>
+          <h3>Angebote</h3>
+          <p>Ein Rechner, der aus wenigen Angaben ein sauberes Angebot macht, statt jedes Mal bei null anzufangen.</p>
+        </li>
+        <li>
+          <h3>Termine</h3>
+          <p>Kunden buchen selbst einen freien Termin, du siehst alles an einem Ort, auch unterwegs.</p>
+        </li>
+        <li>
+          <h3>Aufträge</h3>
+          <p>Eine Übersicht, wer gerade woran arbeitet und was als Nächstes ansteht, ohne Zettelwirtschaft.</p>
+        </li>
+        <li>
+          <h3>Kunden-Bereich</h3>
+          <p>Deine Kunden finden Unterlagen, Rechnungen oder den Stand ihres Auftrags selbst, statt anzurufen.</p>
+        </li>
+        <li>
+          <h3>Programme verbinden</h3>
+          <p>Daten, die du heute von Hand von einem Programm ins andere überträgst, wandern automatisch.</p>
+        </li>
+        <li>
+          <h3>Mit KI-Unterstützung</h3>
+          <p>Wo es passt, übernimmt ein <a href="/ki-mitarbeiter/">KI-Mitarbeiter</a> Teile der Arbeit, zum Beispiel Anfragen vorsortieren.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="vorgehen-titel">
+    <div class="wrap">
+      <p class="eyebrow">So gehen wir vor</p>
+      <h2 id="vorgehen-titel">Klein anfangen, schnell ausprobieren.</h2>
+      <ol class="steps">
+        <li>
+          <h3>Zuhören</h3>
+          <p>Du zeigst uns, wie du heute arbeitest und wo es hakt. Wir fragen nach, bis wir es verstanden haben.</p>
+        </li>
+        <li>
+          <h3>Ehrlich prüfen</h3>
+          <p>Gibt es schon ein gutes fertiges Programm, empfehlen wir dir das. Eigene Software nur, wenn sie sich lohnt.</p>
+        </li>
+        <li>
+          <h3>Erste Version</h3>
+          <p>Du bekommst früh etwas zum Anfassen und probierst es im Alltag aus.</p>
+        </li>
+        <li>
+          <h3>Ausbauen</h3>
+          <p>Was sich bewährt, bauen wir aus. Deine Daten bleiben dabei auf Wunsch bei dir im Betrieb.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+</Leistung>

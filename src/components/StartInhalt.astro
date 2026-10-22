@@ -22,6 +22,18 @@ import { referenzen } from '../content/referenzen';
       <a class="button button-ghost" href="#leistungen">Was wir machen</a>
     </div>
     <p class="hero-note">Was du auf dieser Seite erlebst, bauen wir auch für dich.</p>
+    <!-- Große Bilder: in der ruhigen Darstellung (Leicht, ohne Skript). Im Monitor übernimmt der Monitor diese Rolle. -->
+    <picture class="bild-ruhig hero-bild">
+      <source media="(max-width: 40rem)" srcset="/bilder/zeitreise-hoch.webp" width="900" height="1200" />
+      <img
+        src="/bilder/zeitreise-breit.webp"
+        alt="Monitore aus mehreren Jahrzehnten, vom Röhrenmonitor bis zum randlosen Bildschirm, jeder zeigt eine Webseite im Stil seiner Zeit."
+        width="1600"
+        height="820"
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
   </div>
 </section>
 
@@ -33,6 +45,7 @@ import { referenzen } from '../content/referenzen';
       {
         leistungen.map((l) => (
           <li class="card">
+            <img class="bild-ruhig card-bild" src={l.bild} alt={l.bildText} width="1200" height="800" loading="lazy" decoding="async" />
             <span class="card-nr" aria-hidden="true">{l.nummer}</span>
             <h3>
               <a class="card-link" href={l.href}>{l.titel}</a>
@@ -88,6 +101,37 @@ import { referenzen } from '../content/referenzen';
         KI gleichermaßen klar lesbar ist: wer du bist, was du anbietest und wo.
       </p>
       <p><a href="/auffindbarkeit/">So machen wir dich auffindbar →</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="idee" aria-labelledby="idee-titel">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">Deine Idee</p>
+      <h2 id="idee-titel">Welche digitale Lösung würde dir wirklich weiterhelfen?</h2>
+      <img class="bild-ruhig idee-bild" src="/bilder/loesung.webp" alt="Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick." width="1200" height="800" loading="lazy" decoding="async" />
+    </div>
+    <div>
+      <p>
+        Nicht jedes Problem löst eine Webseite. Vielleicht kostet dich das Schreiben von Angeboten jede Woche einen
+        Abend, oder Termine, Aufträge und Rückrufe liegen auf drei Zetteln verteilt. Erzähl uns, wo es hakt.
+      </p>
+      <ul class="idee-chips" aria-label="Beispiele">
+        <li>Angebote schneller schreiben</li>
+        <li>Termine online vergeben</li>
+        <li>Aufträge auf einen Blick</li>
+        <li>Kunden-Bereich mit Unterlagen</li>
+        <li>Programme verbinden</li>
+      </ul>
+      <p>
+        Gibt es dafür schon eine gute fertige Lösung, sagen wir dir das ehrlich. Wenn nicht, bauen wir genau das
+        Werkzeug, das du brauchst.
+      </p>
+      <div class="actions">
+        <a class="button" href="/termin/">Idee besprechen</a>
+        <a class="button button-ghost" href="/software-nach-mass/">Software nach Maß</a>
+      </div>
     </div>
   </div>
 </section>
