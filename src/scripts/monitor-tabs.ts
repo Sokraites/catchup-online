@@ -88,6 +88,7 @@ export function starteMonitorTabs(monitor: MonitorSteuerung | undefined) {
   async function lade(tab: Tab) {
     if (tab.abschnitte) return tab.abschnitte;
     const antwort = await fetch(tab.href);
+    if (!antwort.ok) throw new Error('nicht gefunden');
     const doc = new DOMParser().parseFromString(await antwort.text(), 'text/html');
     const main = doc.querySelector('main');
     if (!main) throw new Error('keine Seite');
@@ -202,7 +203,8 @@ export function starteMonitorTabs(monitor: MonitorSteuerung | undefined) {
     if (!a || !(schirm!.contains(a) || a.closest('.site-header')) || a.target) return;
     const roh = a.getAttribute('href') ?? '';
     if (roh.startsWith('#') || /^(mailto|tel):/.test(roh)) return;
-    const ziel = new URL(a.href);
+    // Relativ zur Startseite auflösen: Die Adresszeile zeigt gerade evtl. schon einen anderen Tab.
+    const ziel = new URL(roh, startAdresse);
     if (ziel.origin !== location.origin || /\/termin\/(index\.html)?$/.test(ziel.pathname)) return;
     e.preventDefault();
     // Link zur Startseite (z. B. „Start“ in der Brotkrumen-Leiste): zurück zur Übersicht

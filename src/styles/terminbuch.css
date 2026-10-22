@@ -843,3 +843,15 @@ span.tb-tag.tb-belegt {
 .tb-leaf-seite > .tb-kopie-spur {
   padding: 0;
 }
+.tb-spur-huelle {
+  position: relative;
+}
+/* Eselsohr unten rechts auf der Kalenderseite (Handy) */
+.tb-ecke.tb-ecke-spur {
+  right: 0;
+  z-index: 20;
+  width: 52px;
+  height: 52px;
+  --ecke-winkel: 135deg;
+  cursor: pointer;
+}

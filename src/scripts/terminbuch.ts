@@ -92,7 +92,11 @@ export function oeffneTerminbuch() {
   richteAnsichtEin();
   zeichneMonat();
   dialog.showModal();
-  if (mitSpur()) stelleSpur();
+  if (mitSpur()) {
+    stelleSpur();
+    // nach dem Federkreis
+    lupfeEcke(1900);
+  }
   // Nächstes Bild: Deckel klappt auf, Blatt blättert, Feder kreist
   requestAnimationFrame(() => {
     dialog.classList.add('tb-offen');
@@ -494,6 +498,8 @@ function richteAnsichtEin() {
     return;
   }
   if (!spur) {
+    const huelle = document.createElement('div');
+    huelle.className = 'tb-spur-huelle';
     spur = document.createElement('div');
     spur.className = 'tb-spur';
     spur.addEventListener('scroll', () => {
@@ -501,14 +507,24 @@ function richteAnsichtEin() {
       spurGeplant = true;
       requestAnimationFrame(stelleSpur);
     }, { passive: true });
-    tage.after(spur);
+    // Wer selbst anfasst, übernimmt: laufendes Blättern sofort abbrechen
+    for (const typ of ['pointerdown', 'touchstart', 'wheel'] as const) {
+      spur.addEventListener(typ, () => stoppeSpurLauf(), { passive: true });
+    }
+    // Eselsohr: Antippen blättert um (funktioniert auch dort, wo seitliches Wischen abgefangen wird)
+    const ecke = document.createElement('span');
+    ecke.className = 'tb-ecke tb-ecke-spur';
+    ecke.setAttribute('aria-hidden', 'true');
+    ecke.addEventListener('click', () => blaettereAutomatisch(1));
+    huelle.append(spur, ecke);
+    tage.after(huelle);
   }
   spur.hidden = false;
   tage.hidden = true;
   tage.replaceChildren();
   woche.hidden = true;
   dialog.classList.add('tb-mit-spur');
-  hinweis.textContent = 'Rot umkreist: heute. Wähle einen freien Tag. Zum Blättern seitlich wischen.';
+  hinweis.textContent = 'Rot umkreist: heute. Wähle einen freien Tag. Zum Blättern die Ecke antippen oder seitlich wischen.';
   const erster = heute();
   erster.setDate(1);
   spurMonate = [];
@@ -538,9 +554,65 @@ function richteAnsichtEin() {
   spur.scrollLeft = i * spur.clientWidth;
 }
 
+let spurLauf = 0;
+function stoppeSpurLauf() {
+  if (!spurLauf || !spur) return;
+  cancelAnimationFrame(spurLauf);
+  spurLauf = 0;
+  spur.style.scrollSnapType = '';
+}
+
+/**
+ * Blättert zu Seite i. Sanft: eigene Animation (nicht die des Browsers), damit das Blatt
+ * auf jedem Handy gleich schön umschlägt – auch dort, wo „smooth“ fehlt oder springt.
+ */
 function zeigeSpurSeite(i: number, sanft: boolean) {
   if (!spur || i < 0) return;
-  spur.scrollTo({ left: i * spur.clientWidth, behavior: sanft ? 'smooth' : 'auto' });
+  stoppeSpurLauf();
+  const ziel = i * spur.clientWidth;
+  if (!sanft) {
+    spur.scrollLeft = ziel;
+    return;
+  }
+  const s = spur;
+  const start = s.scrollLeft;
+  const t0 = performance.now();
+  const dauer = 750;
+  s.style.scrollSnapType = 'none'; // Einrasten würde die Zwischenschritte zurückziehen
+  const schritt = (jetzt: number) => {
+    const t = Math.min(1, (jetzt - t0) / dauer);
+    const e = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+    s.scrollLeft = start + (ziel - start) * e;
+    if (t < 1) spurLauf = requestAnimationFrame(schritt);
+    else {
+      spurLauf = 0;
+      s.style.scrollSnapType = '';
+    }
+  };
+  spurLauf = requestAnimationFrame(schritt);
+}
+
+/** Nach dem Öffnen hebt sich die Ecke kurz an: So sieht man, dass sich die Seite umblättern lässt. */
+function lupfeEcke(verzoegerung: number) {
+  if (!mitSpur() || ruhig() || spurSeiten.length < 2) return;
+  setTimeout(() => {
+    if (!dialog.open || !spur || spur.scrollLeft > 1 || spurLauf) return;
+    baueSpurBlatt(0);
+    spurSeiten[0].style.visibility = 'hidden';
+    spurSeiten[1].style.visibility = '';
+    spurSeiten[1].style.transform = `translateX(${spur.clientWidth}px)`;
+    leaf().hidden = false;
+    schatten().hidden = false;
+    const t0 = performance.now();
+    const schritt = (jetzt: number) => {
+      const t = Math.min(1, (jetzt - t0) / 900);
+      // hoch und wieder zurück
+      stelleBlatt(-34 * Math.sin(Math.PI * t));
+      if (t < 1 && spur!.scrollLeft < 1) requestAnimationFrame(schritt);
+      else stelleSpur();
+    };
+    requestAnimationFrame(schritt);
+  }, verzoegerung);
 }
 
 /**
