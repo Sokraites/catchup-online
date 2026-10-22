@@ -4,18 +4,19 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/nachbereiten.mjs",
     "preview": "astro preview",
     "bilder": "node scripts/bilder.mjs",
     "pruefen": "node scripts/pruefen.mjs",
     "vorschau": "node scripts/vorschau.mjs",
     "monitore": "node scripts/monitore-rendern.mjs",
-    "komprimieren": "node scripts/komprimieren.mjs"
+    "komprimieren": "node scripts/komprimieren.mjs",
+    "ansehen": "node scripts/ansehen.mjs",
+    "paket": "node scripts/paket.mjs"
   },
   "dependencies": {
     "astro": "7.3.5",
-    "gsap": "3.15.0",
-    "three": "0.186.1"
+    "gsap": "3.15.0"
   },
   "devDependencies": {
     "@fontsource-variable/figtree": "5.3.0",
@@ -27,6 +28,7 @@
     "axe-core": "4.14.0",
     "esbuild": "0.28.2",
     "lighthouse": "13.5.0",
-    "playwright": "1.56.1"
+    "playwright": "1.56.1",
+    "three": "0.186.1"
   }
 }

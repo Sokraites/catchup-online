@@ -27,6 +27,11 @@ export const faqStart: Frage[] = [
       'Sie wird sogar zuerst für das Handy gebaut, weil viele deiner Kunden genau dort nach dir suchen. Auf Tablet und Computer sieht sie danach genauso gut aus.',
   },
   {
+    frage: 'Was kostet eine neue Webseite?',
+    antwort:
+      'Das hängt davon ab, was deine Seite können soll: ein paar Seiten zum Vorstellen oder zum Beispiel auch eine Terminbuchung. Deshalb nennen wir keine Pauschalpreise. Nach einem kurzen, unverbindlichen Gespräch weißt du, womit du rechnen kannst, bevor irgendetwas beauftragt wird.',
+  },
+  {
     frage: 'Baut ihr auch Software, die es nur für meinen Betrieb gibt?',
     antwort:
       'Ja, wenn es sich für dich lohnt. Wir hören uns zuerst an, wo dir Zeit verloren geht. Gibt es dafür schon ein gutes fertiges Programm, empfehlen wir dir das. Wenn nicht, bauen wir eine eigene Lösung: erst klein zum Ausprobieren, dann Schritt für Schritt größer.',

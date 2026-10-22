@@ -1,7 +1,6 @@
 // Rendert Bilder aus den 3D-Modellen:
 // - Monitore (Rahmen, Knöpfe, Fuß) aus scripts/render/monitore.html → public/monitore/*.webp
 //   Maße aus src/config/monitore.json, Bildgrößen nach src/config/monitore-bilder.json
-// - KI-Figuren (Standbilder) aus scripts/render/figuren.html → public/ki/*.webp
 // - Große Szenen (Zeitreise, Leistungen) aus scripts/render/szenen.html → public/bilder/*.webp
 //   npm run monitore
 import { chromium } from 'playwright';
@@ -46,7 +45,6 @@ if (process.argv[2] !== 'szenen') {
   const masse = await rendere('monitore.html', 'public/monitore');
   // Bildgrößen für die Seite (damit nichts springt, bevor die Bilder geladen sind)
   await writeFile('src/config/monitore-bilder.json', JSON.stringify(masse, null, 2) + '\n');
-  await rendere('figuren.html', 'public/ki');
 }
 // Große Bilder für die Darstellung „Leicht“
 await rendere('szenen.html', 'public/bilder');

@@ -8,6 +8,7 @@
  *   Der Pfad lässt sich trotzdem freischalten.
  */
 import { kacheln as konfig } from '../config/kacheln';
+import { stufe } from './stufe';
 
 type Modus = 'maus' | 'touch';
 type Funke = { x: number; y: number; vx: number; vy: number; geboren: number; groesse: number };
@@ -22,6 +23,8 @@ export function starteKacheln() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d')!;
   const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** Stufe „schwer“: Effekte aufgedreht (längeres Nachleuchten, Funkeln auch mit der Maus). */
+  const stark = stufe() === 'schwer';
   const meldung = document.querySelector<HTMLElement>('.pfad-meldung');
   const pupille = document.querySelector<SVGGElement>('.auge-pupille');
   const auge = document.querySelector<HTMLElement>('.auge');
@@ -220,7 +223,7 @@ export function starteKacheln() {
     let aktiv = false;
 
     // Nachleuchtende Spur
-    const dauer = ruhig ? 1 : konfig.nachleuchten;
+    const dauer = ruhig ? 1 : konfig.nachleuchten * (stark ? 2.2 : 1);
     for (const [schluessel, seit] of leuchtet) {
       const alter = jetzt - seit;
       const istAktuell = letzteKachel && schluessel === `${letzteKachel[0]},${letzteKachel[1]}`;
@@ -308,7 +311,7 @@ export function starteKacheln() {
   addEventListener(
     'pointermove',
     (e) => {
-      if (e.pointerType === 'mouse' || e.pointerType === 'pen') bewege(e.clientX, e.clientY, false);
+      if (e.pointerType === 'mouse' || e.pointerType === 'pen') bewege(e.clientX, e.clientY, stark);
     },
     { passive: true },
   );

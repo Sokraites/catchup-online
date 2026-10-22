@@ -20,7 +20,6 @@ const schritte = [
   ['Startseite: Termin buchen (Buch öffnen)', '/', async () => page.tap('.header-cta')],
   ['Terminbuch: Tag wählen', null, async () => page.tap('.tb-links .tb-tag:not(:disabled) >> nth=2')],
   ['Häufige Frage aufklappen', '/auffindbarkeit/', async () => page.tap('.faq summary')],
-  ['KI-Seite: nächste Stufe', '/ki-mitarbeiter/', async () => page.tap('[data-stufe-weiter]')],
 ];
 let schlimmste = 0;
 for (const [name, pfad, aktion] of schritte) {

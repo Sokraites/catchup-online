@@ -18,7 +18,7 @@ import type { MonitorSteuerung } from './monitor';
  * rahmen: Seite mit eigener Gestaltung (z. B. Referenzprojekt), wird als ganze Seite im Tab gezeigt.
  * abschnitte: geladene Abschnitte der Unterseite (bleiben erhalten, solange der Tab offen ist).
  */
-type Tab = { href: string; titel: string; abschnitte?: HTMLElement[]; rahmen?: boolean; belebt?: boolean };
+type Tab = { href: string; titel: string; abschnitte?: HTMLElement[]; rahmen?: boolean };
 
 export function starteMonitorTabs(monitor: MonitorSteuerung | undefined) {
   const html = document.documentElement;
@@ -156,11 +156,6 @@ export function starteMonitorTabs(monitor: MonitorSteuerung | undefined) {
         monitor!.wechsleSeiten(abschnitte);
         imRad = true;
         abschnitte[0].querySelector<HTMLElement>('.tab-zurueck')?.focus({ preventScroll: true });
-        // Die KI-Seite bringt eigene Bewegung mit (Stufen und Figuren)
-        if (!tab.belebt && abschnitte.some((a) => a.matches('[data-stufen]') || a.querySelector('[data-stufen]'))) {
-          tab.belebt = true;
-          import('./ki-seite').then(({ starteKiSeite }) => starteKiSeite(flaeche!, true));
-        }
       }
     } catch {
       // Laden fehlgeschlagen: ganz normal zur Seite wechseln

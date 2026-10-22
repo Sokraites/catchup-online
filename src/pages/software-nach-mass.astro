@@ -1,6 +1,7 @@
 ---
 import Leistung from '../layouts/Leistung.astro';
 import { site } from '../config/site';
+import { kiZusatz } from '../content/leistungen';
 ---
 
 <Leistung
@@ -45,11 +46,8 @@ import { site } from '../config/site';
           <h3>Programme verbinden</h3>
           <p>Daten, die du heute von Hand von einem Programm ins andere überträgst, wandern automatisch.</p>
         </li>
-        <li>
-          <h3>Mit KI-Unterstützung</h3>
-          <p>Wo es passt, übernimmt ein <a href="/ki-mitarbeiter/">KI-Mitarbeiter</a> Teile der Arbeit, zum Beispiel Anfragen vorsortieren.</p>
-        </li>
       </ul>
+      <p class="leistungen-zusatz">{kiZusatz}</p>
     </div>
   </section>
 

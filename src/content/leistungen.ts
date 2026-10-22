@@ -25,23 +25,14 @@ export const leistungen = [
     href: '/auffindbarkeit/',
     nummer: '03',
     titel: 'Gefunden werden',
-    kurz: 'Bei Google und bei KI-Assistenten wie ChatGPT und Claude. Damit Kunden aus der Region bei dir landen und nicht beim Mitbewerber.',
+    kurz: 'Suchmaschinenoptimierung (SEO) für Google und Auffindbarkeit bei KI-Suchsystemen wie ChatGPT und Claude. Damit Kunden aus der Region bei dir landen.',
     schemaName: 'Suchmaschinenoptimierung und Sichtbarkeit in KI-Suchen',
     bild: '/bilder/gefunden.webp',
     bildText: 'Handy mit einer Suche nach einer Schreinerei in der Nähe: Der eigene Betrieb steht oben, ein KI-Assistent empfiehlt ihn.',
   },
   {
-    href: '/ki-mitarbeiter/',
-    nummer: '04',
-    titel: 'KI-Mitarbeiter',
-    kurz: 'Ein digitaler Kollege für wiederkehrende Aufgaben. Vom Praktikanten bis zur Teamleitung, so viel Verantwortung, wie du ihm gibst.',
-    schemaName: 'KI-Mitarbeiter für Betriebe',
-    bild: '/ki/figur-2.webp',
-    bildText: 'Freundliche Roboter-Figur mit Headset als digitaler Kollege.',
-  },
-  {
     href: '/software-nach-mass/',
-    nummer: '05',
+    nummer: '04',
     titel: 'Software nach Maß',
     kurz: 'Wenn es keine fertige Lösung gibt, die wirklich passt: Wir bauen genau das Werkzeug, das deinem Betrieb Arbeit abnimmt.',
     schemaName: 'Individuelle Software für Betriebe',
@@ -49,6 +40,10 @@ export const leistungen = [
     bildText: 'Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick.',
   },
 ] as const;
+
+/** Kurze Zusatzzeile zu KI-Agenten (mehr wird bewusst nicht beworben). */
+export const kiZusatz =
+  'Auf Wunsch binden wir auch KI-Agenten ein, die wiederkehrende Aufgaben übernehmen, zum Beispiel Anfragen vorsortieren.';
 
 /** Ablauf einer Zusammenarbeit. */
 export const ablauf = [

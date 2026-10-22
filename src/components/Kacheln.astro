@@ -17,7 +17,7 @@
 
 <script>
   import { starteKacheln } from '../scripts/kacheln';
-  import { verspielt } from '../scripts/stufe';
-  // Kachel-Rätsel mit Auge: nur in der Stufe „schwer“
-  if (verspielt()) starteKacheln();
+  import { stufe } from '../scripts/stufe';
+  // Kachel-Pfad mit Auge gehört zum Erlebnis (Mittel und Schwer); die ruhige Stufe „leicht“ verzichtet darauf.
+  if (stufe() !== 'leicht') starteKacheln();
 </script>

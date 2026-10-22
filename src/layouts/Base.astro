@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { site } from '../config/site';
+import { site, INDEXIERUNG } from '../config/site';
 import { graph, organisation } from '../lib/schema';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -50,11 +50,14 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {/* Schalter INDEXIERUNG: solange er aus ist, sollen Suchmaschinen keine Seite aufnehmen */}
+    {(noindex || !INDEXIERUNG) && <meta name="robots" content={INDEXIERUNG ? 'noindex' : 'noindex, nofollow'} />}
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0D0D13" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    {INDEXIERUNG && <link rel="sitemap" href="/sitemap.xml" />}
     <link rel="preload" href="/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
 

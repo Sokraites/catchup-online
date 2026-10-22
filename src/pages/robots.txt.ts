@@ -1,10 +1,20 @@
 import type { APIRoute } from 'astro';
-import { site } from '../config/site';
+import { site, INDEXIERUNG } from '../config/site';
 
-/** Alle Suchmaschinen und KI-Systeme sind ausdrücklich willkommen: Wir wollen gefunden werden. */
+/**
+ * Schalter INDEXIERUNG (src/config/site.ts):
+ * aus → alles gesperrt, kein Verweis auf die Sitemap; an → alle Suchmaschinen und KI-Systeme willkommen.
+ */
 export const GET: APIRoute = () =>
-  new Response(`User-agent: *
+  new Response(
+    INDEXIERUNG
+      ? `User-agent: *
 Allow: /
 
 Sitemap: ${site.url}/sitemap.xml
-`);
+`
+      : `User-agent: *
+Disallow: /
+`,
+    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+  );

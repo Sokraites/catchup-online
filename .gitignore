@@ -4,3 +4,4 @@ dist/
 .DS_Store
 .vorschau/
 docs/messung/*.json
+catchup-seite.zip

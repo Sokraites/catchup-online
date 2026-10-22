@@ -13,8 +13,6 @@ const reduziert = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const stufe = (): StufeId => (html.dataset.stufe as StufeId) || 'mittel';
 /** Ruhige Darstellung: keine Bewegung (Stufe leicht oder „Bewegung reduzieren“ im System). */
 export const ruhig = () => stufe() === 'leicht' || reduziert();
-/** Verspielte Extras (Kachel-Rätsel, lebendige 3D-Figuren): nur in Stufe schwer. */
-export const verspielt = () => stufe() === 'schwer' && !reduziert();
 
 function merke(id: StufeId) {
   try {

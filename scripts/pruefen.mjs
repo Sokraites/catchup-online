@@ -7,10 +7,10 @@ import { readFileSync } from 'node:fs';
 const axe = readFileSync(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
 const basis = process.env.BASIS ?? 'http://localhost:4321';
 const fotos = process.argv[2];
-const seiten = ['/', '/webseiten-erstellen/', '/webseiten-modernisieren/', '/auffindbarkeit/', '/ki-mitarbeiter/', '/software-nach-mass/', '/termin/', '/impressum/', '/datenschutz/'];
+const seiten = ['/', '/webseiten-erstellen/', '/webseiten-modernisieren/', '/auffindbarkeit/', '/software-nach-mass/', '/termin/', '/impressum/', '/datenschutz/'];
 const geraete = {
-  handy: { width: 390, height: 844 },
-  tablet: { width: 820, height: 1180 },
+  handy: { width: 360, height: 780 },
+  tablet: { width: 768, height: 1024 },
   desktop: { width: 1440, height: 900 },
 };
 
@@ -18,7 +18,8 @@ const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: p
 let fehler = 0;
 for (const [name, viewport] of Object.entries(geraete)) {
   for (const js of [true, false]) {
-    const ctx = await browser.newContext({ viewport, javaScriptEnabled: js, hasTouch: name !== 'desktop' });
+    // bypassCSP: nur damit das Prüfwerkzeug (axe) eingeschleust werden kann; die CSP selbst prüft scripts/funktionstest.mjs
+    const ctx = await browser.newContext({ viewport, javaScriptEnabled: js, hasTouch: name !== 'desktop', bypassCSP: true });
     const page = await ctx.newPage();
     const konsole = [];
     page.on('console', (m) => m.type() === 'error' && konsole.push(m.text()));
@@ -50,7 +51,7 @@ for (const [name, viewport] of Object.entries(geraete)) {
       if (axeFehler.length) probleme.push(`Barrierefreiheit: ${axeFehler.join(', ')}`);
       fehler += probleme.length;
       console.log(`${probleme.length ? '✗' : '✓'} ${name}${js ? '' : ' (ohne JS)'} ${pfad} ${probleme.join('; ')}`);
-      if (fotos && js && ['/', '/ki-mitarbeiter/', '/auffindbarkeit/'].includes(pfad)) {
+      if (fotos && js && ['/', '/auffindbarkeit/'].includes(pfad)) {
         await page.screenshot({ path: `${fotos}/${name}${pfad.replaceAll('/', '_')}.png`, fullPage: true });
       }
     }

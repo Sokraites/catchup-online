@@ -4,8 +4,8 @@
  * kein Cookie) und kann oben rechts jederzeit geändert werden.
  *
  * - leicht: ruhige Seite, große Bilder, keine Effekte
- * - mittel: Monitor-Zeitreise und Terminbuch mit Animation
- * - schwer: zusätzlich Kachel-Rätsel mit Auge, lebendige 3D-Figuren, Funkeln
+ * - mittel: das Zielbild: Monitor-Zeitreise, Kachel-Pfad mit Auge, Terminbuch mit Animation
+ * - schwer: wie mittel, Effekte aufgedreht (längeres Nachleuchten, Funkeln auch mit der Maus)
  */
 export type StufeId = 'leicht' | 'mittel' | 'schwer';
 
@@ -20,13 +20,13 @@ export const stufen: { id: StufeId; titel: string; kurz: string; text: string }[
     id: 'mittel',
     titel: 'Mittel',
     kurz: 'Mit Bewegung',
-    text: 'Eine Zeitreise durch die Monitore der letzten Jahrzehnte und ein Terminbuch zum Blättern.',
+    text: 'Eine Zeitreise durch die Monitore der letzten Jahrzehnte, ein verstecktes Kachel-Rätsel und ein Terminbuch zum Blättern.',
   },
   {
     id: 'schwer',
     titel: 'Schwer',
     kurz: 'Volles Programm',
-    text: 'Alle Effekte, winkende 3D-Figuren und ein verstecktes Rätsel im Bildschirm.',
+    text: 'Wie Mittel, nur mit aufgedrehten Effekten: mehr Leuchten, Funkeln bei jeder Bewegung.',
   },
 ];
 
