@@ -1241,3 +1241,17 @@ html[data-stufe='leicht'] #auffindbarkeit {
     display: none;
   }
 }
+
+/* Mittel und Schwer: Die großen Bilder gar nicht erst laden, der Monitor übernimmt (Stufe steht schon vor dem Zeichnen fest).
+   Bei „Bewegung reduzieren“ startet kein Monitor, dann bleiben die Bilder. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] .bild-ruhig,
+  html[data-stufe='schwer'] .bild-ruhig {
+    display: none;
+  }
+}
+@media (max-width: 40rem) {
+  .hero-bild img {
+    aspect-ratio: 3 / 4;
+  }
+}

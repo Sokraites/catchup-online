@@ -45,6 +45,12 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Software nach Maß | Neue Leistung 05 mit eigener Unterseite `/software-nach-mass/` und Abschnitt „Welche digitale Lösung würde dir wirklich weiterhelfen?“ auf der Startseite. Ehrlich formuliert: Gibt es eine gute fertige Lösung, empfehlen wir sie. | 22.10.2026 |
 | Marketing als Leistung | **Vorerst nicht** (Vorschlag Geschäftsführung, Gründer kann anders entscheiden): Werbeanzeigen und Social-Media-Betreuung sind laufende Arbeit mit eigenem Fachwissen und würden den Auftritt verwässern. „Gefunden werden“ deckt den Teil des Marketings ab, der zur Webseite gehört. Später als Erweiterung denkbar, wenn Kunden danach fragen. | 22.10.2026 |
 | Terminbuch Handy | Zusätzlich zum Wischen: Eselsohr unten rechts antippen blättert um, die Ecke hebt sich nach dem Öffnen kurz an. Grund: Seitliches Wischen kann in eingebetteten Ansichten (z. B. Vorschau in der Claude-App) von der App abgefangen werden. | 22.10.2026 |
+| KI-Mitarbeiter (Änderung) | **Ändert die Entscheidung vom 20.10.:** Das Stufenmodell (Praktikant bis Teamleiter), die Unterseite und die 3D-Figuren sind entfernt (Auftrag Livegang). KI-Agenten nur noch als kurze Zusatzzeile. | 22.10.2026 |
+| Kontaktdaten | E-Mail catchup-digital@protonmail.com, Telefon +49 176 84607083, nur in `src/config/site.ts`. E-Mail wird später durch eine Adresse auf der eigenen Domain ersetzt. | 22.10.2026 |
+| Indexierung | Schalter INDEXIERUNG in `src/config/site.ts`, Standard aus (noindex, robots.txt sperrt). Erst nach rechtlicher Prüfung einschalten. | 22.10.2026 |
+| Referenz im Livegang | Schalter REFERENZEN, Standard aus, bis die Freigabe des Kunden vorliegt; die Projektseite wird dann auch nicht ausgeliefert. | 22.10.2026 |
+| Darstellungs-Stufen (Anpassung) | Kachel-Pfad mit Auge gehört zum Zielbild und läuft in Mittel (Standard) und Schwer; Schwer dreht Effekte auf. Leicht bleibt ruhig. | 22.10.2026 |
+| Hosting (offen) | Cloudflare Pages vorbereitet (`_headers`). Widerspricht „Hosting in der EU“: Gründer entscheidet. | 22.10.2026 |
 | Private Vorschau | Erlaubt (20.10.2026): private Vorschau-Seite, nur für den Gründer sichtbar, nicht für Suchmaschinen. |
 | Zwischenstände | Nach Phase B wird ein Entwurf gezeigt, danach ein erster Monitor-Entwurf. | 20.10.2026 |
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |

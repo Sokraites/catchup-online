@@ -10,4 +10,8 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
+  // CSS direkt ins HTML: spart eine Ladeschleife, der Inhalt erscheint schneller (Ladezeit ist Design).
+  build: {
+    inlineStylesheets: 'always',
+  },
 });

@@ -49,7 +49,7 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
     </script>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="canonical" href={canonical} />}
     {/* Schalter INDEXIERUNG: solange er aus ist, sollen Suchmaschinen keine Seite aufnehmen */}
     {(noindex || !INDEXIERUNG) && <meta name="robots" content={INDEXIERUNG ? 'noindex' : 'noindex, nofollow'} />}
     <meta name="color-scheme" content="dark" />

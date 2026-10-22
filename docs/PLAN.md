@@ -95,25 +95,25 @@ Nach jeder Etappe abhaken. Jede Etappe wird auf 390 px (Handy), 820 px (Tablet) 
 Regeln: nichts veröffentlichen (kein Push, kein Deployment), nichts erfinden, Platzhalter als `<<HIER ANGABE EINTRAGEN: …>>`.
 
 Stufe 1: Seite überarbeiten
-- [ ] 1.1 Bauen, in 360, 768 und 1440 px ansehen, Befunde (Muss, Soll, Kann) notieren
-- [ ] 1.2 KI-Mitarbeiter-Stufenmodell entfernen (nur noch Zusatzzeile zu KI-Agenten), ungenutzte Bibliotheken raus
-- [ ] 1.2 Kachel-Pfad gehört zur Standard-Darstellung (Zielbild), Touch-Variante vollwertig
-- [ ] 1.2 Muss- und Soll-Punkte beheben (Überlauf 360 px, Konsolenfehler, Tastatur, Kontrast)
-- [ ] 1.3 Texte prüfen, feste Kontaktdaten aus der Konfiguration, Kontaktbereich
-- [ ] 1.4 Kurzbericht Stufe 1
+- [x] 1.1 Bauen, in 360, 768 und 1440 px ansehen, Befunde (Muss, Soll, Kann) notieren
+- [x] 1.2 KI-Mitarbeiter-Stufenmodell entfernen (nur noch Zusatzzeile zu KI-Agenten), ungenutzte Bibliotheken raus
+- [x] 1.2 Kachel-Pfad gehört zur Standard-Darstellung (Zielbild), Touch-Variante vollwertig
+- [x] 1.2 Muss- und Soll-Punkte beheben (Überlauf 360 px, Konsolenfehler, Tastatur, Kontrast)
+- [x] 1.3 Texte prüfen, feste Kontaktdaten aus der Konfiguration, Kontaktbereich
+- [x] 1.4 Kurzbericht Stufe 1
 
 Stufe 2: Veröffentlichungsreife
-- [ ] 2.1 Zentrale Konfiguration vollständig (inkl. Schalter INDEXIERUNG, Standard aus)
-- [ ] 2.2 Schalter INDEXIERUNG wirkt auf Meta-Robots, robots.txt, Sitemap-Verweis
-- [ ] 2.3 Impressum nach § 5 DDG mit Platzhaltern und Entwurfs-Vermerk
-- [ ] 2.4 Datenschutzerklärung als Entwurf, nur was wirklich stattfindet
-- [ ] 2.5 Keine Verbindungen zu fremden Servern; Cookies und lokaler Speicher geprüft
-- [ ] 2.6 Title, Description, Canonical, Open Graph, Sitemap, JSON-LD, FAQ
-- [ ] 2.7 404, Favicon, Manifest
-- [ ] 2.8 `_headers` für Cloudflare Pages inkl. getesteter Content-Security-Policy
-- [ ] 2.9 Statischer Build, Dateizahl, größte Datei, `catchup-seite.zip`
-- [ ] 2.10 Prüfungen a) bis g)
-- [ ] 2.11 `VERÖFFENTLICHUNG.md`
+- [x] 2.1 Zentrale Konfiguration vollständig (inkl. Schalter INDEXIERUNG, Standard aus)
+- [x] 2.2 Schalter INDEXIERUNG wirkt auf Meta-Robots, robots.txt, Sitemap-Verweis
+- [x] 2.3 Impressum nach § 5 DDG mit Platzhaltern und Entwurfs-Vermerk
+- [x] 2.4 Datenschutzerklärung als Entwurf, nur was wirklich stattfindet
+- [x] 2.5 Keine Verbindungen zu fremden Servern; Cookies und lokaler Speicher geprüft
+- [x] 2.6 Title, Description, Canonical, Open Graph, Sitemap, JSON-LD, FAQ
+- [x] 2.7 404, Favicon, Manifest
+- [x] 2.8 `_headers` für Cloudflare Pages inkl. getesteter Content-Security-Policy
+- [x] 2.9 Statischer Build, Dateizahl, größte Datei, `catchup-seite.zip`
+- [x] 2.10 Prüfungen a) bis g)
+- [x] 2.11 `VERÖFFENTLICHUNG.md`
 
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
@@ -127,7 +127,10 @@ Stufe 2: Veröffentlichungsreife
 
 - `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
 - `npm run vorschau`: baut aus `dist/` eine Fassung mit relativen Links in `.vorschau/` (für die private Vorschau).
-- `npm run monitore`: rendert Monitor-Gehäuse, KI-Figuren-Standbilder und die großen Bilder (`public/bilder/`) aus den 3D-Modellen neu. Nur die großen Bilder: `node scripts/monitore-rendern.mjs szenen`.
+- `npm run ansehen`: zeigt den Build lokal an (http://localhost:4321) mit den Sicherheits-Headern aus `_headers`.
+- `node scripts/funktionstest.mjs`: klickt die wichtigen Abläufe mit aktiver Content-Security-Policy durch und prüft alle Links.
+- `npm run paket`: packt `dist/` als `catchup-seite.zip`.
+- `npm run monitore`: rendert Monitor-Gehäuse und die großen Bilder (`public/bilder/`) aus den 3D-Modellen neu. Nur die großen Bilder: `node scripts/monitore-rendern.mjs szenen`.
 - `npm run komprimieren`: komprimierte Fassungen für schnellere Auslieferung (nach dem Bauen).
 - `sh scripts/messen.sh`: Lighthouse-Messung im Handy-Modus; `node scripts/reaktion.mjs`: Reaktionszeit auf Eingaben.
 - `npm run bilder`: erzeugt Vorschaubild (`public/og.png`) und Logo-Bild neu, z. B. nach Namensänderung.

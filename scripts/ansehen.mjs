@@ -1,10 +1,12 @@
 // Zeigt die fertige Seite (Ordner dist/) lokal an, so wie ein statisches Hosting sie ausliefert:
-// Ordner → index.html, unbekannte Adressen → 404.html, Header aus dist/_headers (Format von Cloudflare Pages).
+// Ordner → index.html, unbekannte Adressen → 404.html, Header aus dist/_headers (Format von Cloudflare Pages),
+// Text-Dateien komprimiert (wie bei Cloudflare).
 //   npm run build, dann npm run ansehen → http://localhost:4321
 // Nur Node, keine weiteren Pakete.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
+import { brotliCompressSync, gzipSync } from 'node:zlib';
 
 const WURZEL = process.env.ORDNER ?? 'dist';
 const PORT = Number(process.env.PORT ?? 4321);
@@ -85,6 +87,15 @@ createServer(async (req, res) => {
     res.writeHead(404).end('Nicht gefunden');
     return;
   }
-  res.writeHead(status, { 'Content-Type': typen[extname(gefunden.ziel)] ?? 'application/octet-stream', ...header(regeln, pfad) });
-  res.end(gefunden.inhalt);
+  const typ = typen[extname(gefunden.ziel)] ?? 'application/octet-stream';
+  const kopf = { 'Content-Type': typ, ...header(regeln, pfad) };
+  let inhalt = gefunden.inhalt;
+  const annahme = req.headers['accept-encoding'] ?? '';
+  if (/text|javascript|json|xml|svg/.test(typ)) {
+    if (annahme.includes('br')) [inhalt, kopf['Content-Encoding']] = [brotliCompressSync(inhalt), 'br'];
+    else if (annahme.includes('gzip')) [inhalt, kopf['Content-Encoding']] = [gzipSync(inhalt), 'gzip'];
+    kopf['Vary'] = 'Accept-Encoding';
+  }
+  res.writeHead(status, kopf);
+  res.end(inhalt);
 }).listen(PORT, () => console.log(`Seite läuft: http://localhost:${PORT}  (beenden mit Strg+C)`));
