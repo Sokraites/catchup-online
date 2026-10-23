@@ -51,6 +51,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Referenz im Livegang | Schalter REFERENZEN, Standard aus, bis die Freigabe des Kunden vorliegt; die Projektseite wird dann auch nicht ausgeliefert. | 22.10.2026 |
 | Darstellungs-Stufen (Anpassung) | Kachel-Pfad mit Auge gehört zum Zielbild und läuft in Mittel (Standard) und Schwer; Schwer dreht Effekte auf. Leicht bleibt ruhig. | 22.10.2026 |
 | Hosting (offen) | Cloudflare Pages vorbereitet (`_headers`). Widerspricht „Hosting in der EU“: Gründer entscheidet. | 22.10.2026 |
+| Aussicht (Stufe Schwer) | Nur Desktop (ab 1280 px, Maus, ohne reduzierte Bewegung): Hinter dem Monitor ein Fenster mit Blick über Meer, Gebirge und Stadt am Hang. Sonne wandert beim Scrollen vom Mittag bis zum Untergang, am Seitenende Nacht mit Milchstraße. Wellen dauerhaft, Gewitterwolke mit Blitz alle 30–65 s, abends Sternschnuppe alle 10–25 s. Tischkalender links: Zoom, Stift-Cursor, „Zurück zum Schreibtisch“, ein Tag öffnet das Terminbuch. Technik: eigenes WebGL-Programm ohne Bibliothek (20 KB), wird erst nach dem Laden geholt. | 23.10.2026 |
 | Private Vorschau | Erlaubt (20.10.2026): private Vorschau-Seite, nur für den Gründer sichtbar, nicht für Suchmaschinen. |
 | Zwischenstände | Nach Phase B wird ein Entwurf gezeigt, danach ein erster Monitor-Entwurf. | 20.10.2026 |
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |

@@ -5,7 +5,8 @@
  *
  * - leicht: ruhige Seite, große Bilder, keine Effekte
  * - mittel: das Zielbild: Monitor-Zeitreise, Kachel-Pfad mit Auge, Terminbuch mit Animation
- * - schwer: wie mittel, Effekte aufgedreht (längeres Nachleuchten, Funkeln auch mit der Maus)
+ * - schwer: wie mittel, Effekte aufgedreht (längeres Nachleuchten, Funkeln auch mit der Maus);
+ *   am Desktop zusätzlich der Blick aus dem Fenster (src/scripts/aussicht.ts)
  */
 export type StufeId = 'leicht' | 'mittel' | 'schwer';
 
@@ -26,7 +27,7 @@ export const stufen: { id: StufeId; titel: string; kurz: string; text: string }[
     id: 'schwer',
     titel: 'Schwer',
     kurz: 'Volles Programm',
-    text: 'Wie Mittel, nur mit aufgedrehten Effekten: mehr Leuchten, Funkeln bei jeder Bewegung.',
+    text: 'Wie Mittel, dazu am Computer ein Fenster mit Blick aufs Meer, die Sonne geht beim Scrollen unter.',
   },
 ];
 

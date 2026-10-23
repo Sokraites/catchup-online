@@ -115,6 +115,18 @@ Stufe 2: Veröffentlichungsreife
 - [x] 2.10 Prüfungen a) bis g)
 - [x] 2.11 `VERÖFFENTLICHUNG.md`
 
+## Aussicht durchs Fenster (23.10.2026)
+
+- [x] WebGL-Szene: Meer mit Wellen, Gebirge, Stadt am Hang, Himmel, Sonne, Milchstraße
+- [x] Sonnenlauf an den Scrollfortschritt gekoppelt, Nacht am Seitenende
+- [x] Gewitterwolke mit Blitzen (30–65 s), Sternschnuppen abends (10–25 s)
+- [x] Fensterrahmen, Wand, Schreibtisch; Monitor macht Platz
+- [x] Tischkalender mit Zoom, Stift-Cursor, Zurück-Knopf, Übergabe an das Terminbuch
+- [x] Nur Desktop und Stufe Schwer; Szene pausiert bei offenem Kalender, Terminbuch oder verstecktem Tab
+- [x] Funktionstest erweitert
+- [ ] Prüf-Agent: Befunde auswerten und beheben
+- [ ] Nach GitHub pushen
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
