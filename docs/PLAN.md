@@ -124,8 +124,8 @@ Stufe 2: Veröffentlichungsreife
 - [x] Tischkalender mit Zoom, Stift-Cursor, Zurück-Knopf, Übergabe an das Terminbuch
 - [x] Nur Desktop und Stufe Schwer; Szene pausiert bei offenem Kalender, Terminbuch oder verstecktem Tab
 - [x] Funktionstest erweitert
-- [ ] Prüf-Agent: Befunde auswerten und beheben
-- [ ] Nach GitHub pushen
+- [x] Prüf-Agent: Befunde ausgewertet und behoben (Zimmerlicht, Wolke, Stadt, Kontrast Fußbereich, Zeichenschleife, Fokus im Kalender, weiche Kanten, Blitz am Tag)
+- [x] Nach GitHub pushen
 
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 

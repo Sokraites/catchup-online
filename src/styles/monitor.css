@@ -702,6 +702,10 @@ html.monitor-tab-offen {
 }
 
 /* ---------- Aussicht (Stufe „Schwer“, Desktop): Fenster, Schreibtisch, Tischkalender ---------- */
+:root {
+  /* Mauszeiger: Hand mit Stift (für den Kalender) */
+  --stift-zeiger: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M3 37 9 33 31 7a3 3 0 0 0-4-4L5 29Z' fill='%23263238' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M3 37l2-6 4 2Z' fill='%23c62828'/%3E%3Cpath d='M14 38c-2-3 0-6 3-8l7-5c2-1 4 0 4 2l-1 1 3-2c2-1 4 1 3 3l-1 1c2-1 4 1 3 3l-6 5c-3 2-7 3-11 2Z' fill='%23f2c9a5' stroke='%237a4f33' stroke-width='1.2'/%3E%3C/svg%3E") 3 37;
+}
 /* Liegt hinter dem Inhalt (main hat z-index 1); nur der Kalender liegt darüber, damit er anklickbar ist. */
 .aussicht {
   --licht: 1;
@@ -774,6 +778,7 @@ html.monitor-tab-offen {
 }
 /* Leichte Spiegelung im Glas */
 .aussicht-glas {
+  opacity: var(--licht);
   left: 2.2vw;
   right: 2.2vw;
   top: calc(var(--kopf, 72px) + 26px);
@@ -814,7 +819,7 @@ html.monitor-tab-offen {
   box-shadow: 0 14px 22px -8px rgb(0 0 0 / 0.55), 0 2px 0 #c9bba0;
   color: #2c2219;
   font: 600 0.8rem/1 Georgia, serif;
-  cursor: pointer;
+  cursor: var(--stift-zeiger), pointer;
   transform: perspective(500px) rotateX(8deg);
   transform-origin: bottom center;
   transition: transform 0.25s;
@@ -949,7 +954,7 @@ html.ak-offen {
   background: transparent;
   color: #2c2219;
   font: inherit;
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M3 37 9 33 31 7a3 3 0 0 0-4-4L5 29Z' fill='%23263238' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M3 37l2-6 4 2Z' fill='%23c62828'/%3E%3Cpath d='M14 38c-2-3 0-6 3-8l7-5c2-1 4 0 4 2l-1 1 3-2c2-1 4 1 3 3l-1 1c2-1 4 1 3 3l-6 5c-3 2-7 3-11 2Z' fill='%23f2c9a5' stroke='%237a4f33' stroke-width='1.2'/%3E%3C/svg%3E") 3 37, pointer;
+  cursor: var(--stift-zeiger), pointer;
 }
 .ak-raster-gross .ak-tag:not(:disabled):hover {
   background: rgb(124 77 255 / 0.15);
@@ -998,6 +1003,10 @@ html.ak-offen {
 /* Mit Aussicht: Seite selbst durchsichtig, damit Fenster und Himmel zu sehen sind */
 html.aussicht-an body {
   background: #0d0d13;
+}
+/* Fußbereich liegt auf dem Schreibtisch: eigener dunkler Grund für gut lesbaren Text */
+html.aussicht-an .site-footer {
+  background: rgb(13 13 19 / 0.94);
 }
 html.aussicht-an .monitor-tipp {
   color: rgb(255 255 255 / 0.85);

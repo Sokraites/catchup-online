@@ -10,6 +10,7 @@ Stand: 22.10.2026. Alles hier bezieht sich auf den Build aus `npm run build` (Or
 | Schalter **INDEXIERUNG** (Standard: aus) | `src/config/site.ts`, Zeile `export const INDEXIERUNG = false;` |
 | Schalter **REFERENZEN** (Projekt „Ottos Werkstatt“, Standard: aus) | `src/config/site.ts`, Zeile `export const REFERENZEN = false;` |
 | Darstellungs-Stufen (Leicht, Mittel, Schwer) | `src/config/stufen.ts` |
+| Aussicht durchs Fenster (nur Stufe Schwer, Desktop ab 1280 px) | `src/scripts/aussicht.ts`, Stile in `src/styles/monitor.css` |
 | Impressum (Entwurf) | `src/pages/impressum.astro` → `/impressum/` |
 | Datenschutzerklärung (Entwurf) | `src/pages/datenschutz.astro` → `/datenschutz/` |
 | Sicherheits-Header für Cloudflare Pages | wird beim Bauen erzeugt: `dist/_headers` (aus `scripts/nachbereiten.mjs`) |
@@ -40,7 +41,7 @@ Außerdem: Der Vermerk „ENTWURF – vor Veröffentlichung rechtlich prüfen“
 
 | Prüfung | Ergebnis |
 |---|---|
-| Dateien im Build | 49 (Grenze 1.000) |
+| Dateien im Build | 51 (Grenze 1.000) |
 | Größte Datei | `og.png`, 256 KB (Grenze 25 MiB); größtes Skript 124 KB |
 | ZIP | `catchup-seite.zip`, 737 KB, `index.html` im Stamm |
 | Lighthouse Mobil, Startseite | Leistung 92 · Barrierefreiheit 100 · Empfehlungen 100 · SEO 66 |
@@ -91,4 +92,5 @@ Kontaktbereich, Fußzeile, Terminbuch, Terminseite, Impressum, Datenschutz und d
 - Nicht auf echten Handys getestet, nur nachgestellt (Chromium). Die Checkliste in `docs/QUALITAET.md` gilt weiter.
 - „Ohne Server“: Die Seite ist rein statisch und läuft bei jedem statischen Hosting. Direkt per Doppelklick auf `index.html` funktioniert sie nicht vollständig, weil die Links vom Stammverzeichnis der Domain ausgehen.
 - Terminbuch: Anfragen gehen per vorbereiteter E-Mail (ehrlich beschriftet). Echter Versand und belegte Tage erst mit einem Server-Dienst.
+- Aussicht (Stufe Schwer): nur mit Software-Grafik getestet (ohne Grafikkarte, dort ca. 8 Bilder/s). Auf echten Rechnern mit Grafikkarte flüssiger; bitte an einem echten Desktop ansehen. Bei gesperrtem WebGL bleibt die Seite wie in Stufe Mittel.
 - Der Sicherheits-Header `Strict-Transport-Security` ist bewusst nicht gesetzt. Cloudflare kann HTTPS selbst erzwingen; HSTS erst setzen, wenn die Domain sicher dauerhaft über HTTPS läuft.

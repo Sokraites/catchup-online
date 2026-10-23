@@ -25,15 +25,17 @@ out vec4 farbe;
 uniform vec2 uRes;
 uniform float uZeit;     // Sekunden
 uniform float uTag;      // 0 = Mittag … 1 = Nacht (Scrollfortschritt)
-uniform vec2 uMaus;      // -1 … 1, für leichte Tiefe (Parallaxe)
-uniform float uLinks;    // rechter Rand des linken Fensterteils (0 … 1)
-uniform float uRechts;   // linker Rand des rechten Fensterteils (0 … 1)
+uniform vec2 uMaus;      // -1 … 1, für Tiefe (Ebenen verschieben sich verschieden stark)
+uniform float uLinks;    // rechter Rand des linken Fensterflügels (0 … 1)
+uniform float uRechts;   // linker Rand des rechten Fensterflügels (0 … 1)
+uniform float uRahmenL;  // Innenkante des Fensterrahmens links (0 … 1)
+uniform float uRahmenR;  // Innenkante des Fensterrahmens rechts (0 … 1)
 uniform float uBlitz;    // Helligkeit des Blitzes 0 … 1
 uniform vec2 uBolt[8];   // Blitz-Verlauf (Bildschirm-Koordinaten 0 … 1)
 uniform vec4 uStern;     // Sternschnuppe: Start xy, Richtung xy
 uniform float uSternT;   // Fortschritt 0 … 1 (außerhalb: aus)
 
-const float H = 0.43;    // Horizont
+const float H = 0.5;     // Horizont (hoch: Blick vom erhöhten Haus hinunter aufs Meer)
 
 float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float rausch(vec2 p) {
@@ -46,16 +48,22 @@ float fbm(vec2 p) {
   for (int i = 0; i < 5; i++) { s += a * rausch(p); p = p * 2.03 + 17.1; a *= 0.5; }
   return s;
 }
+float fbm3(vec2 p) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 3; i++) { s += a * rausch(p); p = p * 2.07 + 31.7; a *= 0.5; }
+  return s / 0.875;
+}
 float grat(float x) { return 1.0 - abs(rausch(vec2(x, 0.5)) * 2.0 - 1.0); }
 float gebirge(float x) { return 0.55 * grat(x) + 0.3 * grat(x * 2.1 + 3.0) + 0.15 * grat(x * 4.7 + 7.0); }
-
 float strecke(vec2 p, vec2 a, vec2 b) {
   vec2 pa = p - a, ba = b - a;
   float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
   return length(pa - ba * h);
 }
+// weiche Kante (gegen Treppen): 1 unterhalb der Linie, 0 darüber
+float unter(float y, float linie, float px) { return smoothstep(linie + px, linie - px, y); }
 
-// Himmelsfarbe ohne Sonne/Sterne (auch für Spiegelungen im Wasser)
+// Himmelsfarbe ohne Sonne und Sterne (auch für Spiegelungen im Wasser)
 vec3 himmel(float hoehe, float e) {
   vec3 zenTag = vec3(0.14, 0.36, 0.78), horTag = vec3(0.60, 0.79, 0.95);
   vec3 zenAbend = vec3(0.16, 0.18, 0.40), horAbend = vec3(1.0, 0.48, 0.22);
@@ -69,14 +77,21 @@ void main() {
   vec2 uv = gl_FragCoord.xy / uRes;
   float A = uRes.x / uRes.y;
   float t = uZeit;
+  float px = 1.5 / uRes.y;
+  float mx = uMaus.x;
 
   // Sonnenstand: hoch am Anfang, unter dem Horizont am Ende
   float k = clamp(uTag, 0.0, 1.0);
   float e = clamp(1.0 - 1.39 * k, -0.5, 1.0);
   float nacht = smoothstep(0.0, -0.36, e);
+  float abend = smoothstep(0.08, -0.12, e);
   float sichtbar = smoothstep(-0.07, 0.02, e);
-  vec2 sonne = vec2(uLinks * mix(0.80, 0.66, k), H + e * 0.37);
+  float rot = exp(-pow((e - 0.02) / 0.18, 2.0));
+  float flL = uLinks - uRahmenL;  // Breite des linken Flügels
+  vec2 sonne = vec2(uRahmenL + flL * mix(0.80, 0.62, k), H + e * 0.33);
   vec3 sonnenFarbe = mix(vec3(1.0, 0.42, 0.18), vec3(1.0, 0.97, 0.88), smoothstep(0.0, 0.45, e));
+  float wolkeX = uRahmenL + flL * 0.32 + mx * 0.004;
+  vec3 dunstFarbe = himmel(0.05, e);
 
   vec3 col;
   float hoehe = (uv.y - H) / (1.0 - H);
@@ -84,37 +99,33 @@ void main() {
   if (uv.y >= H) {
     // ---------- Himmel ----------
     col = himmel(hoehe, e);
-    vec2 d2 = (uv - sonne) * vec2(A, 1.0);
-    float d = length(d2);
+    float d = length((uv - sonne) * vec2(A, 1.0));
     col += sonnenFarbe * (0.30 * exp(-d * 5.0) + 0.55 * exp(-d * 22.0)) * sichtbar;
-    // Abendrot entlang des Horizonts, dort wo die Sonne untergeht
-    float rot = exp(-pow((e - 0.02) / 0.18, 2.0));
     col += vec3(1.0, 0.36, 0.16) * rot * 0.55 * exp(-(uv.y - H) * 9.0) * exp(-abs(uv.x - sonne.x) * 1.6);
-    col = mix(col, sonnenFarbe * 1.2, smoothstep(0.034, 0.028, d) * sichtbar);
+    col = mix(col, sonnenFarbe * 1.2, smoothstep(0.032, 0.026, d) * sichtbar);
 
-    // Sterne und Milchstraße
+    // Sterne und Milchstraße (flaches Band über beide Fensterflügel)
     if (nacht > 0.001) {
       vec2 p = vec2(uv.x * A, uv.y);
-      vec2 r = vec2(p.x * 0.80 + p.y * 0.60, -p.x * 0.60 + p.y * 0.80);
-      float band = exp(-pow((r.y - 0.55) / 0.13, 2.0));
-      float staub = fbm(r * vec2(4.0, 10.0) + 3.0);
-      float dunkel = smoothstep(0.52, 0.72, fbm(r * vec2(7.0, 16.0) + 11.0));
-      float kern = exp(-pow((r.x - 0.9) / 0.5, 2.0));
-      vec3 milch = mix(vec3(0.55, 0.62, 0.95), vec3(1.0, 0.86, 0.68), kern) * band * (0.25 + 0.75 * staub) * (1.0 - 0.75 * dunkel);
+      vec2 r = vec2(p.x * 0.98 + p.y * 0.2, -p.x * 0.2 + p.y * 0.98);
+      float band = exp(-pow((r.y - 0.66) / 0.11, 2.0));
+      float staub = fbm(r * vec2(3.5, 11.0) + 3.0);
+      float dunkel = smoothstep(0.5, 0.7, fbm(r * vec2(6.0, 18.0) + 11.0)) * smoothstep(0.3, 0.9, band);
+      float kern = exp(-pow((r.x - 0.35) / 0.45, 2.0));
+      vec3 milch = mix(vec3(0.55, 0.62, 0.98), vec3(1.0, 0.85, 0.66), kern) * band * (0.3 + 0.9 * staub) * (1.0 - 0.8 * dunkel);
       float sterne = 0.0;
       for (int s = 0; s < 2; s++) {
         float skala = s == 0 ? 180.0 : 420.0;
         vec2 z = floor(p * skala);
         float h = hash(z + float(s) * 7.0);
-        float schwelle = (s == 0 ? 0.988 : 0.975) - band * 0.03;
+        float schwelle = (s == 0 ? 0.988 : 0.975) - band * 0.04;
         if (h > schwelle) {
           vec2 m = fract(p * skala) - 0.5 - (vec2(hash(z + 1.3), hash(z + 2.7)) - 0.5) * 0.6;
           float funkeln = 0.65 + 0.35 * sin(t * (1.5 + h * 4.0) + h * 40.0);
           sterne += smoothstep(0.24, 0.0, length(m)) * funkeln * (s == 0 ? 1.0 : 0.55);
         }
       }
-      float dunst = smoothstep(0.0, 0.25, hoehe);
-      col += (milch * 0.85 + vec3(sterne)) * nacht * dunst;
+      col += (milch * 1.1 + vec3(sterne)) * nacht * smoothstep(0.0, 0.2, hoehe);
     }
 
     // Sternschnuppe
@@ -127,105 +138,120 @@ void main() {
       col += vec3(0.9, 0.95, 1.0) * exp(-ds * 900.0) * entlang * sin(3.1416 * uSternT) * 1.6 * nacht;
     }
 
-    // Gewitterwolke (Amboss) in der Ferne über dem Meer (linker Fensterteil)
-    vec2 wolkeMitte = vec2(uLinks * 0.28, H);
-    vec2 q = (uv - wolkeMitte) * vec2(A, 1.0);
-    float rand = fbm(q * 18.0 + vec2(t * 0.015, 0.0)) - 0.5;
-    float turm = 1.0 - length(vec2(q.x / (0.032 + q.y * 0.18), (q.y - 0.07) / 0.075));
-    float amboss = 1.0 - length(vec2((q.x - 0.012) / (0.07 + (q.y - 0.14) * 0.6), (q.y - 0.145) / 0.022));
-    float sockel = 1.0 - length(vec2(q.x / 0.06, (q.y - 0.012) / 0.02));
-    float dichte = max(max(turm, amboss), sockel) + rand * 0.55;
-    float deck = smoothstep(0.0, 0.28, dichte) * smoothstep(0.0, 0.006, q.y);
-    if (deck > 0.0) {
-      float innen = fbm(q * 22.0 + 4.0);
-      float oben = smoothstep(0.0, 0.17, q.y);
-      vec3 hell = mix(vec3(0.94, 0.95, 0.98), vec3(1.0, 0.62, 0.42), smoothstep(0.45, 0.05, e));
-      vec3 schatten = mix(vec3(0.38, 0.40, 0.47), vec3(0.22, 0.14, 0.22), smoothstep(0.45, 0.05, e));
-      vec3 wolke = mix(schatten, hell, clamp(oben * 0.8 + innen * 0.5 - 0.15, 0.0, 1.0));
+    // Ferne Küste über die ganze Breite (sehr flach, im Dunst)
+    float kueste = H + 0.006 + 0.012 * gebirge(uv.x * 9.0 + mx * 0.01);
+    col = mix(col, mix(dunstFarbe, vec3(0.02, 0.025, 0.05), 0.35 + 0.5 * nacht), unter(uv.y, kueste, px) * 0.7);
+
+    // Gewitterwolke: Amboss über breiter Basis, mit Nebenzellen und Regenschleier; nachts flache Wolkenbank am Horizont
+    float flach = mix(1.0, 0.32, nacht);
+    float basis = H + mix(0.035, 0.012, nacht);
+    vec2 q = vec2((uv.x - wolkeX) * A, (uv.y - basis) / flach);
+    float y = q.y;
+    float halb = mix(0.085, 0.055, smoothstep(0.0, 0.11, y)) + smoothstep(0.1, 0.18, y) * 0.075;
+    float form = (halb - abs(q.x - 0.03 * y)) / halb;
+    float hauptzelle = form * smoothstep(-0.005, 0.012, y) * smoothstep(0.205, 0.17, y + (rausch(vec2(q.x * 30.0, 2.0)) - 0.5) * 0.02);
+    // flache Wolkenschicht an der Basis, die in die Hauptzelle übergeht
+    float schicht = (1.0 - abs(q.y - 0.012) / 0.014) * smoothstep(0.17, 0.08, abs(q.x));
+    float dichte = max(hauptzelle, schicht) + (fbm(q * 22.0 + vec2(t * 0.012, 0.0)) - 0.5) * 0.6;
+    float deck = smoothstep(0.0, 0.3, dichte);
+    // Regenschleier unter der Wolke
+    float regen = smoothstep(0.06, 0.0, abs(q.x + 0.01)) * step(uv.y, basis) * smoothstep(H, H + 0.006, uv.y) * 0.35;
+    if (deck > 0.0 || regen > 0.0) {
+      float innen = fbm(q * 18.0 + 4.0);
+      float oben = smoothstep(-0.01, 0.16, y) * 0.8 + 0.2;
+      vec3 hell = mix(vec3(0.95, 0.96, 0.99), vec3(1.0, 0.62, 0.42), smoothstep(0.45, 0.05, e));
+      vec3 schatten = mix(vec3(0.36, 0.38, 0.45), vec3(0.22, 0.14, 0.22), smoothstep(0.45, 0.05, e));
+      vec3 wolke = mix(schatten, hell, clamp(oben * 0.9 + innen * 0.45 - 0.15, 0.0, 1.0));
       wolke = mix(vec3(0.02, 0.025, 0.045) + vec3(0.03) * innen, wolke, smoothstep(-0.3, 0.05, e));
-      wolke += vec3(0.75, 0.80, 1.0) * uBlitz * (0.3 + 0.9 * innen) * (1.0 - oben * 0.5);
+      wolke += vec3(0.75, 0.80, 1.0) * uBlitz * (0.35 + 0.9 * innen) * (1.0 - oben * 0.4);
+      col = mix(col, schatten * 0.9 + vec3(0.6, 0.65, 0.9) * uBlitz * 0.3, regen * (1.0 - deck));
       col = mix(col, wolke, deck * 0.97);
     }
-    // Blitz: Lichtschein und leuchtender Pfad
-    if (uBlitz > 0.01) {
-      vec2 qq = vec2(uv.x * A, uv.y);
-      float db = 1.0;
-      for (int i = 0; i < 7; i++) db = min(db, strecke(qq, vec2(uBolt[i].x * A, uBolt[i].y), vec2(uBolt[i + 1].x * A, uBolt[i + 1].y)));
-      col += vec3(0.85, 0.9, 1.0) * uBlitz * (exp(-db * 1400.0) * 2.5 + exp(-db * 60.0) * 0.25);
-      col += vec3(0.4, 0.45, 0.6) * uBlitz * 0.3 * exp(-length(q) * 5.0);
-    }
 
-    // Gebirge und Stadt (rechter Fensterteil), mit leichter Tiefe je nach Mausposition
-    float rampe = smoothstep(uRechts - 0.02, uRechts + 0.07, uv.x);
-    float xf = uv.x * 3.2 + uMaus.x * 0.02;
-    float xn = uv.x * 6.0 + uMaus.x * 0.05;
-    float fern = H + rampe * (0.10 + 0.20 * gebirge(xf));
-    float nah = H + rampe * (0.03 + 0.09 * gebirge(xn + 5.0));
-    vec3 dunstFarbe = himmel(0.05, e);
+    // Gebirge (rechter Flügel): ferne Kette mit Schnee, nahe Kette; Tiefe durch unterschiedliche Verschiebung
+    float rampe = smoothstep(uRechts - 0.02, uRechts + 0.06, uv.x);
+    float fern = H + rampe * (0.09 + 0.18 * gebirge(uv.x * 3.2 + mx * 0.012));
+    float nah = H + rampe * (0.035 + 0.08 * gebirge(uv.x * 6.0 + 5.0 + mx * 0.03));
     vec3 fernFarbe = mix(dunstFarbe, mix(vec3(0.008, 0.01, 0.022), vec3(0.32, 0.38, 0.52), smoothstep(-0.2, 0.4, e)), 0.55 + 0.4 * nacht);
-    if (uv.y < fern) {
-      vec3 c = fernFarbe;
-      float schnee = smoothstep(fern - 0.02, fern - 0.005, uv.y) * smoothstep(H + 0.15, H + 0.21, fern);
-      c = mix(c, mix(vec3(0.1, 0.1, 0.14), vec3(0.95, 0.96, 1.0), smoothstep(-0.1, 0.3, e)), schnee * 0.85);
-      c += sonnenFarbe * 0.12 * rot;
-      col = c;
-    }
-    if (uv.y < nah) {
-      vec3 c = mix(vec3(0.01, 0.012, 0.02), vec3(0.17, 0.23, 0.22), smoothstep(-0.25, 0.45, e));
-      c *= 0.85 + 0.3 * fbm(vec2(uv.x * 40.0, uv.y * 60.0));
-      col = c;
-    }
-    // Stadt am Hang zur Küste: helle Häuser mit Schattenseite, abends erleuchtete Fenster
-    float stadtX = smoothstep(uRechts + 0.015, uRechts + 0.04, uv.x) * smoothstep(0.995, 0.95, uv.x);
-    if (stadtX > 0.0) {
-      float breite = 5.0;
-      float spalte = floor(uv.x * uRes.x / breite);
-      float inSpalte = fract(uv.x * uRes.x / breite);
-      float hang = H + 0.003 + (nah - H) * 0.6;
-      float hoeheHaus = hang + (0.004 + 0.022 * pow(hash(vec2(spalte, 3.0)), 2.0)) * stadtX;
-      if (uv.y < hoeheHaus && uv.y > H) {
-        float art = hash(vec2(spalte, 11.0));
-        vec3 fassade = mix(vec3(0.93, 0.90, 0.84), vec3(0.86, 0.66, 0.52), step(0.7, art));
-        fassade *= inSpalte < 0.35 ? 0.72 : 1.0;
-        if (hoeheHaus - uv.y < 0.0025) fassade = mix(vec3(0.62, 0.30, 0.22), vec3(0.45, 0.47, 0.5), step(0.5, art));
-        vec3 haus = mix(vec3(0.015, 0.015, 0.03), fassade, smoothstep(-0.2, 0.35, e));
-        haus = mix(haus, haus * sonnenFarbe * 1.25, rot * 0.5);
-        vec2 fz = vec2(uv.x * uRes.x / 2.5, uv.y * uRes.y / 2.5);
-        float an = step(0.6, hash(floor(fz))) * step(fract(fz.y), 0.55) * step(fract(fz.x), 0.55);
-        float abend = smoothstep(0.08, -0.12, e);
-        haus += vec3(1.0, 0.78, 0.45) * an * abend * (0.8 + 0.2 * sin(t * 0.7 + hash(floor(fz)) * 30.0));
-        col = haus;
+    float schnee = smoothstep(fern - 0.03, fern - 0.008, uv.y) * smoothstep(H + 0.14, H + 0.2, fern) * (0.6 + 0.4 * rausch(vec2(uv.x * 80.0, uv.y * 40.0)));
+    vec3 berg = mix(fernFarbe, mix(vec3(0.1, 0.1, 0.14), vec3(0.95, 0.96, 1.0), smoothstep(-0.1, 0.3, e)), schnee * 0.8) + sonnenFarbe * 0.12 * rot;
+    col = mix(col, berg, unter(uv.y, fern, px));
+    vec3 hang = mix(vec3(0.01, 0.012, 0.02), vec3(0.16, 0.23, 0.19), smoothstep(-0.25, 0.45, e));
+    hang *= 0.8 + 0.35 * fbm(vec2(uv.x * 50.0, uv.y * 70.0));
+    col = mix(col, hang, unter(uv.y, nah, px));
+
+    // Stadt am Hang: gestaffelte Häuserreihen von der Küste aufwärts (hintere Reihen zuerst)
+    float stadtX = smoothstep(uRechts + 0.01, uRechts + 0.04, uv.x) * smoothstep(uRahmenR, uRahmenR - 0.03, uv.x);
+    if (stadtX > 0.0 && uv.y < nah + 0.02) {
+      float sx = (uv.x + mx * 0.02) * A / 0.0062;
+      float spalte = floor(sx);
+      float inSpalte = fract(sx);
+      for (int r = 5; r >= 0; r--) {
+        float fr = float(r);
+        float reihe = H + 0.002 + (nah - H) * (0.04 + fr * 0.15) * stadtX;
+        float hh = (0.005 + 0.011 * hash(vec2(spalte, fr * 3.1))) * (1.0 - fr * 0.1);
+        float lueckeX = step(0.1, inSpalte) * step(hash(vec2(spalte, fr + 9.0)), 0.88);
+        if (uv.y > reihe && uv.y < reihe + hh && lueckeX > 0.0 && reihe < nah) {
+          float art = hash(vec2(spalte, fr + 11.0));
+          vec3 fassade = mix(vec3(0.93, 0.90, 0.84), vec3(0.88, 0.70, 0.55), step(0.65, art));
+          fassade *= inSpalte < 0.38 ? 0.74 : 1.0;
+          if (uv.y > reihe + hh * 0.78) fassade = mix(vec3(0.66, 0.32, 0.22), vec3(0.42, 0.44, 0.48), step(0.55, art));
+          vec3 haus = mix(vec3(0.015, 0.015, 0.03), fassade, smoothstep(-0.2, 0.35, e));
+          haus = mix(haus, haus * sonnenFarbe * 1.25, rot * 0.5);
+          vec2 fz = vec2(sx * 3.0, (uv.y - reihe) / 0.0024);
+          float an = step(0.55, hash(floor(fz) + spalte)) * step(fract(fz.y), 0.55) * step(fract(fz.x), 0.5) * step(uv.y, reihe + hh * 0.75);
+          haus += vec3(1.0, 0.78, 0.45) * an * abend * (0.8 + 0.2 * sin(t * 0.7 + hash(floor(fz)) * 30.0));
+          col = haus;
+        }
       }
     }
     // Dunst über dem Horizont
-    col = mix(col, dunstFarbe, exp(-(uv.y - H) * 60.0) * 0.35 * (1.0 - nacht * 0.7));
+    col = mix(col, dunstFarbe, exp(-(uv.y - H) * 60.0) * 0.3 * (1.0 - nacht * 0.7));
   } else {
-    // ---------- Meer ----------
+    // ---------- Meer (von oben gesehen) ----------
     float tiefe = H - uv.y;
     float z = 0.08 / max(tiefe, 0.002);
-    vec2 w = vec2((uv.x - 0.5) * A * z, z);
+    vec2 w = vec2((uv.x - 0.5 + mx * 0.01) * A * z, z);
     vec2 strom = vec2(t * 0.05, t * 0.11);
-    float wl = fbm(w * vec2(1.6, 3.0) + strom) * 0.6 + fbm(w * vec2(4.0, 7.0) - strom * 1.7) * 0.4;
-    float wr = fbm((w + vec2(0.02, 0.0)) * vec2(1.6, 3.0) + strom) * 0.6 + fbm((w + vec2(0.02, 0.0)) * vec2(4.0, 7.0) - strom * 1.7) * 0.4;
-    float wo = fbm((w + vec2(0.0, 0.02)) * vec2(1.6, 3.0) + strom) * 0.6 + fbm((w + vec2(0.0, 0.02)) * vec2(4.0, 7.0) - strom * 1.7) * 0.4;
+    float wl = fbm3(w * vec2(1.6, 3.0) + strom) * 0.6 + fbm3(w * vec2(4.0, 7.0) - strom * 1.7) * 0.4;
+    float wr = fbm3((w + vec2(0.02, 0.0)) * vec2(1.6, 3.0) + strom) * 0.6 + fbm3((w + vec2(0.02, 0.0)) * vec2(4.0, 7.0) - strom * 1.7) * 0.4;
+    float wo = fbm3((w + vec2(0.0, 0.02)) * vec2(1.6, 3.0) + strom) * 0.6 + fbm3((w + vec2(0.0, 0.02)) * vec2(4.0, 7.0) - strom * 1.7) * 0.4;
     vec2 n = vec2(wr - wl, wo - wl) * 12.0;
     float fresnel = pow(1.0 - clamp(tiefe * 2.2, 0.0, 1.0), 4.0);
     vec3 tief = mix(mix(vec3(0.004, 0.008, 0.02), vec3(0.10, 0.06, 0.10), smoothstep(-0.3, 0.0, e)), vec3(0.03, 0.17, 0.28), smoothstep(0.1, 0.5, e));
     vec3 spiegel = himmel(0.15 + n.y * 0.4, e);
     col = mix(tief, spiegel, 0.25 + 0.6 * fresnel);
     col *= 0.85 + 0.3 * wl;
-    // Glitzern unter der Sonne
     float spur = exp(-pow((uv.x - sonne.x + n.x * 0.03) * A / (0.012 + tiefe * 0.35), 2.0));
     float glanz = pow(clamp(wl * 1.25, 0.0, 1.0), 6.0);
     col += sonnenFarbe * spur * glanz * 2.2 * sichtbar;
-    // Spiegelung der Stadtlichter und des Blitzes
-    float abend = smoothstep(0.05, -0.15, e);
-    float stadtSpur = smoothstep(uRechts + 0.015, uRechts + 0.04, uv.x) * smoothstep(0.99, 0.95, uv.x);
-    float lichtSaeule = step(0.7, hash(vec2(floor(uv.x * uRes.x / 5.0), 5.0)));
-    col += vec3(1.0, 0.75, 0.4) * stadtSpur * lichtSaeule * abend * exp(-tiefe * 18.0) * (0.25 + 0.5 * glanz);
-    col += vec3(0.6, 0.65, 0.9) * uBlitz * 0.25 * exp(-abs(uv.x - uLinks * 0.28) * A * 6.0) * exp(-tiefe * 6.0);
-    // Schaumkronen
+    float stadtSpur = smoothstep(uRechts + 0.01, uRechts + 0.04, uv.x) * smoothstep(uRahmenR, uRahmenR - 0.03, uv.x);
+    float lichtSaeule = step(0.7, hash(vec2(floor((uv.x + mx * 0.02) * A / 0.0062), 5.0)));
+    col += vec3(1.0, 0.75, 0.4) * stadtSpur * lichtSaeule * abend * exp(-tiefe * 16.0) * (0.25 + 0.5 * glanz);
+    col += vec3(0.6, 0.65, 0.9) * uBlitz * 0.3 * exp(-abs(uv.x - wolkeX) * A * 6.0) * exp(-tiefe * 6.0);
     col += vec3(0.8) * smoothstep(0.82, 0.92, wl) * (1.0 - fresnel) * smoothstep(-0.2, 0.3, e) * 0.35;
+
+    // Bewaldeter Hang im Vordergrund: Das Haus steht erhöht, man schaut hinunter
+    float vorn = 0.17 + 0.07 * smoothstep(0.35, 1.0, uv.x) + 0.03 * fbm((uv.x + mx * 0.05) * vec2(7.0, 1.0)) + 0.012 * (rausch(vec2((uv.x + mx * 0.05) * 160.0, 1.0)) - 0.5);
+    vec3 wald = mix(vec3(0.008, 0.012, 0.012), vec3(0.12, 0.2, 0.12), smoothstep(-0.2, 0.4, e));
+    wald *= 0.75 + 0.5 * fbm(vec2(uv.x * 90.0, uv.y * 90.0));
+    wald = mix(wald, wald * sonnenFarbe * 1.4, rot * 0.4);
+    // ein paar Häuser im Wald, abends erleuchtet
+    vec2 hzf = vec2((uv.x + mx * 0.05) * A / 0.01, uv.y / 0.012);
+    vec2 hz = floor(hzf);
+    float punkt = smoothstep(0.22, 0.05, length(fract(hzf) - 0.5));
+    float licht = step(0.9, hash(hz)) * punkt * step(uv.y, vorn - 0.02);
+    wald += vec3(1.0, 0.75, 0.42) * licht * abend * 0.9;
+    col = mix(col, wald, unter(uv.y, vorn, px));
+  }
+
+  // Blitz: leuchtender Pfad, am Tag als helle Linie (nicht nur aufaddiert)
+  if (uBlitz > 0.01) {
+    vec2 qq = vec2(uv.x * A, uv.y);
+    float db = 1.0;
+    for (int i = 0; i < 7; i++) db = min(db, strecke(qq, vec2(uBolt[i].x * A, uBolt[i].y), vec2(uBolt[i + 1].x * A, uBolt[i + 1].y)));
+    col = mix(col, vec3(0.92, 0.95, 1.0), clamp(exp(-db * 900.0) * uBlitz * 1.6, 0.0, 1.0));
+    col += vec3(0.5, 0.55, 0.8) * uBlitz * exp(-db * 50.0) * 0.25;
   }
 
   farbe = vec4(pow(col, vec3(0.95)), 1.0);
@@ -254,7 +280,7 @@ function kompiliere(gl: WebGL2RenderingContext) {
   gl.enableVertexAttribArray(ort);
   gl.vertexAttribPointer(ort, 2, gl.FLOAT, false, 0, 0);
   const u: Uniforms = {};
-  for (const name of ['uRes', 'uZeit', 'uTag', 'uMaus', 'uLinks', 'uRechts', 'uBlitz', 'uBolt', 'uStern', 'uSternT']) {
+  for (const name of ['uRes', 'uZeit', 'uTag', 'uMaus', 'uLinks', 'uRechts', 'uRahmenL', 'uRahmenR', 'uBlitz', 'uBolt', 'uStern', 'uSternT']) {
     u[name] = gl.getUniformLocation(prog, name);
   }
   return u;
@@ -375,7 +401,10 @@ function baueKalender(wurzel: HTMLElement) {
     return blatt.animate(rein ? frames : frames.reverse(), { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }).finished.catch(() => {});
   }
 
+  /** Solange der Kalender groß ist, bleibt der Rest der Seite für Tastatur und Vorlesehilfen unerreichbar. */
+  const rest = () => [...document.querySelectorAll<HTMLElement>('.site-header, main, .site-footer')];
   function oeffne() {
+    rest().forEach((el) => (el.inert = true));
     gezeigt = monat;
     zeichne();
     gross.hidden = false;
@@ -392,6 +421,7 @@ function baueKalender(wurzel: HTMLElement) {
     gross.hidden = true;
     hintergrund.hidden = true;
     document.documentElement.classList.remove('ak-offen');
+    rest().forEach((el) => (el.inert = false));
     if (fokus) knopf.focus({ preventScroll: true });
   }
   async function waehle(d: Date) {
@@ -410,6 +440,10 @@ function baueKalender(wurzel: HTMLElement) {
 }
 
 /* ---------- Start ---------- */
+
+/** Horizont im Grafik-Programm (gleicher Wert wie dort). */
+const HORIZONT = 0.5;
+const MEDIEN = '(min-width: 1280px) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
 
 export function starteAussicht(): boolean {
   const geraet = document.querySelector<HTMLElement>('.monitor-geraet');
@@ -436,16 +470,21 @@ export function starteAussicht(): boolean {
     return false;
   }
   document.body.prepend(wurzel);
-  // Der Kalender liegt über dem Seiteninhalt (sonst nicht anklickbar), die Szene darunter.
+  // Der Kalender liegt über dem Seiteninhalt (sonst nicht anklickbar) und steht früh in der Tab-Reihenfolge.
   const kalender = document.createElement('div');
   kalender.className = 'aussicht-kalender';
-  document.body.append(kalender);
+  const main = document.querySelector('main');
+  if (main) main.prepend(kalender);
+  else document.body.append(kalender);
   baueKalender(kalender);
 
   const html = document.documentElement;
+  const medien = matchMedia(MEDIEN);
   const MASSSTAB = 0.6; // Auflösung der Szene (weich, schnell)
   let links = 0.2;
   let rechts = 0.8;
+  let rahmenL = 0.03;
+  let rahmenR = 0.97;
   let tag = 0;
   let tagZiel = 0;
   const maus = { x: 0, y: 0, zx: 0, zy: 0 };
@@ -461,45 +500,55 @@ export function starteAussicht(): boolean {
   }
   groesse();
   addEventListener('resize', groesse);
-  addEventListener('pointermove', (e) => {
-    maus.zx = (e.clientX / innerWidth) * 2 - 1;
-    maus.zy = (e.clientY / innerHeight) * 2 - 1;
-  }, { passive: true });
+  addEventListener(
+    'pointermove',
+    (e) => {
+      maus.zx = (e.clientX / innerWidth) * 2 - 1;
+      maus.zy = (e.clientY / innerHeight) * 2 - 1;
+    },
+    { passive: true },
+  );
 
-  /** Lage von Monitor und Schreibtisch, damit Fenster, Tisch und Kalender dazu passen. */
+  /** Lage von Monitor, Fensterrahmen und Schreibtisch, damit Szene, Tisch und Kalender zusammenpassen. */
   function messe() {
     const r = geraet!.getBoundingClientRect();
     const rand = 70; // Gehäuse links/rechts (ungefähr)
     links = Math.max(0.05, (r.left - rand) / innerWidth);
     rechts = Math.min(0.95, (r.right + rand) / innerWidth);
+    const rahmenPx = innerWidth * 0.022 + 14; // 2.2vw Wand + 14px Rahmen (wie im CSS)
+    rahmenL = rahmenPx / innerWidth;
+    rahmenR = 1 - rahmenL;
     let fuss = r.bottom + 40;
     document.querySelectorAll<HTMLElement>('.mg-fuss').forEach((f) => {
       const b = f.getBoundingClientRect();
       if (b.height) fuss = Math.max(fuss, b.bottom);
     });
-    html.style.setProperty('--tisch-y', `${Math.round(Math.min(innerHeight - 30, fuss - 6))}px`);
+    // Tischplatte mindestens 70 px hoch, der Fuß steht dann ein Stück auf der Platte
+    html.style.setProperty('--tisch-y', `${Math.round(Math.min(innerHeight - 70, fuss - 6))}px`);
     html.style.setProperty('--monitor-l', `${Math.round(r.left - rand)}px`);
     html.style.setProperty('--monitor-r', `${Math.round(innerWidth - r.right - rand)}px`);
   }
+  const wolkeX = () => rahmenL + (links - rahmenL) * 0.32;
 
-  // Blitze: alle 30–65 Sekunden, mit kurzem Nachflackern
+  // Blitze: alle 30–65 Sekunden, mit kurzem Nachflackern; von der Wolkenbasis bis aufs Meer
   function schlage() {
-      const x0 = links * 0.28 + (Math.random() - 0.5) * 0.015;
-      let x = x0;
-      let y = 0.43 + 0.05;
-      for (let i = 0; i < 8; i++) {
-        bolt[i * 2] = x;
-        bolt[i * 2 + 1] = y;
-        x += (Math.random() - 0.5) * 0.012;
-        y -= 0.05 / 7;
-      }
-      const start = performance.now();
-      const flackern = (jetzt: number) => {
-        const s = (jetzt - start) / 1000;
-        blitz = s < 0.08 ? 1 : s < 0.16 ? 0.25 : s < 0.24 ? 0.85 : Math.max(0, 0.85 - (s - 0.24) * 2.5);
-        if (blitz > 0) requestAnimationFrame(flackern);
-      };
-      requestAnimationFrame(flackern);
+    const nacht = tag > 0.8;
+    let x = wolkeX() + (Math.random() - 0.5) * 0.01;
+    let y = HORIZONT + (nacht ? 0.012 : 0.035);
+    const ende = HORIZONT - 0.004;
+    for (let i = 0; i < 8; i++) {
+      bolt[i * 2] = x;
+      bolt[i * 2 + 1] = y;
+      x += (Math.random() - 0.5) * 0.01;
+      y -= (y - ende) / (7 - Math.min(i, 6));
+    }
+    const start = performance.now();
+    const flackern = (jetzt: number) => {
+      const s = (jetzt - start) / 1000;
+      blitz = s < 0.08 ? 1 : s < 0.16 ? 0.25 : s < 0.24 ? 0.85 : Math.max(0, 0.85 - (s - 0.24) * 2.5);
+      if (blitz > 0) requestAnimationFrame(flackern);
+    };
+    requestAnimationFrame(flackern);
   }
   function naechsterBlitz() {
     setTimeout(() => {
@@ -509,18 +558,19 @@ export function starteAussicht(): boolean {
   }
   naechsterBlitz();
 
-  // Sternschnuppen: abends alle 10–25 Sekunden
+  // Sternschnuppen: abends alle 10–25 Sekunden, in einem der beiden Fensterflügel
+  function schnuppe() {
+    const links_ = Math.random() < 0.5;
+    stern[0] = links_ ? rahmenL + (links - rahmenL) * (0.3 + Math.random() * 0.5) : rechts + (rahmenR - rechts) * (0.2 + Math.random() * 0.5);
+    stern[1] = 0.8 + Math.random() * 0.12;
+    const w = -0.6 - Math.random() * 0.5;
+    stern[2] = Math.cos(w) * (Math.random() < 0.5 ? 1 : -1) * 0.7;
+    stern[3] = Math.sin(w);
+    sternStart = performance.now();
+  }
   function naechsteSchnuppe() {
     setTimeout(() => {
-      if (tag > 0.8) {
-        stern[0] = links * (0.25 + Math.random() * 0.5);
-        stern[1] = 0.78 + Math.random() * 0.15;
-        const w = -0.6 - Math.random() * 0.5;
-        stern[2] = Math.cos(w) * (Math.random() < 0.5 ? 1 : -1) * 0.7;
-        stern[3] = Math.sin(w);
-        if (Math.random() < 0.5) stern[0] = rechts + (1 - rechts) * (0.2 + Math.random() * 0.6);
-        sternStart = performance.now();
-      }
+      if (tag > 0.8) schnuppe();
       naechsteSchnuppe();
     }, 10000 + Math.random() * 15000);
   }
@@ -535,18 +585,22 @@ export function starteAussicht(): boolean {
 
   const t0 = performance.now();
   let letztes = 0;
-  let laeuft = true;
+  let schleife = 0;
+  const starte = () => {
+    cancelAnimationFrame(schleife);
+    schleife = requestAnimationFrame(bild);
+  };
   document.addEventListener('visibilitychange', () => {
-    laeuft = !document.hidden;
-    if (laeuft) requestAnimationFrame(bild);
+    if (document.hidden) cancelAnimationFrame(schleife);
+    else starte();
   });
 
   function bild(jetzt: number) {
-    if (!laeuft) return;
-    requestAnimationFrame(bild);
+    schleife = requestAnimationFrame(bild);
     if (jetzt - letztes < 32) return; // höchstens ~30 Bilder pro Sekunde
-    // Kalender herangezoomt oder Terminbuch offen: Szene ist nur verschwommen zu sehen, also anhalten
-    if (html.classList.contains('ak-offen') || document.querySelector('dialog[open]')) return;
+    // Nicht zeichnen, wenn nichts davon zu sehen ist: Fenster zu schmal (Szene per CSS aus),
+    // Kalender herangezoomt oder Terminbuch offen (Szene verschwommen dahinter)
+    if (!medien.matches || html.classList.contains('ak-offen') || document.querySelector('dialog[open]')) return;
     // Glättung nach echter Zeit (nicht pro Bild): auch auf langsamen Geräten nach ~1 s am Ziel
     const dt = Math.min(0.5, (jetzt - (letztes || jetzt)) / 1000);
     letztes = jetzt;
@@ -556,7 +610,7 @@ export function starteAussicht(): boolean {
     maus.x += (maus.zx - maus.x) * (1 - Math.exp(-dt / 0.6));
     maus.y += (maus.zy - maus.y) * (1 - Math.exp(-dt / 0.6));
     // Licht im Zimmer folgt der Tageszeit
-    html.style.setProperty('--licht', String(Math.min(1, Math.max(0.12, 1 - (tag - 0.5) / 0.45)).toFixed(3)));
+    wurzel.style.setProperty('--licht', String(Math.min(1, Math.max(0.12, 1 - (tag - 0.5) / 0.45)).toFixed(3)));
     const st = sternStart < 0 ? -1 : (jetzt - sternStart) / 900;
     if (st > 1) sternStart = -1;
     const g = gl!;
@@ -566,13 +620,15 @@ export function starteAussicht(): boolean {
     g.uniform2f(u.uMaus, maus.x, maus.y);
     g.uniform1f(u.uLinks, links);
     g.uniform1f(u.uRechts, rechts);
+    g.uniform1f(u.uRahmenL, rahmenL);
+    g.uniform1f(u.uRahmenR, rahmenR);
     g.uniform1f(u.uBlitz, blitz);
     g.uniform2fv(u.uBolt, bolt);
     g.uniform4fv(u.uStern, stern);
     g.uniform1f(u.uSternT, st);
     g.drawArrays(g.TRIANGLES, 0, 3);
   }
-  requestAnimationFrame(bild);
+  starte();
 
   // Für Prüfungen: aktueller Stand
   (window as unknown as { aussicht: object }).aussicht = {
@@ -587,10 +643,7 @@ export function starteAussicht(): boolean {
     },
     /** Nur für Tests: sofort einen Blitz bzw. eine Sternschnuppe auslösen. */
     testBlitz: schlage,
-    testSternschnuppe() {
-      stern.set([links * 0.5, 0.88, -0.55, -0.83]);
-      sternStart = performance.now();
-    },
+    testSternschnuppe: schnuppe,
   };
   return true;
 }
