@@ -700,3 +700,306 @@ html.monitor-tab-offen {
   background: none;
   border: 0;
 }
+
+/* ---------- Aussicht (Stufe „Schwer“, Desktop): Fenster, Schreibtisch, Tischkalender ---------- */
+/* Liegt hinter dem Inhalt (main hat z-index 1); nur der Kalender liegt darüber, damit er anklickbar ist. */
+.aussicht {
+  --licht: 1;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.aussicht-szene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.aussicht-raum > * {
+  position: absolute;
+}
+/* Wand rund um das Fenster: wird mit der Tageszeit dunkler */
+.aussicht-wand {
+  inset: 0;
+  --wand: color-mix(in srgb, #d8cfc2 calc(var(--licht) * 100%), #0b0b12);
+  background: var(--wand);
+  /* Fensteröffnung freischneiden: oben unter der Kopfleiste bis zur Tischkante, links und rechts ein Wandstreifen */
+  clip-path: polygon(
+    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+    2.2vw calc(var(--kopf, 72px) + 26px),
+    2.2vw var(--tisch-y, 85vh),
+    calc(100% - 2.2vw) var(--tisch-y, 85vh),
+    calc(100% - 2.2vw) calc(var(--kopf, 72px) + 26px),
+    2.2vw calc(var(--kopf, 72px) + 26px)
+  );
+  box-shadow: inset 0 0 120px rgb(0 0 0 / 0.35);
+}
+/* Fensterrahmen mit Sprossen und Kämpfer: Man erkennt sofort, dass man durch ein Fenster schaut */
+.aussicht-rahmen {
+  left: 2.2vw;
+  right: 2.2vw;
+  top: calc(var(--kopf, 72px) + 26px);
+  height: calc(var(--tisch-y, 85vh) - var(--kopf, 72px) - 26px);
+  border: 14px solid color-mix(in srgb, #f3efe8 calc(var(--licht) * 100%), #1a1a22);
+  border-bottom-width: 22px;
+  box-shadow:
+    inset 0 0 0 2px rgb(0 0 0 / 0.18),
+    0 0 0 3px rgb(0 0 0 / 0.12),
+    inset 0 18px 30px -18px rgb(0 0 0 / 0.5);
+}
+.aussicht-sprosse,
+.aussicht-kaempfer {
+  position: absolute;
+  background: color-mix(in srgb, #f3efe8 calc(var(--licht) * 100%), #1a1a22);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+.aussicht-sprosse {
+  top: 0;
+  bottom: 0;
+  width: 12px;
+}
+/* Sprossen knapp neben dem Monitor, damit links und rechts je ein eigener Fensterflügel entsteht */
+.aussicht-sprosse-l {
+  left: calc(var(--monitor-l, 20vw) - 2.2vw - 32px);
+}
+.aussicht-sprosse-r {
+  right: calc(var(--monitor-r, 20vw) - 2.2vw - 32px);
+}
+.aussicht-kaempfer {
+  left: 0;
+  right: 0;
+  top: 26%;
+  height: 10px;
+}
+/* Leichte Spiegelung im Glas */
+.aussicht-glas {
+  left: 2.2vw;
+  right: 2.2vw;
+  top: calc(var(--kopf, 72px) + 26px);
+  height: calc(var(--tisch-y, 85vh) - var(--kopf, 72px) - 26px);
+  background: linear-gradient(118deg, rgb(255 255 255 / 0.07) 0 12%, transparent 12% 22%, rgb(255 255 255 / 0.04) 22% 26%, transparent 26%);
+}
+/* Schreibtisch: Holzplatte ab der Unterkante der Monitorfüße */
+.aussicht-tisch {
+  left: 0;
+  right: 0;
+  top: var(--tisch-y, 85vh);
+  bottom: 0;
+  --holz: color-mix(in srgb, #7a5235 calc(var(--licht) * 100%), #120c08);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.18), transparent 6px),
+    repeating-linear-gradient(92deg, rgb(0 0 0 / 0.06) 0 2px, transparent 2px 18px),
+    linear-gradient(180deg, var(--holz), color-mix(in srgb, var(--holz), #000 40%));
+  box-shadow: 0 -2px 0 rgb(0 0 0 / 0.35);
+}
+
+/* Tischkalender links neben dem Monitor */
+.aussicht-kalender {
+  position: fixed;
+  z-index: 2;
+  left: max(3vw, calc(var(--monitor-l, 20vw) * 0.5 - 85px));
+  top: calc(var(--tisch-y, 85vh) - 150px);
+  pointer-events: auto;
+}
+.ak-tisch {
+  position: relative;
+  display: grid;
+  width: 170px;
+  height: 156px;
+  padding: 18px 12px 10px;
+  border: 0;
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(180deg, #fbf7ee, #efe6d4);
+  box-shadow: 0 14px 22px -8px rgb(0 0 0 / 0.55), 0 2px 0 #c9bba0;
+  color: #2c2219;
+  font: 600 0.8rem/1 Georgia, serif;
+  cursor: pointer;
+  transform: perspective(500px) rotateX(8deg);
+  transform-origin: bottom center;
+  transition: transform 0.25s;
+}
+.ak-tisch:hover,
+.ak-tisch:focus-visible {
+  transform: perspective(500px) rotateX(2deg) translateY(-4px);
+}
+.ak-tisch:focus-visible {
+  outline: 3px solid var(--accent-2);
+  outline-offset: 4px;
+}
+.ak-ring {
+  position: absolute;
+  top: -6px;
+  left: 18px;
+  right: 18px;
+  height: 12px;
+  background: repeating-linear-gradient(90deg, #6b6b73 0 4px, transparent 4px 13px);
+  border-radius: 3px;
+}
+.ak-kopf {
+  margin-bottom: 4px;
+  color: #b22f2f;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ak-raster {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  font-size: 0.6rem;
+  text-align: center;
+}
+.ak-wt {
+  color: #8a7b66;
+  font-style: italic;
+}
+.ak-tag.ak-belegt {
+  color: #b3a690;
+}
+.ak-heute {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px #c62828;
+}
+
+/* Herangezoomter Kalender */
+html.ak-offen {
+  overflow: hidden;
+}
+.ak-hintergrund {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgb(5 5 10 / 0.55);
+  backdrop-filter: blur(3px);
+}
+.ak-hintergrund[hidden],
+.ak-gross[hidden] {
+  display: none;
+}
+.ak-gross {
+  position: fixed;
+  inset: 0;
+  z-index: 81;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1.25rem;
+  pointer-events: none;
+}
+.ak-gross > * {
+  pointer-events: auto;
+}
+.ak-blatt {
+  position: relative;
+  width: min(560px, 90vw);
+  padding: 2.5rem 2rem 1.5rem;
+  border-radius: 10px 10px 6px 6px;
+  background: linear-gradient(180deg, #fbf7ee, #efe6d4);
+  box-shadow: 0 40px 90px rgb(0 0 0 / 0.6);
+  color: #2c2219;
+  font-family: Georgia, serif;
+  transform-origin: center;
+}
+.ak-blatt .ak-ring {
+  top: -8px;
+  height: 16px;
+  left: 40px;
+  right: 40px;
+}
+.ak-monat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.ak-monat h2 {
+  margin: 0;
+  color: #2c2219;
+  font: italic 600 1.8rem/1.2 Georgia, serif;
+}
+.ak-pfeil {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(44 34 25 / 0.25);
+  border-radius: 50%;
+  background: transparent;
+  color: #2c2219;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.ak-pfeil:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.ak-raster-gross {
+  gap: 6px;
+  font-size: 1.05rem;
+}
+.ak-raster-gross .ak-wt {
+  padding-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+/* Der Mauszeiger wird zur Hand mit Stift */
+.ak-raster-gross .ak-tag {
+  aspect-ratio: 1;
+  min-height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #2c2219;
+  font: inherit;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M3 37 9 33 31 7a3 3 0 0 0-4-4L5 29Z' fill='%23263238' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M3 37l2-6 4 2Z' fill='%23c62828'/%3E%3Cpath d='M14 38c-2-3 0-6 3-8l7-5c2-1 4 0 4 2l-1 1 3-2c2-1 4 1 3 3l-1 1c2-1 4 1 3 3l-6 5c-3 2-7 3-11 2Z' fill='%23f2c9a5' stroke='%237a4f33' stroke-width='1.2'/%3E%3C/svg%3E") 3 37, pointer;
+}
+.ak-raster-gross .ak-tag:not(:disabled):hover {
+  background: rgb(124 77 255 / 0.15);
+  box-shadow: 0 0 0 2px #7c4dff;
+}
+.ak-raster-gross .ak-tag:focus-visible {
+  outline: 2px solid #2c2219;
+}
+.ak-raster-gross .ak-tag:disabled {
+  color: rgb(44 34 25 / 0.42);
+  cursor: default;
+}
+.ak-hinweis {
+  margin: 1rem 0 0;
+  color: rgb(44 34 25 / 0.75);
+  font-style: italic;
+  font-size: 0.95rem;
+  text-align: center;
+}
+/* Gut sichtbarer Weg zurück */
+.ak-schliessen {
+  min-height: 52px;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--accent-deep);
+  color: #fff;
+  font: 600 1.05rem/1 var(--font-body);
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+}
+.ak-schliessen:hover,
+.ak-schliessen:focus-visible {
+  background: var(--accent);
+  outline: 3px solid var(--accent-2);
+  outline-offset: 3px;
+}
+
+/* Ohne passende Breite (Fenster verkleinert) keine Aussicht */
+@media not ((min-width: 1280px) and (pointer: fine)) {
+  .aussicht,
+  .aussicht-kalender {
+    display: none;
+  }
+}
+/* Mit Aussicht: Seite selbst durchsichtig, damit Fenster und Himmel zu sehen sind */
+html.aussicht-an body {
+  background: #0d0d13;
+}
+html.aussicht-an .monitor-tipp {
+  color: rgb(255 255 255 / 0.85);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+}

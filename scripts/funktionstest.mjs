@@ -7,7 +7,11 @@
 import { chromium } from 'playwright';
 
 const BASIS = process.env.BASIS ?? 'http://localhost:4321';
-const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+// SwiftShader: Grafik ohne Grafikkarte, damit die WebGL-Aussicht auch im Test läuft
+const browser = await chromium.launch({
+  ...(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}),
+  args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+});
 const befunde = [];
 const ok = (text) => console.log(`✓ ${text}`);
 const fehler = (text) => {
@@ -15,9 +19,9 @@ const fehler = (text) => {
   console.log(`✗ ${text}`);
 };
 
-async function neueSeite(breite, stufe) {
+async function neueSeite(breite, stufe, hoehe) {
   const ctx = await browser.newContext({
-    viewport: { width: breite, height: breite < 800 ? 780 : 900 },
+    viewport: { width: breite, height: hoehe ?? (breite < 800 ? 780 : 900) },
     hasTouch: breite < 1000,
     isMobile: breite < 1000,
   });
@@ -168,6 +172,51 @@ for (const breite of [360, 768, 1440]) {
   }
   if (ohneRahmen) fehler(`Tastatur: ${ohneRahmen} von 12 Elementen ohne sichtbaren Fokus`);
   else ok('Tastatur: Fokus bei den ersten 12 Elementen sichtbar');
+  await ctx.close();
+}
+
+// 6. Aussicht am Desktop (Stufe „Schwer“): Szene, Tageszeit, Kalender mit Zoom und Terminbuch
+{
+  const { ctx, page, meldungen } = await neueSeite(1440, 'schwer');
+  await page.goto(BASIS + '/');
+  await page.waitForTimeout(3500);
+  const aktiv = await page.evaluate(() => Boolean(window.aussicht) && document.documentElement.classList.contains('aussicht-an'));
+  if (aktiv) ok('Aussicht läuft (Desktop, Stufe Schwer)');
+  else fehler('Aussicht startet nicht');
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(2500);
+  const nacht = await page.evaluate(() => window.aussicht?.tag ?? 0);
+  if (nacht > 0.95) ok(`Seitenende: Nacht (Tageszeit ${nacht.toFixed(2)})`);
+  else fehler(`Seitenende nicht Nacht: ${nacht}`);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForTimeout(1500);
+  await page.click('.ak-tisch');
+  await page.waitForTimeout(1500);
+  if (await page.isVisible('.ak-gross')) ok('Tischkalender zoomt heran');
+  else fehler('Tischkalender öffnet nicht');
+  await page.click('[data-ak-schliessen]');
+  await page.waitForTimeout(2000);
+  if (!(await page.isVisible('.ak-gross'))) ok('„Zurück zum Schreibtisch“ schließt den Kalender');
+  else fehler('Kalender schließt nicht');
+  await page.click('.ak-tisch');
+  await page.waitForTimeout(1500);
+  await page.locator('.ak-raster-gross .ak-tag:not(:disabled)').first().click();
+  await page.waitForTimeout(3000);
+  const gewaehlt = await page.textContent('[data-tb-gewaehlt]');
+  if (gewaehlt?.startsWith('Gewählt:')) ok(`Kalender-Tag öffnet das Terminbuch (${gewaehlt})`);
+  else fehler('Kalender-Tag öffnet das Terminbuch nicht');
+  const echt = meldungen.filter((m) => !/software WebGL|GroupMarkerNotSet|swiftshader/i.test(m));
+  if (echt.length) fehler(`Aussicht Konsole: ${[...new Set(echt)].join(' | ')}`);
+  else ok('Aussicht ohne Konsolenfehler und CSP-Verstöße');
+  await ctx.close();
+}
+// Mittel und kleinere Bildschirme: keine Aussicht
+{
+  const { ctx, page } = await neueSeite(1100, 'schwer');
+  await page.goto(BASIS + '/');
+  await page.waitForTimeout(2500);
+  if (!(await page.evaluate(() => Boolean(document.querySelector('.aussicht'))))) ok('Unter 1280 px keine Aussicht');
+  else fehler('Aussicht auch unter 1280 px');
   await ctx.close();
 }
 

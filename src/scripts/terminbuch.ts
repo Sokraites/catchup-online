@@ -85,18 +85,24 @@ function einrichten() {
   bereit = true;
 }
 
-export function oeffneTerminbuch() {
+/** @param vorwahl Tag, der schon gewählt sein soll (z. B. aus dem Tischkalender auf der Startseite). */
+export function oeffneTerminbuch(vorwahl?: Date) {
   if (!bereit) einrichten();
   dialog.querySelector<HTMLElement>('[data-tb-danke]')!.hidden = true;
   zeigeFormular(Boolean(gewaehlt), false);
-  monat = plusMonate(heute(), 0);
+  monat = vorwahl ? new Date(vorwahl.getFullYear(), vorwahl.getMonth(), 1) : plusMonate(heute(), 0);
   richteAnsichtEin();
   zeichneMonat();
   dialog.showModal();
   if (mitSpur()) {
     stelleSpur();
     // nach dem Federkreis
-    lupfeEcke(1900);
+    if (!vorwahl) lupfeEcke(1900);
+  }
+  if (vorwahl && frei(vorwahl)) {
+    const name = langesDatum(vorwahl);
+    const knopf = [...links.querySelectorAll<HTMLButtonElement>('button.tb-tag')].find((k) => k.getAttribute('aria-label')?.startsWith(name));
+    if (knopf) waehle(vorwahl, knopf);
   }
   // Nächstes Bild: Deckel klappt auf, Blatt blättert, Feder kreist
   requestAnimationFrame(() => {

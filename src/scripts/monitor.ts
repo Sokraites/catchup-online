@@ -101,7 +101,9 @@ export function starteMonitor(): MonitorSteuerung | undefined {
     const m = handy() ? 0.34 : innerWidth < 1000 ? 0.5 : 0.62;
     const randMax = Math.max(...EPOCHEN.map((e) => e.rand)) * m;
     const luft = handy() ? 6 : 40;
-    const b = Math.min(1100, innerWidth - 2 * (randMax + luft), handy() ? Infinity : (verfuegbarH - gehaeuseHoehe(m)) * 1.7);
+    // Mit Aussicht (Stufe „Schwer“, Desktop) macht der Monitor seitlich Platz für Fenster und Kalender.
+    const platz = html.classList.contains('aussicht-an') && innerWidth >= 1280 ? innerWidth * 0.56 : Infinity;
+    const b = Math.min(1100, platz, innerWidth - 2 * (randMax + luft), handy() ? Infinity : (verfuegbarH - gehaeuseHoehe(m)) * 1.7);
     const hLesen = Math.max(260, verfuegbarH - gehaeuseHoehe(m) - (handy() ? 10 : 24));
     // Querformat wie ein echter Monitor (nur Handy, zum Auftakt)
     const hQuer = Math.min(hLesen, Math.round(b * 0.78));
@@ -249,6 +251,9 @@ export function starteMonitor(): MonitorSteuerung | undefined {
     const i = seiten.findIndex((s) => s.contains(el));
     if (i >= 0) zeige(i, el);
   });
+
+  // Aussicht konnte nicht starten: Monitor wieder in voller Breite
+  addEventListener('monitor-neu', () => baue());
 
   // Aufgeklappte Fragen verändern die Länge: neu berechnen.
   schirm.addEventListener('toggle', () => baue(), true);
