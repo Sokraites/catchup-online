@@ -1,0 +1,58 @@
+Inhalt von catchup-seite-v1.zip
+Dateien: 51
+Größte Datei: og.png (256.1 KB)
+ZIP-Größe: 747.8 KB
+Geprüft: unzip -t ohne Fehler, index.html im Stamm, Dateiliste gleich dem Ordner dist/ (ohne .br/.gz)
+
+Größe      Datei
+  23.0 KB  _astro/aussicht.APVC1Y46.js
+   0.0 KB  _astro/Base.astro_astro_type_script_index_0_lang.DXcXTj5_.js
+ 122.9 KB  _astro/index.astro_astro_type_script_index_0_lang.-uBPORDH.js
+   5.2 KB  _astro/Kacheln.astro_astro_type_script_index_0_lang.ByfALINe.js
+   2.4 KB  _astro/page.B3sWyS9n.js
+   1.6 KB  _astro/preload-helper.DHhhL8Zf.js
+   2.1 KB  _astro/stufe.DiRvSDRL.js
+   0.6 KB  _astro/Terminbuch.astro_astro_type_script_index_0_lang.SELjbcLn.js
+  14.6 KB  _astro/terminbuch.Dw5lXww5.js
+   1.4 KB  _headers
+  44.5 KB  404.html
+  50.6 KB  auffindbarkeit/index.html
+  20.0 KB  bilder/gefunden.webp
+  18.7 KB  bilder/loesung.webp
+  21.3 KB  bilder/modernisierung.webp
+  23.0 KB  bilder/neue-webseite.webp
+  32.4 KB  bilder/zeitreise-breit.webp
+  27.4 KB  bilder/zeitreise-hoch.webp
+  48.0 KB  datenschutz/index.html
+   0.3 KB  favicon.svg
+   4.4 KB  fonts/inter-LICENSE.txt
+  47.1 KB  fonts/inter.woff2
+   4.4 KB  fonts/jetbrains-mono-LICENSE.txt
+  39.5 KB  fonts/jetbrains-mono.woff2
+   4.3 KB  fonts/space-grotesk-LICENSE.txt
+  21.8 KB  fonts/space-grotesk.woff2
+  45.7 KB  impressum/index.html
+  81.6 KB  index.html
+   1.2 KB  llms.txt
+  14.2 KB  logo.png
+   3.0 KB  monitore/fuss-0.webp
+   2.1 KB  monitore/fuss-1.webp
+   2.1 KB  monitore/fuss-2.webp
+   2.1 KB  monitore/fuss-3.webp
+   1.3 KB  monitore/fuss-4.webp
+   1.2 KB  monitore/knoepfe-0.webp
+   1.0 KB  monitore/knoepfe-1.webp
+   1.4 KB  monitore/knoepfe-2.webp
+   5.4 KB  monitore/rahmen-0.webp
+   4.1 KB  monitore/rahmen-1.webp
+   3.3 KB  monitore/rahmen-2.webp
+   3.1 KB  monitore/rahmen-3.webp
+   2.5 KB  monitore/rahmen-4.webp
+ 256.1 KB  og.png
+   0.0 KB  robots.txt
+   0.5 KB  site.webmanifest
+   0.6 KB  sitemap.xml
+  48.1 KB  software-nach-mass/index.html
+  45.0 KB  termin/index.html
+  47.8 KB  webseiten-erstellen/index.html
+  47.5 KB  webseiten-modernisieren/index.html

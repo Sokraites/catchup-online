@@ -1,5 +1,22 @@
 # Veröffentlichung
 
+## Was ich als Nächstes tun muss
+
+Einsteiger-Anleitung mit allen Klickwegen: [START-HIER.md](START-HIER.md).
+
+- [ ] Version 1 herunterladen: `releases/v1/catchup-seite-v1.zip` (START-HIER.md, Abschnitt b)
+- [ ] Prüfsumme vergleichen mit `releases/v1/PRUEFSUMME.txt` (Abschnitt c)
+- [ ] Zum Test bei Cloudflare hochladen und die Testadresse nicht weitergeben (Abschnitt d)
+- [ ] Eigene Prüfung in sechs Klicks (Abschnitt e)
+- [ ] Impressum-Angaben liefern: Firmenname und Rechtsform, Anschrift, Vertretung, ggf. Registernummer und USt-ID (Liste unten, Abschnitt 2)
+- [ ] Hosting-Anbieter festlegen (Cloudflare ist ein US-Anbieter, Regel war „Hosting in der EU“), danach Hosting-Angaben für den Datenschutz liefern
+- [ ] Impressum und Datenschutz rechtlich prüfen lassen
+- [ ] Entscheiden: „Software nach Maß“ behalten oder herausnehmen; Freigabe des Kunden für „Ottos Werkstatt“ einholen
+- [ ] Domain registrieren
+- [ ] Erst danach: Claude Version 2 mit eingeschalteter Indexierung erstellen lassen (Abschnitt f)
+
+---
+
 Stand: 22.10.2026. Alles hier bezieht sich auf den Build aus `npm run build` (Ordner `dist/`) und das Paket `catchup-seite.zip`.
 
 ## 1. Wo steht was

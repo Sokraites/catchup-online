@@ -12,7 +12,8 @@
     "monitore": "node scripts/monitore-rendern.mjs",
     "komprimieren": "node scripts/komprimieren.mjs",
     "ansehen": "node scripts/ansehen.mjs",
-    "paket": "node scripts/paket.mjs"
+    "paket": "node scripts/paket.mjs",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "astro": "7.3.5",

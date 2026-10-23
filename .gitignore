@@ -5,3 +5,6 @@ dist/
 .vorschau/
 docs/messung/*.json
 catchup-seite.zip
+# Versionen der fertigen Seite gehören ausdrücklich ins Repository (siehe START-HIER.md)
+!releases/
+!releases/**

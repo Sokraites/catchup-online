@@ -127,6 +127,17 @@ Stufe 2: Veröffentlichungsreife
 - [x] Prüf-Agent: Befunde ausgewertet und behoben (Zimmerlicht, Wolke, Stadt, Kontrast Fußbereich, Zeichenschleife, Fokus im Kalender, weiche Kanten, Blitz am Tag)
 - [x] Nach GitHub pushen
 
+## Versionen und Einsteiger-Doku (23.10.2026)
+
+Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der Seite.
+
+- [x] 1 Grund für die fehlende ZIP geprüft (`.gitignore` Zeile 7 und 2), Ausnahme `!releases/` ergänzt
+- [x] 2 Ordner `releases/` mit `README.md`, `AKTUELL.md` und `v1/` (ZIP, Prüfsumme, Inhalt, Version)
+- [x] 3 `scripts/release.mjs` und `npm run release -- <Version>`, Probelauf in einem temporären Ordner
+- [x] 4 `START-HIER.md` für Einsteiger
+- [x] 5 `VERÖFFENTLICHUNG.md`: Abschnitt „Was ich als Nächstes tun muss“ oben
+- [x] 6 Version 1 bauen, committen, Tag `v1`, Branch und Tag pushen
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
