@@ -2,8 +2,6 @@
  * Regeln für das Terminbuch. Platzhalter, bis die Gründer echte Zeiten festlegen
  * und ein Kalender angebunden ist (dann kommen belegte Termine von dort).
  */
-import { site } from './site';
-
 export const termine = {
   /** Wochentage mit Terminen: 1 = Montag … 7 = Sonntag. */
   wochentage: [1, 2, 3, 4, 5],
@@ -13,5 +11,5 @@ export const termine = {
   vorlaufTage: 1,
   /** Wie viele Monate im Voraus gebucht werden kann. */
   monateVoraus: 3,
-  gespraechsarten: ['Telefon', 'Video', `Vor Ort im ${site.region.schwerpunkt}`],
+  gespraechsarten: ['Telefon', 'Video', 'Persönlich vor Ort'],
 } as const;

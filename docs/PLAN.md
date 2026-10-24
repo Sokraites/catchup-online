@@ -127,6 +127,15 @@ Stufe 2: Veröffentlichungsreife
 - [x] Prüf-Agent: Befunde ausgewertet und behoben (Zimmerlicht, Wolke, Stadt, Kontrast Fußbereich, Zeichenschleife, Fokus im Kalender, weiche Kanten, Blitz am Tag)
 - [x] Nach GitHub pushen
 
+## Foto-Aussicht, Gestaltung, Region entfernt (24.10.2026)
+
+- [x] Foto als Aussicht (Stufe Schwer, Desktop) mit Sonnenlauf, Wellen, Gewitter, Nachthimmel, Sternschnuppen, Stadtlichtern
+- [x] Tischkalender sitzt auf dem Kalender im Foto
+- [x] Region „Donnersbergkreis“ und „Rheinland-Pfalz“ entfernt
+- [x] Gestaltung hochwertiger (Goldlinien, Karten, Muster; Leicht mit stärkeren Akzenten)
+- [ ] Sonne im dritten Fenster von rechts: hinter dem Monitor, Entscheidung offen
+- [ ] Version 2 erstellen (nur auf Wunsch)
+
 ## Versionen und Einsteiger-Doku (23.10.2026)
 
 Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der Seite.

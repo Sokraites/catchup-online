@@ -9,7 +9,7 @@ export const GET: APIRoute = () => {
     '',
     `> ${site.beschreibung}`,
     '',
-    `Region: ${site.region.schwerpunkt}, ${site.region.land}. Sprache: Deutsch.`,
+    'Sprache: Deutsch.',
     '',
     '## Leistungen',
     '',

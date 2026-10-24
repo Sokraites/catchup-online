@@ -47,16 +47,18 @@ import { faqSeite, website } from '../lib/schema';
   const AUSSICHT = '(min-width: 1280px) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
   const html = document.documentElement;
   const mitAussicht = stufe() === 'schwer' && matchMedia(AUSSICHT).matches && 'WebGL2RenderingContext' in window;
+  // Fällt die Aussicht aus (kein WebGL, Foto lädt nicht), steht der Monitor wieder in voller Breite.
+  const ohneAussicht = () => {
+    html.classList.remove('aussicht-an');
+    dispatchEvent(new Event('monitor-neu'));
+  };
   if (mitAussicht) html.classList.add('aussicht-an');
   starteMonitorTabs(starteMonitor());
   if (mitAussicht) {
     // erst laden, wenn die Seite steht: Der Inhalt hat Vorrang
     const los = () =>
       import('../scripts/aussicht').then(({ starteAussicht }) => {
-        if (!starteAussicht()) {
-          html.classList.remove('aussicht-an');
-          dispatchEvent(new Event('monitor-neu'));
-        }
+        if (!starteAussicht(ohneAussicht)) ohneAussicht();
       });
     if ('requestIdleCallback' in window) requestIdleCallback(los, { timeout: 2000 });
     else setTimeout(los, 500);

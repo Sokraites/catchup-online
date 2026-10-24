@@ -33,10 +33,6 @@ export const site = {
   /** Domain, noch nicht registriert (Platzhalter). Ohne Schrägstrich am Ende. Wirkt auf Canonical, Sitemap, Open Graph, JSON-LD. */
   url: 'https://catchup-digital.com',
   sprache: 'de',
-  region: {
-    schwerpunkt: 'Donnersbergkreis',
-    land: 'Rheinland-Pfalz',
-  },
   kontakt: {
     /** Wird später durch eine Adresse auf der eigenen Domain ersetzt: nur hier ändern. */
     email: ECHT('catchup-digital@protonmail.com'),
@@ -59,7 +55,7 @@ export const site = {
   },
   /** Standard-Beschreibung für Suchmaschinen und Vorschauen. */
   beschreibung:
-    'Neue Webseiten, Modernisierung, Suchmaschinenoptimierung und Auffindbarkeit bei KI-Suchsystemen für Betriebe im Donnersbergkreis und in Rheinland-Pfalz.',
+    'Neue Webseiten, Modernisierung, Suchmaschinenoptimierung und Auffindbarkeit bei KI-Suchsystemen für Betriebe.',
 } as const;
 
 /** Hauptnavigation. Reihenfolge = Reihenfolge im Menü. */

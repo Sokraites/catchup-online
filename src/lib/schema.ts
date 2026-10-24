@@ -19,10 +19,6 @@ export function organisation() {
     url: `${site.url}/`,
     logo: `${site.url}/logo.png`,
     image: `${site.url}/og.png`,
-    areaServed: [
-      { '@type': 'AdministrativeArea', name: site.region.schwerpunkt },
-      { '@type': 'State', name: site.region.land },
-    ],
     knowsLanguage: 'de',
     ...(telefon.link && !telefon.anzeige.platzhalter ? { telephone: telefon.link } : {}),
     ...(!email.platzhalter ? { email: email.text } : {}),
@@ -47,7 +43,6 @@ export function leistung(name: string, beschreibung: string, pfad: string) {
     description: beschreibung,
     url: new URL(pfad, site.url).href,
     provider: { '@id': orgId },
-    areaServed: { '@type': 'AdministrativeArea', name: site.region.schwerpunkt },
   };
 }
 

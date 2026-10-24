@@ -42,9 +42,9 @@ export const faqStart: Frage[] = [
       'Garantieren kann das niemand, der ehrlich ist. Aber wir bauen deine Seite so, dass KI-Assistenten klar verstehen, wer du bist, was du anbietest und wo. Das ist die beste Voraussetzung, um empfohlen zu werden.',
   },
   {
-    frage: 'Warum ein Team aus dem Donnersbergkreis?',
+    frage: 'Wer betreut mein Projekt?',
     antwort:
-      'Weil wir die Betriebe und Kunden hier kennen. Du hast feste Ansprechpartner, die du direkt erreichst, und musst nichts dreimal erklären.',
+      'Du hast feste Ansprechpartner, die du direkt erreichst. Du musst nichts dreimal erklären, und die Person, die dich berät, ist auch die, die deine Seite umsetzt.',
   },
 ];
 

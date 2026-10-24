@@ -18,7 +18,7 @@ background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),lin
 h1{font-family:SG;font-size:96px;line-height:1.02;letter-spacing:-.035em;margin:48px 0 28px;max-width:900px}
 p{font-size:30px;color:#A9A7BD;margin:0}</style><body>
 <div class="b"><div class="l">${logo('#A98BFF')}</div>${site.name}</div>
-<h1>${site.claim}</h1><p>Webseiten aus dem ${site.region.schwerpunkt} · ${site.region.land}</p></body></html>`;
+<h1>${site.claim}</h1><p>Webseiten für Betriebe</p></body></html>`;
 
 const logoSeite = `<html><body style="margin:0;background:#0D0D13;width:512px;height:512px;display:grid;place-items:center"><div style="width:400px;height:400px">${logo('#A98BFF')}</div></body></html>`;
 
