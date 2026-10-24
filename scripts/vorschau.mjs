@@ -19,9 +19,11 @@ const schrift = (pfad) => `data:font/woff2;base64,${readFileSync(join('dist', pf
 const css = (pfad) =>
   readFileSync(join('dist', pfad), 'utf8').replace(/url\(\/(fonts\/[^)]+)\)/g, (_, f) => `url(${schrift(f)})`);
 // Skripte samt nachgeladenen Teilen (z. B. 3D) zu einer Datei bündeln, damit sie direkt in der Seite stehen können.
+// Das Foto der Aussicht liegt im Skript als absoluter Pfad: in der Vorschau direkt als Datenadresse einbetten
+const fotoDaten = `data:image/webp;base64,${readFileSync(join('dist', 'aussicht', 'fenster.webp')).toString('base64')}`;
 const js = (pfad) =>
   buildSync({ entryPoints: [join('dist', pfad)], bundle: true, format: 'esm', write: false, minify: true, logLevel: 'error' })
-    .outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+    .outputFiles[0].text.replace(/<\/script/gi, '<\\/script').split('"/aussicht/fenster.webp"').join(`"${fotoDaten}"`);
 
 const STATUS = `
 <div id="vorschau-status" aria-hidden="true" style="position:fixed;z-index:99;left:max(8px,env(safe-area-inset-left,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:6px 10px;border-radius:999px;background:#ffd166;color:#1a1400;font:600 11px/1.3 ui-monospace,Menlo,monospace;pointer-events:none;max-width:calc(100vw - 16px)">Vorschau · Skripte laufen nicht</div>
