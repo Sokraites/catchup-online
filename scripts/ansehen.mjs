@@ -22,6 +22,8 @@ const typen = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
 };
@@ -95,6 +97,20 @@ createServer(async (req, res) => {
     if (annahme.includes('br')) [inhalt, kopf['Content-Encoding']] = [brotliCompressSync(inhalt), 'br'];
     else if (annahme.includes('gzip')) [inhalt, kopf['Content-Encoding']] = [gzipSync(inhalt), 'gzip'];
     kopf['Vary'] = 'Accept-Encoding';
+  }
+  // Videos: Teilstücke ausliefern (Browser springen damit im Video, z. B. beim Neustart)
+  const bereich = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? '');
+  if (status === 200 && typ.startsWith('video/')) {
+    kopf['Accept-Ranges'] = 'bytes';
+    if (bereich) {
+      const ganz = inhalt.length;
+      const von = bereich[1] ? Number(bereich[1]) : ganz - Number(bereich[2]);
+      const bis = bereich[1] && bereich[2] ? Math.min(Number(bereich[2]), ganz - 1) : ganz - 1;
+      kopf['Content-Range'] = `bytes ${von}-${bis}/${ganz}`;
+      res.writeHead(206, kopf);
+      res.end(inhalt.subarray(von, bis + 1));
+      return;
+    }
   }
   res.writeHead(status, kopf);
   res.end(inhalt);

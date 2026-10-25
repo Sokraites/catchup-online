@@ -1,6 +1,7 @@
 ---
 import Faq from './Faq.astro';
 import Kontakt from './Kontakt.astro';
+import Medium from './Medium.astro';
 import { site, REFERENZEN } from '../config/site';
 import { leistungen, ablauf, kiZusatz } from '../content/leistungen';
 import { faqStart } from '../content/faq';
@@ -44,7 +45,7 @@ import { referenzen } from '../content/referenzen';
       {
         leistungen.map((l) => (
           <li class="card">
-            <img class="bild-ruhig card-bild" src={l.bild} alt={l.bildText} width="1200" height="800" loading="lazy" decoding="async" />
+            <Medium name={l.medium} class="card-bild" />
             <span class="card-nr" aria-hidden="true">{l.nummer}</span>
             <h3>
               <a class="card-link" href={l.href}>{l.titel}</a>
@@ -110,7 +111,7 @@ import { referenzen } from '../content/referenzen';
     <div>
       <p class="eyebrow">Deine Idee</p>
       <h2 id="idee-titel">Welche digitale Lösung würde dir wirklich weiterhelfen?</h2>
-      <img class="bild-ruhig idee-bild" src="/bilder/loesung.webp" alt="Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick." width="1200" height="800" loading="lazy" decoding="async" />
+      <Medium name="05-deine-idee" class="idee-bild" />
     </div>
     <div>
       <p>

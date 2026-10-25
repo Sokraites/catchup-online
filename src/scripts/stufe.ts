@@ -65,7 +65,13 @@ export function starteStufenWahl() {
     const auf = menue!.hidden;
     menue!.hidden = !auf;
     knopf.setAttribute('aria-expanded', String(auf));
-    if (auf) menue!.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus();
+    if (auf) {
+      // Nie über den Bildschirmrand hinaus (z. B. wenn die Kopfleiste bei großer Schrift umbricht)
+      menue!.style.right = '';
+      const links = menue!.getBoundingClientRect().left;
+      if (links < 8) menue!.style.right = `${links - 8}px`;
+      menue!.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus();
+    }
   });
   document.addEventListener('click', (e) => {
     if (schalter && !schalter.contains(e.target as Node)) menueZu();

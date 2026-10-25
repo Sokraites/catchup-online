@@ -1,0 +1,39 @@
+---
+/**
+ * Bild mit optionalem Video (Einstellungen in src/config/medien.ts).
+ * Im HTML steht immer nur das Standbild. Das Video setzt das Skript in der Stufe Mittel darüber,
+ * erst wenn es zu sehen ist (src/scripts/medien.ts). Ohne JavaScript bleibt es beim Bild.
+ */
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { medien, type Medium, type MediumName } from '../config/medien';
+
+interface Props {
+  name: MediumName;
+  class?: string;
+}
+const { name, class: klasse } = Astro.props;
+const m: Medium = medien[name];
+// Beim Bauen nachsehen, welche Dateien es in public/media/ gibt
+const gibt = (endung: string) => existsSync(join(process.cwd(), 'public', 'media', `${name}${endung}`));
+const bild = gibt('.webp') ? `/media/${name}.webp` : m.ersatzBild;
+if (!bild) throw new Error(`Medium ${name}: weder public/media/${name}.webp noch ersatzBild vorhanden`);
+const quellen = [
+  gibt('.webm') && { src: `/media/${name}.webm`, type: 'video/webm' },
+  gibt('.mp4') && { src: `/media/${name}.mp4`, type: 'video/mp4' },
+].filter(Boolean);
+---
+
+<div
+  class:list={['medium', klasse]}
+  style={`--medium-pos: ${m.objectPosition}`}
+  data-medium={quellen.length ? name : undefined}
+  data-quellen={quellen.length ? JSON.stringify(quellen) : undefined}
+>
+  <img src={bild} alt={m.alt} width="1280" height="720" loading="lazy" decoding="async" />
+</div>
+
+<script>
+  import { starteMedien } from '../scripts/medien';
+  starteMedien();
+</script>

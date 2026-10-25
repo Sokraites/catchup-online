@@ -27,6 +27,7 @@ Stand: 22.10.2026. Alles hier bezieht sich auf den Build aus `npm run build` (Or
 | Schalter **INDEXIERUNG** (Standard: aus) | `src/config/site.ts`, Zeile `export const INDEXIERUNG = false;` |
 | Schalter **REFERENZEN** (Projekt „Ottos Werkstatt“, Standard: aus) | `src/config/site.ts`, Zeile `export const REFERENZEN = false;` |
 | Darstellungs-Stufen (Leicht, Mittel, Schwer) | `src/config/stufen.ts` |
+| Bilder und Videos der Startseite (Geschwindigkeit, Bildausschnitt, alt-Texte) | `src/config/medien.ts`, Dateien in `public/media/` |
 | Aussicht durchs Fenster (nur Stufe Schwer, Desktop ab 1280 px) | `src/scripts/aussicht.ts`, Stile in `src/styles/monitor.css` |
 | Impressum (Entwurf) | `src/pages/impressum.astro` → `/impressum/` |
 | Datenschutzerklärung (Entwurf) | `src/pages/datenschutz.astro` → `/datenschutz/` |

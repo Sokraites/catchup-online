@@ -188,6 +188,10 @@
 .monitor-an .monitor-flaeche .steps li {
   padding: 1.1rem 1.15rem;
 }
+.monitor-an .monitor-flaeche .card-bild {
+  width: calc(100% + 2.3rem);
+  margin: -1.1rem -1.15rem 0.9rem;
+}
 .monitor-an .monitor-flaeche .card h3 {
   font-size: 1.15rem;
 }

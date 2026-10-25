@@ -147,6 +147,21 @@ Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der S
 - [x] 5 `VERÖFFENTLICHUNG.md`: Abschnitt „Was ich als Nächstes tun muss“ oben
 - [x] 6 Version 1 bauen, committen, Tag `v1`, Branch und Tag pushen
 
+## Bilder und Videos in den Karten (25.10.2026)
+
+- [x] 1. Code gelesen, Stufenlogik erklärt (Wechsel lädt die Seite neu, siehe Abweichungen im Bericht)
+- [x] 2. Medien unverändert nach `public/media/` kopiert (12 Dateien, Prüfsummen gleich)
+- [x] 3. Zentrale Liste `src/config/medien.ts` (Geschwindigkeit, Bildausschnitt, weicher Neustart); Karte 04 mit bisherigem Bild, neue Dateien `04-software-nach-mass.webp/.mp4/.webm` greifen beim nächsten Bauen automatisch
+- [x] 4. Stufe Leicht: Standbilder 16:9 in Karte 01–03 und „Deine Idee“, kein Video
+- [x] 5. Stufe Mittel: Videos ab 25 % Sichtbarkeit, Pause beim Verlassen, höchstens zwei gleichzeitig; Standbild bei reduzierter Bewegung, Datensparmodus, gesperrtem Autoplay
+- [x] 6. Video 01: weicher Neustart (Ausblenden über das Standbild statt hartem Sprung)
+- [x] 7. Handy: Stufen-Schalter rutschte bei 417–439 px Breite in eine zweite Zeile, Menü lag links außerhalb des Bildschirms. Behoben (Kopfzeile bleibt einzeilig, Menü wird notfalls in den Bildschirm geschoben)
+- [x] 8. Build ohne Warnungen, Funktionstest und Barrierefreiheit ohne Befund
+- [x] 9. Screenshots 390 und 1440 px, Stufe Leicht und Mittel
+- [ ] Karte 04: eigenes Bild und Video liefern
+- [ ] Stufe Schwer zeigt die Videos noch nicht (bewusst unverändert); auf Wunsch freischalten
+- [ ] Stufenwechsel ohne Neuladen (größerer Umbau, siehe Bericht)
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
@@ -159,7 +174,7 @@ Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der S
 
 - `npm run build`, dann `npm run preview` und in einem zweiten Fenster `npm run pruefen`: prüft alle Seiten auf Handy, Tablet und Desktop, jeweils mit und ohne JavaScript (eine Hauptüberschrift, kein seitlicher Überlauf, Tippflächen, automatische Barrierefreiheitsprüfung).
 - `npm run vorschau`: baut aus `dist/` eine Fassung mit relativen Links in `.vorschau/` (für die private Vorschau).
-- `npm run ansehen`: zeigt den Build lokal an (http://localhost:4321) mit den Sicherheits-Headern aus `_headers`.
+- `npm run ansehen`: zeigt den Build lokal an (http://localhost:4321) mit den Sicherheits-Headern aus `_headers`; Videos werden in Teilstücken ausgeliefert wie bei einem echten Hoster.
 - `node scripts/funktionstest.mjs`: klickt die wichtigen Abläufe mit aktiver Content-Security-Policy durch und prüft alle Links.
 - `npm run paket`: packt `dist/` als `catchup-seite.zip`.
 - `npm run monitore`: rendert Monitor-Gehäuse und die großen Bilder (`public/bilder/`) aus den 3D-Modellen neu. Nur die großen Bilder: `node scripts/monitore-rendern.mjs szenen`.

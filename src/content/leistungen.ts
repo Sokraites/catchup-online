@@ -9,8 +9,8 @@ export const leistungen = [
     titel: 'Neue Webseite',
     kurz: 'Von Grund auf gebaut: schnell, klar und auf dem Handy zu Hause. Damit Besucher sofort verstehen, was du anbietest, und dich direkt erreichen.',
     schemaName: 'Webseiten erstellen',
-    bild: '/bilder/neue-webseite.webp',
-    bildText: 'Moderner Bildschirm und Handy zeigen dieselbe neue Webseite eines Betriebs.',
+    /** Bild und Video: src/config/medien.ts */
+    medium: '01-neue-webseite',
   },
   {
     href: '/webseiten-modernisieren/',
@@ -18,8 +18,8 @@ export const leistungen = [
     titel: 'Modernisierung',
     kurz: 'Deine Seite ist in die Jahre gekommen? Wir behalten, was funktioniert, und machen Gestaltung und Aufbau fit für heute.',
     schemaName: 'Webseiten modernisieren',
-    bild: '/bilder/modernisierung.webp',
-    bildText: 'Alter Röhrenmonitor mit einer Webseite von früher, daneben ein moderner Bildschirm mit der erneuerten Seite.',
+    /** Bild und Video: src/config/medien.ts */
+    medium: '02-modernisierung',
   },
   {
     href: '/auffindbarkeit/',
@@ -27,8 +27,8 @@ export const leistungen = [
     titel: 'Gefunden werden',
     kurz: 'Suchmaschinenoptimierung (SEO) für Google und Auffindbarkeit bei KI-Suchsystemen wie ChatGPT und Claude. Damit Kunden aus der Region bei dir landen.',
     schemaName: 'Suchmaschinenoptimierung und Sichtbarkeit in KI-Suchen',
-    bild: '/bilder/gefunden.webp',
-    bildText: 'Handy mit einer Suche nach einer Schreinerei in der Nähe: Der eigene Betrieb steht oben, ein KI-Assistent empfiehlt ihn.',
+    /** Bild und Video: src/config/medien.ts */
+    medium: '03-gefunden-werden',
   },
   {
     href: '/software-nach-mass/',
@@ -36,8 +36,8 @@ export const leistungen = [
     titel: 'Software nach Maß',
     kurz: 'Wenn es keine fertige Lösung gibt, die wirklich passt: Wir bauen genau das Werkzeug, das deinem Betrieb Arbeit abnimmt.',
     schemaName: 'Individuelle Software für Betriebe',
-    bild: '/bilder/loesung.webp',
-    bildText: 'Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick.',
+    /** Bild und Video: src/config/medien.ts */
+    medium: '04-software-nach-mass',
   },
 ] as const;
 

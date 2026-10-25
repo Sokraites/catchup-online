@@ -313,6 +313,8 @@ button.button {
 }
 .header-cta {
   margin-left: auto;
+  /* Abstand zwischen „Termin“ und „buchen“ (im Flex-Knopf geht das Leerzeichen sonst verloren) */
+  column-gap: 0.28em;
 }
 @media (max-width: 59.99rem) {
   .header-inner {
@@ -1076,14 +1078,54 @@ html[data-stufe='leicht'] .pfad-meldung {
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 30px 90px rgb(124 77 255 / 0.18);
 }
+/* Bild mit Video (Medium.astro): fester 16:9-Rahmen, nichts springt, wenn Bild oder Video kommen */
+.medium {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+}
+.medium > img,
+.medium-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--medium-pos, 50% 50%);
+}
+.medium-video {
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+.medium-laeuft .medium-video {
+  opacity: 1;
+}
+/* Weicher Neustart: kurz über das Standbild aus- und wieder einblenden */
+.medium-laeuft.medium-blende .medium-video {
+  opacity: 0;
+  transition-duration: 300ms;
+}
+/* Nur mit Maus: leichter Zoom beim Überfahren */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .medium > img,
+  .medium-video {
+    transition:
+      opacity 250ms ease,
+      transform 0.45s ease;
+  }
+  .card:hover .medium > img,
+  .card:hover .medium-video,
+  .medium:hover > img,
+  .medium:hover .medium-video {
+    transform: scale(1.03);
+  }
+}
 .card-bild {
   display: block;
   width: calc(100% + 3rem);
   max-width: none;
-  height: auto;
   margin: -1.5rem -1.5rem 1.25rem;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
   border-radius: var(--radius) var(--radius) 0 0;
   border-bottom: 1px solid var(--line);
 }
@@ -1218,8 +1260,9 @@ html[data-stufe='leicht'] #auffindbarkeit {
   letter-spacing: 0.02em;
 }
 
-/* Sehr schmale Handys: Logo, Auge, Termin-Knopf und Stufen-Schalter in einer Zeile */
-@media (max-width: 26rem) {
+/* Handys bis 439 px (auch große iPhones mit 428/430 px): Logo, Auge, Termin-Knopf und Stufen-Schalter in einer Zeile.
+   Bei 26rem rutschte der Schalter mit Auge in eine zweite Zeile, sein Menü öffnete sich dann links außerhalb des Bildschirms. */
+@media (max-width: 27.49rem) {
   .header-inner {
     column-gap: 0.375rem;
   }
@@ -1247,6 +1290,10 @@ html[data-stufe='leicht'] #auffindbarkeit {
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] .bild-ruhig,
   html[data-stufe='schwer'] .bild-ruhig {
+    display: none;
+  }
+  /* Bilder mit Video: in Mittel sichtbar (auch im Monitor), Schwer bleibt wie bisher ohne */
+  html[data-stufe='schwer'] .medium {
     display: none;
   }
 }
