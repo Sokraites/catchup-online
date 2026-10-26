@@ -55,6 +55,8 @@ function seite(quelle, tiefe, { fragment = false } = {}) {
   html = html.replace(/<link rel="stylesheet" href="\/(_astro\/[^"]+\.css)">/g, (_, f) => `<style>${css(f)}</style>`);
   html = html.replace(/<script type="module" src="\/(_astro\/[^"]+\.js)"><\/script>/g, (_, f) => `<script type="module">${js(f)}</script>`);
   html = html.replace(/<link rel="preload"[^>]*as="font"[^>]*>/g, '');
+  // Astro setzt das CSS oft direkt ins HTML (kein <link>): Schriften auch dort einbetten
+  html = html.replace(/url\(\/(fonts\/[^)]+)\)/g, (_, f) => `url(${schrift(f)})`);
   // Links relativ machen; die Startseite der Vorschau ist der Monitor-Entwurf
   html = html.replace(/(href|src)="\/([^"]*)"/g, (_, attr, pfad) => {
     const [weg, anker = ''] = pfad.split('#');
@@ -62,6 +64,8 @@ function seite(quelle, tiefe, { fragment = false } = {}) {
     return `${attr}="${zurWurzel}site/${ziel}${anker ? '#' + anker : ''}"`;
   });
   html = html.replace(/url\(\/((?:monitore|ki)\/)/g, `url(${zurWurzel}site/$1`);
+  // Videoquellen stehen als JSON im Attribut data-quellen (Medium.astro): gleich umschreiben
+  html = html.replace(/&quot;src&quot;:&quot;\/([^&]*)&quot;/g, (_, pfad) => `&quot;src&quot;:&quot;${zurWurzel}site/${pfad}&quot;`);
   html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">');
   if (!quelle.startsWith("referenzen/")) html = html.replace(/<\/body>/, `${STATUS}</body>`);
   if (fragment) {
