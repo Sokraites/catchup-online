@@ -1285,15 +1285,10 @@ html[data-stufe='leicht'] #auffindbarkeit {
   }
 }
 
-/* Mittel und Schwer: Die großen Bilder gar nicht erst laden, der Monitor übernimmt (Stufe steht schon vor dem Zeichnen fest).
+/* Schwer: Die großen Bilder gar nicht erst laden, der Monitor übernimmt (Stufe steht schon vor dem Zeichnen fest).
    Bei „Bewegung reduzieren“ startet kein Monitor, dann bleiben die Bilder. */
 @media (prefers-reduced-motion: no-preference) {
-  html[data-stufe='mittel'] .bild-ruhig,
   html[data-stufe='schwer'] .bild-ruhig {
-    display: none;
-  }
-  /* Bilder mit Video: in Mittel sichtbar (auch im Monitor), Schwer bleibt wie bisher ohne */
-  html[data-stufe='schwer'] .medium {
     display: none;
   }
 }
@@ -1385,4 +1380,25 @@ html[data-stufe='leicht'] .card {
 }
 html[data-stufe='leicht'] .button-ghost {
   border-color: rgb(216 183 122 / 0.5);
+}
+
+/* Hauptpunkte (Stufen Mittel und Schwer): sanft einblenden, danach ein feiner goldener Schimmer an der Nummer */
+@media (prefers-reduced-motion: no-preference) {
+  .hervor {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+  }
+  .hervor.hervor-an {
+    opacity: 1;
+    transform: none;
+  }
+  .card-nr {
+    transition: text-shadow 1.2s ease 0.4s;
+  }
+  .hervor-an .card-nr {
+    text-shadow: 0 0 16px rgb(216 183 122 / 0.55);
+  }
 }

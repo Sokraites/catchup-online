@@ -102,7 +102,7 @@ Kontaktbereich, Fußzeile, Terminbuch, Terminseite, Impressum, Datenschutz und d
 1. **Hosting bei Cloudflare Pages:** Unsere Leitplanke lautet „Hosting in der EU“. Cloudflare ist ein US-Unternehmen mit weltweitem Netz. Entweder bewusst so entscheiden (und im Datenschutz benennen) oder einen EU-Anbieter wählen. Die Seite läuft bei jedem statischen Hosting.
 2. **„Software nach Maß“:** Der Auftrag nennt vier Leistungen (neue Webseiten, Modernisierung, SEO, Auffindbarkeit bei KI-Suche). „Software nach Maß“ hattest du am 22.10. selbst gewünscht. Sie ist noch auf der Seite (Unterseite, Abschnitt „Welche digitale Lösung …“, Menüpunkt). Behalten oder herausnehmen?
 3. **Referenz „Ottos Werkstatt“:** Ist vorerst ausgeblendet und nicht im Paket (Schalter REFERENZEN), bis die schriftliche Freigabe des Kunden für Nennung, Fotos und Kontaktdaten vorliegt.
-4. **Darstellungs-Stufen:** Laut Zielbild gehört der Kachel-Pfad zur Standard-Darstellung. „Mittel“ (Standard) zeigt ihn jetzt; „Schwer“ dreht nur die Effekte auf (mehr Leuchten, Funkeln mit der Maus), die 3D-Figuren gibt es nicht mehr.
+4. **Darstellungs-Stufen:** „Leicht“ ist ruhig und schick, ohne Bewegung. „Mittel“ (Standard) hat geringe Bewegung: die Hauptpunkte blenden sanft ein, die Filme laufen stumm, dazu der Kachel-Pfad. „Schwer“ zeigt alles, was möglich ist: die Zeitreise im Monitor, Effekte und das Fenster mit Blick aufs Meer (nur am Desktop).
 
 **Bekannte Mängel:**
 

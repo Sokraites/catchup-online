@@ -15,7 +15,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import konfig from '../config/monitore.json';
 import bilder from '../config/monitore-bilder.json';
-import { ruhig } from './stufe';
+import { ruhig, stufe } from './stufe';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,8 +35,8 @@ export type MonitorSteuerung = {
 export function starteMonitor(): MonitorSteuerung | undefined {
   const buehne = document.querySelector<HTMLElement>('[data-monitor]');
   if (!buehne) return;
-  // Stufe „leicht“ oder reduzierte Bewegung: ganz normale Seite ohne Monitor
-  if (ruhig()) return;
+  // Nur Stufe „schwer“ zeigt den Monitor. Leicht und Mittel: ganz normale Seite, bei reduzierter Bewegung ebenso.
+  if (ruhig() || stufe() !== 'schwer') return;
 
   const html = document.documentElement;
   const kopf = document.querySelector<HTMLElement>('.site-header')!;

@@ -1,10 +1,10 @@
 /**
- * Videos in der Stufe Mittel (Einstellungen: src/config/medien.ts, Bausteine: Medium.astro).
+ * Videos in den Stufen Mittel und Schwer (Einstellungen: src/config/medien.ts, Bausteine: Medium.astro).
  *
  * - Im HTML steht nur das Standbild. Das Video entsteht erst, wenn ein Viertel davon zu sehen ist,
  *   und hält an, sobald es den Bildschirm verlässt. Höchstens zwei laufen gleichzeitig.
  * - Das Standbild bleibt immer darunter liegen: Bis das Video läuft (oder wenn es nicht darf), sieht man das Bild.
- * - Kein Video bei Stufe Leicht oder Schwer, „Bewegung reduzieren“, Datensparmodus oder gesperrtem Autoplay.
+ * - Kein Video bei Stufe Leicht, „Bewegung reduzieren“, Datensparmodus oder gesperrtem Autoplay.
  * - Ändert sich die Stufe, blendet das Video aus und wird freigegeben.
  */
 import { medien, medienRegeln, type Medium, type MediumName } from '../config/medien';
@@ -26,7 +26,7 @@ const html = document.documentElement;
 const reduziert = matchMedia('(prefers-reduced-motion: reduce)');
 const verbindung = (navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } }).connection;
 
-const erlaubt = () => stufe() === 'mittel' && !reduziert.matches && !verbindung?.saveData;
+const erlaubt = () => ['mittel', 'schwer'].includes(stufe()) && !reduziert.matches && !verbindung?.saveData;
 
 let gestartet = false;
 

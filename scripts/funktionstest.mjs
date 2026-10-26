@@ -121,7 +121,10 @@ for (const breite of [360, 768, 1440]) {
   if (mail?.startsWith('mailto:') && (await page.locator('[data-tb-danke]').isVisible())) ok('Terminanfrage: Bestätigung und vorbereitete E-Mail');
   else fehler('Terminanfrage ohne Bestätigung');
   await page.keyboard.press('Escape');
-  // Tab im Monitor über das Menü
+  // Tab im Monitor über das Menü (der Monitor gibt es nur in Stufe Schwer)
+  await page.evaluate(() => localStorage.setItem('catchup-stufe', 'schwer'));
+  await page.goto(BASIS + '/');
+  await page.waitForTimeout(1200);
   await page.locator('.main-nav a').first().tap();
   await page.waitForTimeout(1200);
   if ((await page.locator('.bl-tab-aktiv').count()) > 0) ok('Menü öffnet einen Tab im Monitor');
