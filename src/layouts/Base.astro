@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/farbwelten.css';
 import { site, INDEXIERUNG } from '../config/site';
 import { graph, organisation } from '../lib/schema';
 import Header from '../components/Header.astro';
@@ -8,6 +9,7 @@ import Kacheln from '../components/Kacheln.astro';
 import Terminbuch from '../components/Terminbuch.astro';
 import StufenWahl from '../components/StufenWahl.astro';
 import { standardStufe, stufenSchluessel } from '../config/stufen';
+import { seitenWelten } from '../config/farbwelten';
 
 interface Props {
   /** Seitentitel ohne Firmennamen; der Name wird angehängt. */
@@ -24,6 +26,8 @@ const fullTitle = title ? `${title} | ${site.name}` : `${site.name}: ${site.clai
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = `${site.url}/og.png`;
 const jsonLd = JSON.stringify(graph(organisation(), ...schema));
+// Farbwelt der Seite (nur Stufe Mittel sichtbar, siehe src/config/farbwelten.ts)
+const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
 ---
 
 <!doctype html>
@@ -78,9 +82,10 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+    <div class="farbwelt" aria-hidden="true" data-welt={welt}></div>
     <Kacheln />
     <Header />
-    <main id="inhalt">
+    <main id="inhalt" data-welt={welt}>
       <slot />
     </main>
     <Footer />
@@ -89,8 +94,11 @@ const jsonLd = JSON.stringify(graph(organisation(), ...schema));
     <script>
       import { starteStufenWahl } from '../scripts/stufe';
       import { starteHervor } from '../scripts/hervor';
+      import { starteMittel } from '../scripts/mittel';
+      import { stufe } from '../scripts/stufe';
       starteStufenWahl();
       starteHervor();
+      if (stufe() === 'mittel') starteMittel();
     </script>
   </body>
 </html>

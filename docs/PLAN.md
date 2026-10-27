@@ -162,6 +162,16 @@ Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der S
 - [ ] Stufe Schwer zeigt die Videos noch nicht (bewusst unverändert); auf Wunsch freischalten
 - [ ] Stufenwechsel ohne Neuladen (größerer Umbau, siehe Bericht)
 
+## Stufe Mittel: Farbwelten und Politur (27.10.2026)
+
+- [x] Monitor nur in Stufe Schwer; Mittel ist eine normale Seite mit Kachel-Raster im Hintergrund
+- [x] Farbwelt je Abschnitt (`src/styles/farbwelten.css`, Zuordnung `src/config/farbwelten.ts`), Wechsel 1,2 s in der Bildschirmmitte
+- [x] Akzentfarbe für Kategorie-Zeile, Überschrift, Links, Hover; Trennlinie in der Akzentfarbe des beginnenden Abschnitts
+- [x] Überschriften Wort für Wort (ohne Zusatz-Bibliothek), Karten heben sich bei Maus und Tastatur-Fokus, eine Bewegungskurve für alle Übergänge
+- [x] Scroll-Hinweis auf der Startseite (verschwindet nach 5 s oder beim Scrollen, speichert nichts)
+- [x] Kontraste geprüft (docs/ENTSCHEIDUNGEN.md), Leicht und Schwer bildpunktgleich zum vorigen Stand
+- [ ] Terminbuch auf dem Handy: Wisch-Leiste ist per Tastatur nicht erreichbar (bestand schon vorher, auch in Schwer)
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

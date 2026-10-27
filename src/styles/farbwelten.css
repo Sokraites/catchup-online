@@ -1,0 +1,247 @@
+/* ---------- Stufe Mittel: Farbwelten und Politur ----------
+   Jeder Themenbereich hat eine eigene dunkle Grundfarbe und eine Akzentfarbe. Beim Scrollen wechselt die
+   Hintergrund-Ebene sanft (src/scripts/mittel.ts, Zuordnung in src/config/farbwelten.ts).
+   Das ersetzt in Mittel die Monitor-Dramaturgie der Stufe Schwer.
+   Jede Regel beginnt mit html[data-stufe='mittel']: Leicht und Schwer bleiben unberührt.
+   Kontraste nach WCAG 2.2 AA geprüft, Werte in docs/ENTSCHEIDUNGEN.md. */
+
+:root {
+  /* Grundfarben je Welt */
+  --farbe-hero: #0d0d13;
+  --farbe-leistungen: #12141f;
+  --farbe-nutzen: #0f1a14;
+  --farbe-auffindbarkeit: #1a1220;
+  --farbe-software: #141020;
+  --farbe-idee: #1a1512;
+  --farbe-ablauf: #0f1418;
+  --farbe-faq: #101318;
+  --farbe-kontakt: #12101e;
+
+  /* Akzentfarben je Welt: Kategorie-Zeile, Überschrift, Links, Hover */
+  --akzent-hero: #a98bff;
+  --akzent-leistungen: #8b9dff;
+  --akzent-nutzen: #6ee7a0;
+  --akzent-auffindbarkeit: #c084fc;
+  --akzent-software: #a78bfa;
+  --akzent-idee: #fbbf24;
+  --akzent-ablauf: #7dd3fc;
+  --akzent-faq: #94a3b8;
+  --akzent-kontakt: #818cf8;
+
+  --ease-mittel: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Eine Bewegungskurve für alle Übergänge */
+html[data-stufe='mittel'] *,
+html[data-stufe='mittel'] *::before,
+html[data-stufe='mittel'] *::after {
+  transition-timing-function: var(--ease-mittel) !important;
+}
+
+/* Hintergrund-Ebene: liegt unter den Kacheln (z 0) und dem Inhalt (z 1).
+   Der Wechsel ändert nur die Farbe (kein Neuberechnen des Layouts) und läuft neben allem anderen her. */
+.farbwelt {
+  display: none;
+}
+html[data-stufe='mittel'] .farbwelt {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--farbe-hero);
+  transition: background-color 1.2s;
+}
+html[data-stufe='mittel'] body .farbwelt {
+  transition-timing-function: ease-in-out !important;
+}
+html[data-stufe='mittel'] .farbwelt[data-welt='leistungen'] { background-color: var(--farbe-leistungen); }
+html[data-stufe='mittel'] .farbwelt[data-welt='nutzen'] { background-color: var(--farbe-nutzen); }
+html[data-stufe='mittel'] .farbwelt[data-welt='auffindbarkeit'] { background-color: var(--farbe-auffindbarkeit); }
+html[data-stufe='mittel'] .farbwelt[data-welt='software'] { background-color: var(--farbe-software); }
+html[data-stufe='mittel'] .farbwelt[data-welt='idee'] { background-color: var(--farbe-idee); }
+html[data-stufe='mittel'] .farbwelt[data-welt='ablauf'] { background-color: var(--farbe-ablauf); }
+html[data-stufe='mittel'] .farbwelt[data-welt='faq'] { background-color: var(--farbe-faq); }
+html[data-stufe='mittel'] .farbwelt[data-welt='kontakt'] { background-color: var(--farbe-kontakt); }
+
+/* Welt je Seite (Unterseiten) und je Abschnitt (Startseite) */
+html[data-stufe='mittel'] main { --welt: var(--farbe-hero); --akzent: var(--akzent-hero); }
+html[data-stufe='mittel'] main[data-welt='leistungen'],
+html[data-stufe='mittel'] main #leistungen { --welt: var(--farbe-leistungen); --akzent: var(--akzent-leistungen); }
+html[data-stufe='mittel'] main #nutzen { --welt: var(--farbe-nutzen); --akzent: var(--akzent-nutzen); }
+html[data-stufe='mittel'] main[data-welt='auffindbarkeit'],
+html[data-stufe='mittel'] main #auffindbarkeit { --welt: var(--farbe-auffindbarkeit); --akzent: var(--akzent-auffindbarkeit); }
+html[data-stufe='mittel'] main[data-welt='software'] { --welt: var(--farbe-software); --akzent: var(--akzent-software); }
+html[data-stufe='mittel'] main #idee { --welt: var(--farbe-idee); --akzent: var(--akzent-idee); }
+html[data-stufe='mittel'] main #ablauf { --welt: var(--farbe-ablauf); --akzent: var(--akzent-ablauf); }
+html[data-stufe='mittel'] main #faq { --welt: var(--farbe-faq); --akzent: var(--akzent-faq); }
+html[data-stufe='mittel'] main[data-welt='kontakt'],
+html[data-stufe='mittel'] main #kontakt { --welt: var(--farbe-kontakt); --akzent: var(--akzent-kontakt); }
+
+/* Flächen (Karten, Chips, Hinweise) nehmen einen Hauch der Welt auf */
+html[data-stufe='mittel'] main,
+html[data-stufe='mittel'] main section {
+  --surface: color-mix(in srgb, var(--welt) 95%, white);
+  --surface-2: color-mix(in srgb, var(--welt) 91%, white);
+}
+
+/* Akzent: Kategorie-Zeile, Überschrift, Links */
+html[data-stufe='mittel'] main .eyebrow {
+  color: var(--akzent);
+}
+html[data-stufe='mittel'] body main .eyebrow::before {
+  background: linear-gradient(90deg, var(--akzent), transparent);
+}
+html[data-stufe='mittel'] main h2 {
+  color: var(--akzent);
+}
+html[data-stufe='mittel'] main a:not(.button, .card-link),
+html[data-stufe='mittel'] main .card-more {
+  color: var(--akzent);
+}
+html[data-stufe='mittel'] main a:not(.button, .card-link):hover {
+  color: var(--ink);
+}
+html[data-stufe='mittel'] main .button-ghost:hover {
+  border-color: var(--akzent);
+}
+
+/* Abschnitte: Hauch der Akzentfarbe oben, feine Linie in der Akzentfarbe des beginnenden Abschnitts */
+html[data-stufe='mittel'] body .section {
+  border-bottom: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--akzent) 5%, transparent), transparent 42%);
+}
+html[data-stufe='mittel'] body .section::before {
+  width: calc(min(var(--wrap), 100%) - 2 * var(--gutter));
+  background: linear-gradient(90deg, transparent, var(--akzent) 15%, var(--akzent) 85%, transparent);
+  opacity: 0.3;
+}
+
+/* Karten: Rand mit Gold und Akzent; beim Überfahren (Maus) oder Tastatur-Fokus heller und leicht angehoben */
+html[data-stufe='mittel'] body .card {
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(140deg, rgb(216 183 122 / 0.45), color-mix(in srgb, var(--akzent) 14%, transparent) 42%, transparent 72%) border-box;
+}
+html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
+  background:
+    linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
+    linear-gradient(140deg, var(--akzent), color-mix(in srgb, var(--akzent) 30%, transparent) 45%, transparent 75%) border-box;
+}
+@media (hover: hover) and (pointer: fine) {
+  html[data-stufe='mittel'] body .card:hover {
+    background:
+      linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
+      linear-gradient(140deg, var(--akzent), color-mix(in srgb, var(--akzent) 30%, transparent) 45%, transparent 75%) border-box;
+  }
+}
+/* Touch: Antippen hinterlässt keinen Hover-Zustand */
+@media (hover: none) {
+  html[data-stufe='mittel'] body .card:hover:not(:has(.card-link:focus-visible)) {
+    background:
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      linear-gradient(140deg, rgb(216 183 122 / 0.45), color-mix(in srgb, var(--akzent) 14%, transparent) 42%, transparent 72%) border-box;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hauptpunkte blenden über „translate“ ein, damit „transform“ frei bleibt fürs Anheben */
+  html[data-stufe='mittel'] body .hervor {
+    transform: none;
+    translate: 0 16px;
+  }
+  html[data-stufe='mittel'] body .hervor.hervor-an {
+    translate: none;
+  }
+  html[data-stufe='mittel'] body .card,
+  html[data-stufe='mittel'] body .hervor {
+    transition:
+      opacity 0.6s,
+      translate 0.6s,
+      transform 0.3s,
+      box-shadow 0.3s,
+      background 0.2s,
+      border-color 0.2s;
+  }
+  html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
+    transform: translateY(-4px);
+    box-shadow:
+      0 22px 48px -18px rgb(0 0 0 / 0.75),
+      0 0 36px -10px color-mix(in srgb, var(--akzent) 45%, transparent);
+  }
+
+  /* Überschriften Wort für Wort */
+  html[data-stufe='mittel'] .wortweise .wort {
+    display: inline-block;
+    opacity: 0;
+    translate: 0 0.4em;
+    transition:
+      opacity 0.5s,
+      translate 0.5s;
+    transition-delay: calc(var(--i, 0) * 60ms);
+  }
+  html[data-stufe='mittel'] .wortweise.worte-an .wort {
+    opacity: 1;
+    translate: none;
+  }
+
+  /* Scroll-Hinweis am unteren Rand der ersten Ansicht: pulsiert einmal, verschwindet nach 5 s oder beim Scrollen */
+  html[data-stufe='mittel'] .scroll-hinweis {
+    position: fixed;
+    z-index: 5;
+    left: 50%;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    width: 18px;
+    height: 48px;
+    translate: -50% 0;
+    pointer-events: none;
+    opacity: 0.75;
+    transition: opacity 0.8s;
+    animation: hinweis-puls 1.8s 0.8s 1 backwards;
+  }
+  html[data-stufe='mittel'] .scroll-hinweis::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 38px;
+    background: linear-gradient(to bottom, transparent, var(--akzent-hero));
+  }
+  html[data-stufe='mittel'] .scroll-hinweis::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 9px;
+    height: 9px;
+    border-right: 1px solid var(--akzent-hero);
+    border-bottom: 1px solid var(--akzent-hero);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  html[data-stufe='mittel'] .scroll-hinweis-weg {
+    opacity: 0;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] body .card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 22px 48px -18px rgb(0 0 0 / 0.75),
+      0 0 36px -10px color-mix(in srgb, var(--akzent) 45%, transparent);
+  }
+}
+@keyframes hinweis-puls {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 0.75;
+    transform: none;
+  }
+}

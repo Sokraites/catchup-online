@@ -60,6 +60,8 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Handy-Gestaltung | Darf sich vom Desktop unterscheiden (gleicher Inhalt, eigene Darstellung), wenn es auf dem Handy besser wirkt. | 20.10.2026 |
 | Kontakt | Eigene Telefonnummer und E-Mail kommen. Bis dahin Platzhalter, Seite wird gebaut, als gäbe es sie schon. | 20.10.2026 |
 | Farbwelt | Aus der Vergleichsseite des Partners: dunkel mit Lila. Basis: Hintergrund `#0D0D13`, Flächen `#15151E`/`#1B1B26`, Linien `#272735`, Text `#EDECF6`, gedämpft `#9C9AB1`, Akzent `#7C4DFF`, hell `#A98BFF`, tief `#5B2BE0`. Kontraste werden geprüft und bei Bedarf angepasst. | 20.10.2026 |
+| Stufen | Leicht: ruhig und schick, ohne Bewegung. Mittel: geringe Bewegung, Farbwelt je Abschnitt, Hauptpunkte blenden ein, kein Monitor. Schwer: alles, was möglich ist (Monitor, Aussicht, Effekte). | 27.10.2026 |
+| Farbwelten Stufe Mittel | Jeder Abschnitt eigene dunkle Grundfarbe und Akzentfarbe, sanfter Wechsel beim Scrollen. Werte in `src/styles/farbwelten.css`, Kontraste siehe unten. | 27.10.2026 |
 
 ## In Klärung
 
@@ -80,3 +82,24 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Fortschritt im Kachelpfad speichern | Nicht speichern, gilt nur solange die Seite offen ist. |
 | Messung | Nur Platzhalter. |
 | Impressum, Rechtsform, Verantwortlicher | Platzhalter. |
+
+## Kontrast-Prüfung Farbwelten (Stufe Mittel, 27.10.2026)
+
+Geprüft nach WCAG 2.2 AA: Fließtext und kleine Schrift mindestens 4,5:1, große Überschriften mindestens 3:1.
+„Schlechtester Grund“: Abschnittsfarbe mit 5 % Akzent-Tönung (oben im Abschnitt) und den hellen Kachel-Linien darüber.
+„Karte“: hervorgehobene Karte (Abschnittsfarbe mit 9 % Weiß). Text `#EDECF6`, gedämpfter Text `#A9A7BD`.
+
+| Welt | Grund | Akzent | Akzent auf Grund | Akzent, schlechtester Grund | Akzent auf Karte | gedämpft auf Karte | Text auf Karte |
+|---|---|---|---|---|---|---|---|
+| Einstieg | `#0d0d13` | `#a98bff` | 7,22 | 6,00 | 5,84 | 6,68 | 13,39 |
+| Leistungen | `#12141f` | `#8b9dff` | 7,30 | 5,90 | 5,75 | 6,15 | 12,32 |
+| Nutzen | `#0f1a14` | `#6ee7a0` | 11,54 | 9,00 | 9,01 | 5,93 | 11,88 |
+| Auffindbarkeit | `#1a1220` | `#c084fc` | 6,90 | 5,59 | 5,43 | 6,12 | 12,25 |
+| Software (Unterseite) | `#141020` | `#a78bfa` | 6,86 | 5,61 | 5,45 | 6,32 | 12,67 |
+| Deine Idee | `#1a1512` | `#fbbf24` | 10,85 | 8,54 | 8,50 | 6,04 | 12,11 |
+| Ablauf | `#0f1418` | `#7dd3fc` | 11,11 | 8,81 | 8,78 | 6,24 | 12,50 |
+| FAQ | `#101318` | `#94a3b8` | 7,26 | 5,90 | 5,75 | 6,28 | 12,58 |
+| Kontakt | `#12101e` | `#818cf8` | 6,29 | 5,18 | 5,01 | 6,37 | 12,76 |
+
+Ergebnis: Alle Kombinationen erfüllen AA auch für kleine Schrift. Keine Farbe musste angepasst werden; die Palette gilt wie vorgeschlagen.
+axe kann den Kontrast über der festen Farb-Ebene nicht selbst messen (meldet „nicht prüfbar“), deshalb diese Rechnung.
