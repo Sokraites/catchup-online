@@ -1,0 +1,396 @@
+CATCH UP – ÜBERGABE VERSION 3
+==============================================================================
+
+Stand:        27.10.2026
+Version:      v3 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 0b9e6b1 (GitHub: Sokraites/catchup-online, Branch main)
+ZIP:          releases/v3/catchup-seite-v3.zip (68 Dateien, 12,6 MB)
+Prüfsumme:    270224cba532584e17f3cfb76d9c5c169f6e95755bae8dbbf720a8cb743e0a4f
+Frühere:      v1  e062569acdba40113df91ef41408d28a5313784c5ad428c32467d0ca85f7b419
+              v2  e428ee631d55e5b026bdcc76bcfb90288072d60eaa84e504768622d20b1024d3
+
+Diese Datei ist für zwei Leser gedacht: für dich (Teil A und B, einfaches Deutsch)
+und für den nächsten Claude bzw. jeden Entwickler (Teil C).
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+==============================================================================
+TEIL A – KURZFASSUNG
+==============================================================================
+
+Was v3 gegenüber v2 neu hat (alles in der Stufe „Mittel“, außer wo anders genannt):
+  - Kartentitel nehmen beim Überfahren die Farbe ihres Abschnitts an.
+  - Überschriften blenden Wort für Wort ein (GSAP). Vorgelesen wird der ganze Satz.
+  - Die Kategorie-Zeile (z. B. „LEISTUNGEN“) schimmert einmal, wenn sie ins Bild kommt.
+  - Scroll-Hinweis am unteren Rand der Startseite, zwei Pulse, einmal pro Sitzung.
+  - Drei Produktkarten statt vier Leistungen: 01 Fundament, 02 Konversion,
+    03 Laufender Vorsprung (alle Stufen).
+  - Strukturierte Daten für KI-Suche: Angebotskatalog mit den drei Stufen und
+    Einsatzgebiet Rheinland-Pfalz / Deutschland (alle Stufen, nur im Quelltext).
+
+Was seit v1 insgesamt dazugekommen ist:
+  - Bilder und Videos in den Karten und bei „Deine Idee“.
+  - Die drei Stufen sind klar getrennt:
+      Leicht   ruhig und schick, keine Bewegung.
+      Mittel   geringe Bewegung: Farbwelt je Abschnitt, Hauptpunkte blenden ein, Filme laufen
+               stumm, Kachel-Pfad im Hintergrund. Kein Monitor.
+      Schwer   alles, was möglich ist: Monitor-Zeitreise, Effekte, am Desktop das Fenster mit
+               Meerblick.
+  - Stufen-Schalter auf großen Handys (417–439 px) repariert.
+
+
+==============================================================================
+TEIL B – DIE 7 ENTSCHEIDUNGEN, DIE DU PRÜFEN SOLLTEST
+==============================================================================
+
+1) KARTENTEXTE
+   Stand: Ich habe die Texte aus deinem Auftrag in die „du“-Form gebracht, wie es die
+   Projektregeln verlangen. Statt „als Top-Empfehlung genannt werden“ steht dort
+   „… und können dich in deiner Region empfehlen“.
+   Warum: Niemand kann zusagen, was ein KI-Assistent empfiehlt. Ein solches Versprechen
+   kann angreifbar sein. Das ist keine Rechtsberatung, bitte bei der rechtlichen
+   Prüfung mitprüfen lassen.
+   Du entscheidest: Passt die vorsichtigere Formulierung, oder soll es mutiger klingen?
+   Ändern: src/content/produkte.ts (Feld „kurz“). Der Katalog in den strukturierten
+   Daten übernimmt den Text automatisch.
+
+2) ZIELE DER LINKS AUF DEN KARTEN
+   Stand: 01 führt zu „Neue Webseite“, 02 zu „Software nach Maß“ (dort steht der Satz
+   zu KI-Agenten), 03 zu „Gefunden werden“. Eigene Unterseiten für 02 und 03 gibt es
+   noch nicht.
+   Du entscheidest: Reichen die Zwischenlösungen, oder sollen eigene Seiten entstehen
+   (KI-Vorqualifizierer; Automatisierung & Monitoring)? Eine eigene Seite pro Leistung
+   ist auch eine SEO-Regel des Projekts.
+   Ändern: Feld „href“ in src/content/produkte.ts.
+
+3) BILDER UND VIDEOS DER KARTEN
+   Stand: Karte 02 zeigt vorerst das Tablet-Bild (Platzhalter). Das Video
+   „Modernisierung“ kommt auf der Startseite nicht mehr vor, liegt aber noch in
+   public/media und damit in der ZIP (rund 3,6 MB ohne Nutzen).
+   Du entscheidest: Eigenes Bild/Video für den KI-Vorqualifizierer liefern? Das
+   Modernisierungs-Video auf der Seite „Webseiten modernisieren“ verwenden oder löschen?
+   Ändern: Dateien ki-vorqualifizierer.webp / .mp4 / .webm in public/media legen,
+   dann neu bauen. Alles Weitere steht in src/config/medien.ts.
+
+4) GESTRICHENE ZEILE
+   Stand: Die Zeile „Auf Wunsch binden wir auch KI-Agenten ein …“ unter den Karten ist
+   weg, weil Karte 02 genau das sagt. Auf der Seite „Software nach Maß“ steht sie weiter.
+   Hinweis: Früher sollten KI-Agenten nur mit dieser einen Zusatzzeile erwähnt und nicht
+   beworben werden (Kommentar in src/content/leistungen.ts). Mit den drei Produktkarten
+   gilt das nicht mehr, es ist jetzt dein Angebot (Eintrag in docs/ENTSCHEIDUNGEN.md).
+   Du entscheidest: Zeile wieder einsetzen oder weglassen?
+
+5) TEXTE, DIE NOCH DAS ALTE ANGEBOT NENNEN
+   Stand: Folgende Stellen sprechen noch von vier Leistungen (neue Webseite,
+   Modernisierung, SEO, Auffindbarkeit/Software) und wurden nicht angepasst:
+     - Einstiegstext ganz oben (nennt Webseiten, Modernisierung und Auffindbarkeit,
+       aber nicht den KI-Vorqualifizierer)
+     - Standard-Seitenbeschreibung (site.beschreibung, erscheint in Google und bei
+       geteilten Links)
+     - die vier Menüpunkte
+     - die FAQ und die Unterseiten
+     - die Datei llms.txt (Kurzüberblick für KI-Systeme, wird aus der alten Liste erzeugt)
+   Du entscheidest: Alles auf das 3-Stufen-Angebot umschreiben oder das alte Angebot
+   als Unterseiten beibehalten? Beides zusammen wirkt für Besucher uneinheitlich.
+   Ändern: src/config/site.ts (Beschreibung, Menü), src/components/StartInhalt.astro,
+   src/content/faq.ts, src/content/leistungen.ts (Quelle für llms.txt).
+
+6) POSITION DES SCROLL-HINWEISES
+   Stand: Er sitzt am unteren Rand des ersten Bildschirms, nicht am Ende des
+   Hero-Bereichs. Auf dem Handy liegt das Hero-Ende außerhalb des ersten Bildschirms,
+   dort sähe ihn niemand.
+   Du entscheidest: So lassen, oder am Hero-Ende (dann sieht ihn ein Handy-Nutzer nicht)?
+   Ändern: src/scripts/mittel.ts (starteScrollHinweis) und .scroll-hinweis in
+   src/styles/farbwelten.css.
+
+7) DATENSCHUTZERKLÄRUNG UND DER SCROLL-HINWEIS
+   Stand: Auf deinen Wunsch merkt sich die Seite, dass der Hinweis schon gezeigt wurde
+   (sessionStorage, Eintrag „scroll-hinweis-gezeigt“, endet beim Schließen des Tabs,
+   wird nie übertragen). Die Datenschutzerklärung nennt diesen Eintrag noch nicht.
+   Ich habe die Rechtstexte nicht angefasst. Ob ein solcher Eintrag ohne Einwilligung
+   erlaubt ist, kann nur die rechtliche Prüfung klären, denn ein Animationshinweis ist
+   nicht zwingend nötig.
+   Entwurf eines Satzes zur Prüfung (nicht rechtsgeprüft): „Beim Aufruf der Startseite
+   in der Darstellung ‚Mittel‘ speichert dein Browser bis zum Schließen des Tabs einen
+   Eintrag (scroll-hinweis-gezeigt), damit ein Scroll-Hinweis nur einmal erscheint. Der
+   Eintrag verlässt dein Gerät nicht.“
+   Du entscheidest: Satz aufnehmen oder das Speichern ganz weglassen? Sicherster Weg:
+   weglassen, der Hinweis erscheint dann bei jedem Laden der Startseite ganz oben.
+   Ändern: Eintrag in src/scripts/mittel.ts (HINWEIS_GEZEIGT). Offener Punkt steht in
+   VERÖFFENTLICHUNG.md.
+
+Weitere offene Entscheidungen aus früheren Runden:
+   a) Sonne im Fenster (Stufe Schwer): sie steht hinter dem Monitor im dritten Fenster
+      von rechts. Die drei Optionen A, B, C aus der früheren Runde warten auf Antwort.
+   b) Kachel-Pfad: bleibt er in Mittel (jetzt so) oder nur in Schwer?
+   c) „Software nach Maß“ behalten oder herausnehmen (VERÖFFENTLICHUNG.md, Abschnitt 6)?
+   d) Referenz „Ottos Werkstatt“: bleibt ausgeblendet, bis der Kunde schriftlich zustimmt.
+   e) Hosting: Cloudflare Pages (US-Anbieter) oder ein EU-Anbieter. Die Regel lautet
+      „Hosting in der EU“. Danach Hosting-Angaben in die Datenschutzerklärung.
+   f) Impressum-Angaben liefern, Domain registrieren, rechtliche Prüfung.
+   g) Terminbuch am Handy: Die Wisch-Leiste der Monate ist per Tastatur nicht erreichbar
+      (kleine Behebung, betrifft alle Stufen).
+
+
+==============================================================================
+TEIL C – TECHNIK FÜR DIE WEITERENTWICKLUNG
+==============================================================================
+
+C1  AUFBAU UND BEFEHLE
+----------------------------------------------------------------------------
+Astro 7.3.5 (statisch), GSAP 3.15.0, Node 22. Schriften und Bibliotheken liegen im
+Projekt, es gibt keine Fremdserver und keine Cookies.
+Wichtigste Quellen: CLAUDE.md (verbindliche Regeln), docs/PLAN.md (Etappen),
+docs/ENTSCHEIDUNGEN.md (Entscheidungen, Kontrast-Tabelle), VERÖFFENTLICHUNG.md
+(Livegang), START-HIER.md (Einsteiger-Anleitung), UEBERGABE.md im Hauptordner
+(ursprünglicher Auftrag).
+
+  npm install                 einmalig
+  npm run dev                 Entwicklungsserver
+  npm run build               baut dist/ und schreibt dist/_headers (CSP mit Prüfsummen)
+  npm run ansehen             zeigt dist/ lokal wie ein Hoster (Port 4321; PORT und
+                              ORDNER einstellbar), liefert Videos in Teilstücken aus
+  BASIS=http://localhost:PORT npm run pruefen
+                              axe, Überlauf, mit und ohne JavaScript (360/768/1440 px)
+  CHROMIUM=/opt/pw-browsers/chromium BASIS=http://localhost:PORT node scripts/funktionstest.mjs
+                              Header, 34 Links, Konsole, Abläufe, Aussicht, Kalender
+  sh scripts/messen.sh        Lighthouse mobil (Seite vorher mit npm run komprimieren
+                              und einem Server auf Port 4322 starten, siehe Kopf der Datei)
+  npm run vorschau            baut .vorschau/ für den privaten Vorschau-Link
+  npm run release -- vX "Was ist neu"
+                              baut, packt, prüft und legt releases/vX/ an. Bricht ab, wenn
+                              es vX schon gibt. Warnt, wenn src/ vom Commit abweicht.
+                              Danach selbst committen.
+  npx tsc --noEmit -p .       Typprüfung (der Build prüft keine Typen)
+
+
+C2  DAS STUFEN-MODELL TECHNISCH
+----------------------------------------------------------------------------
+Gesetzt wird die Stufe vor dem ersten Zeichnen durch ein Inline-Skript in
+src/layouts/Base.astro: <html data-stufe="leicht|mittel|schwer">. Reihenfolge: ?stufe= in
+der Adresse, dann localStorage „catchup-stufe“, dann window.name (Fallback, wenn der
+Speicher gesperrt ist). Standard: mittel, bei „Bewegung reduzieren“ leicht, dann mit Banner.
+src/scripts/stufe.ts bietet stufe() und ruhig() (= leicht oder Bewegung reduziert).
+Ein Wechsel über den Schalter oder das Banner lädt die Seite neu (location.reload()).
+
+                Leicht                 Mittel                          Schwer
+  Monitor       nein                   nein                            ja (monitor.ts, GSAP)
+  Aussicht      nein                   nein                            ja, Desktop ab 1280 px
+                                                                       mit Maus (aussicht.ts)
+  Kacheln/Auge  nein (display:none)    ja, fester Hintergrund          ja, im Monitor
+  Farbwelt      nein                   ja (.farbwelt, mittel.ts)       nein
+  Einblenden    nein                   ja (hervor.ts, mittel.ts)       hervor.ts ja
+  Videos        nein, nur Standbild    ja (medien.ts)                  ja
+  Stile         global.css             + farbwelten.css (alle Regeln   + monitor.css (greift
+                                       mit html[data-stufe='mittel'])  bei html.monitor-an)
+
+Bei „Bewegung reduzieren“ gilt unabhängig von der Stufe: kein Monitor, kein Einblenden,
+kein Video, Farbwechsel ohne Übergang. Videos starten auch nicht bei Datensparmodus
+(saveData) oder gesperrtem Autoplay: dann bleibt das Standbild.
+Prüfung, dass Änderungen an Mittel die anderen Stufen nicht berühren: Bildvergleich
+vorher/nachher. Nach der Farbwelt-Runde (Commit 2ae8534) waren Leicht und Schwer
+bildpunktgleich zum Stand davor. Die Produktkarten in v3 ändern den Inhalt dagegen in
+allen Stufen.
+
+
+C3  WO ÄNDERE ICH WAS
+----------------------------------------------------------------------------
+  Name, Claim, Domain, E-Mail, Telefon, Einsatzgebiet, Schalter  src/config/site.ts
+  (INDEXIERUNG, REFERENZEN), Impressum-Angaben, Menü
+  Stufen-Texte im Menü/Banner                                    src/config/stufen.ts
+  Drei Produktkarten (Startseite + Angebotskatalog)              src/content/produkte.ts
+  Alte Leistungen (Unterseiten, llms.txt, Menü)                  src/content/leistungen.ts
+  Bilder und Videos                                              src/config/medien.ts,
+                                                                 public/media/
+  Farbwerte der Farbwelten                                       src/styles/farbwelten.css
+  Welche Seite/Abschnitt zu welcher Welt gehört                  src/config/farbwelten.ts
+  Verhalten in Mittel (Farbwechsel, Überschriften, Hinweis)      src/scripts/mittel.ts
+  Strukturierte Daten                                            src/lib/schema.ts,
+                                                                 src/pages/index.astro
+  FAQ                                                            src/content/faq.ts
+  Terminbuch-Regeln (Tage, Uhrzeiten)                            src/config/termine.ts
+  Kachel-Pfad                                                    src/config/kacheln.ts
+  Monitor-Epochen                                                src/config/monitore.json
+  Impressum / Datenschutz (Entwurf)                              src/pages/impressum.astro,
+                                                                 datenschutz.astro
+  Sicherheits-Header und CSP                                     scripts/nachbereiten.mjs
+
+
+C4  FARBWELTEN ERWEITERN
+----------------------------------------------------------------------------
+Eine neue Welt braucht fünf Schritte:
+  1. In src/styles/farbwelten.css: --farbe-NAME und --akzent-NAME in :root.
+  2. Dort eine Regel für den Hintergrund: .farbwelt[data-welt='NAME'].
+  3. Dort die Zeile für main #NAME (Abschnitt) bzw. main[data-welt='NAME'] (Seite),
+     die --welt und --akzent setzt.
+  4. In src/config/farbwelten.ts den Namen in „Welt“ und bei Abschnitten in
+     abschnittsWelten (die id des Abschnitts muss dem Namen entsprechen) bzw. Seiten in
+     seitenWelten eintragen.
+  5. Kontrast prüfen (Tabelle in docs/ENTSCHEIDUNGEN.md): Akzent gegen Grund mindestens
+     4,5:1, auch auf Karten (Grund + 9 % Weiß) und im ungünstigsten Fall mit Tönung
+     und Kachel-Linien.
+Der Farbwechsel läuft über eine feste Ebene (.farbwelt, z-index -1) unter den Kacheln
+(z 0) und dem Inhalt (z 1): nur background-color, kein Layout-Neuberechnen.
+Stolperstein: Viele Regeln beginnen mit „html[data-stufe='mittel'] body …“, damit sie gegen
+die Regeln aus global.css gewinnen (Spezifität, nicht Reihenfolge). Neue Regeln ebenso
+schreiben, sonst wirken sie nicht.
+axe kann den Kontrast über der festen Ebene nicht messen („nicht prüfbar“). Deshalb
+bleibt die Rechnung in docs/ENTSCHEIDUNGEN.md maßgeblich.
+
+
+C5  PRODUKTKARTEN UND STRUKTURIERTE DATEN
+----------------------------------------------------------------------------
+produkte.ts speist zwei Orte: die Karten in StartInhalt.astro und den Angebotskatalog
+(angebote() in src/lib/schema.ts, eingehängt in src/pages/index.astro). Der Katalog hängt
+an der Organisation (gleiche @id wie organisation(), die Knoten verschmelzen), enthält
+Service-Einträge mit areaServed (State Rheinland-Pfalz, Country Deutschland) und keine
+Preise. Auf der Seite selbst steht keine Region (bewusst, der Donnersbergkreis wurde
+früher entfernt). Das Einsatzgebiet steht zentral in site.einsatzgebiet.
+Die Strukturdaten sind im Quelltext der Startseite geprüft (gültiges JSON,
+Angebote und areaServed vorhanden). Ein Test mit dem Rich-Results-Test von Google oder
+dem Schema-Validator steht noch aus (geht erst mit veröffentlichter Seite).
+
+
+C6  MEDIEN
+----------------------------------------------------------------------------
+Konvention: public/media/NAME.webp (Standbild 16:9), NAME.webm (VP9), NAME.mp4 (H.264),
+ohne Ton, 1280×720. src/config/medien.ts hat pro Name alt-Text, playbackRate,
+objectPosition, optional weicherNeustart und ersatzBild. Medium.astro prüft beim Bauen,
+welche Dateien existieren: Fehlt das Standbild, gilt ersatzBild. Fehlen beide Videos,
+bleibt es beim Bild. Die Rahmen sind fest 16:9 (kein Layoutsprung).
+medien.ts (Skript) lädt ein Video erst ab 25 % Sichtbarkeit, pausiert außerhalb, lässt
+höchstens zwei gleichzeitig laufen und gibt nicht gebrauchte Videos frei. Video 01 hat
+einen weichen Neustart (0,3 s über das Standbild), die anderen laufen in Schleife.
+Die Sicherheitsregel (CSP) hat kein eigenes media-src, für Videos gilt default-src 'self'.
+Hosting muss Teilstücke (HTTP Range) für Videos ausliefern können (Standard bei
+Cloudflare, Apache, nginx).
+
+
+C7  PRÜFERGEBNISSE VERSION 3
+----------------------------------------------------------------------------
+  Build                         ohne Warnungen, 68 Dateien in dist/, größte Datei
+                                media/02-modernisierung.webm (1,9 MB)
+  npm run pruefen               ohne Befund (alle Seiten, 360/768/1440 px, mit/ohne JS)
+  funktionstest.mjs             „Alles in Ordnung“ (Monitor-Tab wird in Schwer geprüft)
+  axe in Mittel nach Einblenden Startseite und die drei Leistungsseiten ohne Verstoß;
+                                /termin/ siehe C9 Punkt 2
+  Lighthouse Mittel, mobil      Leistung 95–96, Barrierefreiheit 100, Empfehlungen 100,
+  (3 Läufe, Startseite)         SEO 69, LCP 2,5 s, CLS 0,001, TBT 30–50 ms
+  SEO 69                        Einziger Abzug ist die ausgeschaltete Indexierung (Absicht)
+  Messbedingungen               Chromium ohne Grafikkarte, Handy-Drosselung simuliert; die
+                                Lighthouse-Läufe liegen vor der letzten Layout-Änderung
+                                (drei Spalten ab 1024 px). Danach liefen Funktionstest und
+                                pruefen erneut grün. Keine echten Geräte.
+
+
+C8  VERÖFFENTLICHEN, VERSIONEN, VORSCHAU
+----------------------------------------------------------------------------
+Versionen: npm run release -- vX "Was ist neu" legt releases/vX/ an (ZIP, PRUEFSUMME.txt,
+INHALT.txt, VERSION.txt) und ergänzt releases/AKTUELL.md. Alte Versionen werden nie
+überschrieben. Den Eintrag selbst committen.
+Hosting: Die ZIP enthält dist/_headers (Format von Cloudflare Pages/Netlify) mit CSP,
+X-Frame-Options usw. Bei einem anderen Hoster (z. B. netcup, Hetzner, all-inkl mit
+Apache/nginx) müssen diese Header dort in .htaccess bzw. die Server-Konfiguration
+übersetzt werden, sonst läuft die Seite ohne diese Schutzregeln.
+Private Vorschau (claude.ai-Link, für jeden mit Link sichtbar):
+  https://claude.ai/artifact/R7vkK7Qi4cu2wj2kVHYZEe
+Sie zeigt aktuell den Stand von Commit 2ae8534 (Vorschau-Version 17), also NICHT v3.
+Ablauf zum Aktualisieren: npm run build, npm run vorschau, dann mit dem Artifact-Werkzeug
+.vorschau/index.html als Seite und alle Dateien unter .vorschau/site/ (außer _headers!)
+als Dateiliste veröffentlichen. Dateien, die es nicht mehr gibt, müssen ausdrücklich mit
+null entfernt werden, sonst bleiben alte Seiten (z. B. die Referenz) erreichbar.
+vorschau.mjs schreibt Links, Videoquellen (data-quellen) und Schriften für die
+Vorschau um. Getestet wird die Vorschau in einem Rahmen mit sandbox="allow-scripts":
+dort kann localStorage gesperrt sein, die Seite fällt auf window.name zurück.
+Google Drive: Der Ordner „Claude to Kimmy Catch-up Digital“ existiert (leer):
+  https://drive.google.com/drive/folders/14C2QbZbLdHlxPg0j4562iNTiUvLSKsaH
+Der Drive-Konnektor nimmt Dateiinhalte nur direkt im Aufruf an, eine 12–18-MB-ZIP geht
+damit nicht. ZIP bitte per Hand hineinziehen.
+
+
+C9  BEKANNTE PROBLEME UND TECHNISCHE SCHULDEN (nach Nutzen sortiert)
+----------------------------------------------------------------------------
+1. GSAP wird auf der Startseite in JEDER Stufe geladen.
+   index.astro importiert monitor.ts fest, und das bindet gsap (68 KB) und ScrollTrigger
+   (42 KB) ein: zusammen 110 KB roh, rund 40 KB Brotli, auch in Leicht, obwohl dort
+   keine Bewegung läuft. Das verstößt gegen die Leitplanke „schwere Effekte nur
+   nachladen, wo sie gebraucht werden“.
+   KORREKTUR einer früheren Aussage von mir: Ich hatte geschrieben, GSAP werde „nur in
+   Schwer geladen“. Das stimmt nur für Unterseiten. Auf der Startseite ist es überall dabei.
+   Behebung (klein): in src/pages/index.astro monitor und monitor-tabs nur in Schwer
+   mit dynamischem import() laden. mittel.ts lädt GSAP schon dynamisch.
+   Danach Lighthouse neu messen (LCP liegt mit 2,5 s knapp am Ziel).
+2. Terminbuch am Handy: Die Wisch-Leiste (.tb-spur) ist scrollbar, aber per Tastatur nicht
+   erreichbar (axe: scrollable-region-focusable, auf /termin/ bei 390 px in Mittel und
+   Schwer nach dem Scrollen). Stand schon vor v3, gehört zum Terminbuch aller Stufen.
+3. Zwei Listen für das Angebot: produkte.ts (Karten, Katalog) und leistungen.ts (Menü,
+   Unterseiten, llms.txt). Entscheidung 5 klärt, wie sie zusammenkommen.
+4. Rund 3,6 MB ungenutzte Medien (02-modernisierung.*) liegen in der ZIP.
+5. Neun TypeScript-Meldungen in src/scripts/aussicht.ts („'u' is possibly 'null'“).
+   Sie bestanden schon vorher und stören den Build nicht (Astro prüft keine Typen). Die
+   Datei gehört zu Stufe Schwer und wurde nicht angefasst.
+6. Zahlen in VERÖFFENTLICHUNG.md Abschnitt 3 und in docs/QUALITAET.md stammen vom
+   22.10.2026 (z. B. Lighthouse Leistung 92, 51 Dateien) und sind überholt. Vor dem
+   Livegang neu eintragen.
+7. Die Domain catchup-digital.com ist ein Platzhalter (nicht registriert). Sie steckt in
+   Canonical, Sitemap, Open Graph und JSON-LD (site.url).
+8. Nicht auf echten Geräten getestet: iPhone/Safari (stumme Videos mit playsinline,
+   Wischen im Terminbuch), Android, Firefox. Die Aussicht (WebGL) lief nur mit
+   Software-Grafik (rund 8 Bilder/s); auf einem Rechner mit Grafikkarte ansehen.
+   Checkliste: docs/QUALITAET.md, Abschnitt „Checkliste für den Test auf echten Handys“.
+
+
+C10 FALLSTRICKE AUS DER ARBEIT
+----------------------------------------------------------------------------
+- Nie „pkill -f MUSTER“ verwenden: das beendet auch die eigene Shell (Exit 144). Server
+  über die Prozessnummer beenden.
+- Lokale Testserver sterben, wenn die Umgebung neu startet. Dann neu starten:
+  PORT=4400 nohup node scripts/ansehen.mjs. Genutzte Ports: 4400 (dist/), 4403 und 4500
+  (Vorschau und Rahmen-Test).
+- Playwright findet sein Modul nur innerhalb des Projektordners: Testskripte kurz als
+  scripts/_name.mjs ablegen und danach löschen. Für WebGL Chromium mit
+  --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist starten.
+- Tags lassen sich in dieser Umgebung nicht zu GitHub hochladen (403 durch Richtlinie).
+  Die Tags v1, v2 (und v3) liegen nur lokal. Branch-Pushes funktionieren. Releases bei
+  Bedarf über die GitHub-Weboberfläche anlegen.
+- Neue Inline-Skripte sind nur erlaubt, weil nachbereiten.mjs ihre Prüfsummen in die CSP
+  schreibt. Nach jedem Build neu erzeugt, also nie von Hand pflegen.
+- sessionStorage und localStorage können werfen (privates Fenster, eingebetteter
+  Rahmen). Jeder Zugriff steht in try/catch, die Seite läuft ohne.
+- Der Stufen-Wechsel lädt neu, weil Monitor, Kacheln und Aussicht nur beim Laden starten.
+  Ein Wechsel ohne Neuladen wäre ein größerer Umbau.
+
+
+C11 LEITPLANKEN IN KURZFORM (volltext in CLAUDE.md)
+----------------------------------------------------------------------------
+Echter HTML-Text, Dekoration mit aria-hidden. Ladezeit ist Design (LCP ≤ 2,5 s,
+INP ≤ 200 ms, CLS ≤ 0,1, Lighthouse Leistung ≥ 90, SEO und Barrierefreiheit ≥ 95).
+prefers-reduced-motion ergibt die ruhige Variante, alles per Tastatur bedienbar.
+Nichts von Fremdservern, keine Tracker, keine Cookies. Name, Claim, Domain und
+Kontakt nur in src/config/site.ts. Animation bremst nie. Texte auf Deutsch, du,
+ohne Fachjargon.
+Nicht ins Projekt: Gründernamen, Team-Fotos, Preise, Interna, kopierte Texte/Bilder/Marken,
+erfundene Zahlen, Referenzen oder Kundenstimmen, erfundene Impressums-Angaben.
+Veröffentlichen, Hochladen auf Fremdserver und Zugangsdaten nutzen nur nach Rückfrage.
+Speichern im privaten GitHub-Repository ist erlaubt.
+
+
+C12 VORSCHLAG FÜR DIE NÄCHSTEN SCHRITTE
+----------------------------------------------------------------------------
+Vorschlag zur Reihenfolge (jeweils in einer Etappe mit Commit):
+  1. Entscheidungen 1–7 oben beantworten.
+  2. GSAP nur in Schwer laden (C9 Punkt 1), danach messen.
+  3. Texte auf das 3-Stufen-Angebot angleichen (Entscheidung 5) inklusive FAQ,
+     Seitenbeschreibung, llms.txt.
+  4. Eigene Unterseiten für KI-Vorqualifizierer und Automatisierung & Monitoring,
+     jeweils mit eigener Farbwelt-Zuordnung und Strukturdaten.
+  5. Terminbuch per Tastatur reparieren (C9 Punkt 2).
+  6. Vor dem Livegang: Impressum, Datenschutz (inkl. Sitzungs-Eintrag), Hosting, Domain,
+     rechtliche Prüfung, dann INDEXIERUNG einschalten und eine neue Version bauen.
+
+So startest du die nächste Runde mit Claude (Textbaustein):
+  „Lies zuerst CLAUDE.md, docs/PLAN.md und releases/v3/UEBERGABE.txt. Antworte mir
+   in zwei Sätzen, was du verstanden hast, bevor du etwas veränderst. Danach:
+   [deine Aufgabe]. Kleine Etappen, nach jeder Etappe docs/PLAN.md abhaken und
+   committen, vor jedem Bericht bei 390 px und 1440 px prüfen. Nichts veröffentlichen,
+   nichts hochladen und keine Zugangsdaten nutzen, ohne vorher zu fragen.“
