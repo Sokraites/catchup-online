@@ -11,6 +11,7 @@ Einsteiger-Anleitung mit allen Klickwegen: [START-HIER.md](START-HIER.md).
 - [ ] Impressum-Angaben liefern: Firmenname und Rechtsform, Anschrift, Vertretung, ggf. Registernummer und USt-ID (Liste unten, Abschnitt 2)
 - [ ] Hosting-Anbieter festlegen (Cloudflare ist ein US-Anbieter, Regel war „Hosting in der EU“), danach Hosting-Angaben für den Datenschutz liefern
 - [ ] Impressum und Datenschutz rechtlich prüfen lassen
+- [ ] Datenschutzerklärung um den Sitzungs-Eintrag `scroll-hinweis-gezeigt` ergänzen (Scroll-Hinweis, Stufe Mittel)
 - [ ] Entscheiden: „Software nach Maß“ behalten oder herausnehmen; Freigabe des Kunden für „Ottos Werkstatt“ einholen
 - [ ] Domain registrieren
 - [ ] Erst danach: Claude Version 2 mit eingeschalteter Indexierung erstellen lassen (Abschnitt f)

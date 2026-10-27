@@ -1,18 +1,21 @@
 /**
- * Stufe Mittel: Farbwelten je Abschnitt, Überschriften Wort für Wort, Scroll-Hinweis.
+ * Stufe Mittel: Farbwelten je Abschnitt, Überschriften Wort für Wort, Schimmer auf der Kategorie-Zeile, Scroll-Hinweis.
  * Ersatz für die Monitor-Dramaturgie der Stufe Schwer. Farben und Übergänge: src/styles/farbwelten.css.
  *
  * - Der Inhalt bleibt echter Text. Ohne JavaScript bleibt die Grundfarbe stehen, alles ist sofort sichtbar.
- * - Bei „Bewegung reduzieren“ wechseln die Farben ohne Übergang; Überschriften und Hinweis bleiben ruhig.
- * - Nichts wird auf dem Gerät gespeichert.
+ * - Bei „Bewegung reduzieren“ wechseln die Farben ohne Übergang; nichts blendet ein, nichts schimmert.
+ * - Gespeichert wird nur, ob der Scroll-Hinweis in dieser Sitzung schon zu sehen war (sessionStorage, endet mit dem Tab).
  */
 import { abschnittsWelten, type Welt } from '../config/farbwelten';
 import { ruhig } from './stufe';
 
+const HINWEIS_GEZEIGT = 'scroll-hinweis-gezeigt';
+
 export function starteMittel() {
   starteFarbwelten();
   if (ruhig()) return;
-  starteWortweise();
+  void starteWortweise();
+  starteSchimmer();
   starteScrollHinweis();
 }
 
@@ -36,23 +39,16 @@ function starteFarbwelten() {
   abschnitte.forEach((s) => beobachter.observe(s));
 }
 
-/** Überschriften (h2) blenden Wort für Wort ein. Vorgelesen wird weiter der ganze Satz. */
-function starteWortweise() {
+/**
+ * Überschriften (h2) blenden Wort für Wort ein (GSAP ScrollTrigger: 60 ms Abstand, 0,5 s, 12 px).
+ * „power1.out“ ist dieselbe Kurve wie cubic-bezier(0.25, 0.46, 0.45, 0.94) der übrigen Übergänge.
+ * Vorgelesen wird weiter der ganze Satz (aria-label), die Wort-Teile sind für Hilfstechnik ausgeblendet.
+ */
+async function starteWortweise() {
   const ueberschriften = [...document.querySelectorAll<HTMLElement>('main h2')].filter(
     (h) => h.textContent?.trim() && [...h.childNodes].every((n) => n.nodeType === Node.TEXT_NODE),
   );
   if (!ueberschriften.length) return;
-
-  const beobachter = new IntersectionObserver(
-    (meldungen) => {
-      for (const m of meldungen) {
-        if (!m.isIntersecting) continue;
-        m.target.classList.add('worte-an');
-        beobachter.unobserve(m.target);
-      }
-    },
-    { threshold: 0.2, rootMargin: '0px 0px -8% 0px' },
-  );
 
   for (const h of ueberschriften) {
     const text = h.textContent!.trim().replace(/\s+/g, ' ');
@@ -63,18 +59,56 @@ function starteWortweise() {
       const s = document.createElement('span');
       s.className = 'wort';
       s.setAttribute('aria-hidden', 'true');
-      s.style.setProperty('--i', String(i));
       s.textContent = wort;
       h.append(s);
     });
     h.classList.add('wortweise');
-    beobachter.observe(h);
+  }
+
+  try {
+    // Auf der Startseite ist GSAP schon geladen (Monitor-Code), sonst wird es hier nachgeladen
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')]);
+    gsap.registerPlugin(ScrollTrigger);
+    for (const h of ueberschriften) {
+      gsap.fromTo(
+        h.querySelectorAll('.wort'),
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power1.out', scrollTrigger: { trigger: h, start: 'top 88%', once: true } },
+      );
+    }
+  } catch {
+    // GSAP nicht ladbar: Überschriften sofort zeigen
+    ueberschriften.forEach((h) => h.classList.remove('wortweise'));
   }
 }
 
-/** Dezenter Pfeil am unteren Rand der ersten Ansicht (nur Startseite, nur ganz oben). */
+/** Kategorie-Zeile: einmaliger Schimmer, wenn ihr Abschnitt zum ersten Mal ins Bild kommt. */
+function starteSchimmer() {
+  const zeilen = document.querySelectorAll<HTMLElement>('main .eyebrow');
+  const beobachter = new IntersectionObserver(
+    (meldungen) => {
+      for (const m of meldungen) {
+        if (!m.isIntersecting) continue;
+        const el = m.target as HTMLElement;
+        beobachter.unobserve(el);
+        el.addEventListener('animationend', () => el.classList.remove('eyebrow-schimmer'), { once: true });
+        el.classList.add('eyebrow-schimmer');
+      }
+    },
+    { threshold: 1, rootMargin: '0px 0px -10% 0px' },
+  );
+  zeilen.forEach((z) => beobachter.observe(z));
+}
+
+/** Dezenter Pfeil am unteren Rand der ersten Ansicht: nur Startseite, nur ganz oben, einmal pro Sitzung. */
 function starteScrollHinweis() {
   if (!document.getElementById('leistungen') || !document.querySelector('main .hero') || scrollY > 40) return;
+  try {
+    if (sessionStorage.getItem(HINWEIS_GEZEIGT)) return;
+    sessionStorage.setItem(HINWEIS_GEZEIGT, '1');
+  } catch {
+    // Speicher gesperrt: Hinweis trotzdem zeigen
+  }
   const hinweis = document.createElement('div');
   hinweis.className = 'scroll-hinweis';
   hinweis.setAttribute('aria-hidden', 'true');

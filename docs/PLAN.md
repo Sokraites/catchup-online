@@ -172,6 +172,18 @@ Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der S
 - [x] Kontraste geprüft (docs/ENTSCHEIDUNGEN.md), Leicht und Schwer bildpunktgleich zum vorigen Stand
 - [ ] Terminbuch auf dem Handy: Wisch-Leiste ist per Tastatur nicht erreichbar (bestand schon vorher, auch in Schwer)
 
+## Stufe Mittel: Akzente, Politur, 3-Stufen-Angebot, GEO-Schema (27.10.2026)
+
+- [x] Akzentfarbe auch beim Überfahren der Kartentitel; Trennlinie 0,25; Schatten 0 8px 32px; eine Bewegungskurve auch für den Farbwechsel
+- [x] Überschriften Wort für Wort mit GSAP ScrollTrigger (60 ms, 0,5 s, 12 px), vorgelesen wird der ganze Satz
+- [x] Einmaliger Schimmer auf der Kategorie-Zeile, Scroll-Hinweis mit zwei Pulsen, einmal pro Sitzung
+- [x] Drei Produktkarten (01 Fundament, 02 Konversion, 03 Laufender Vorsprung), am breiten Bildschirm nebeneinander
+- [x] Angebotskatalog und Einsatzgebiet in den strukturierten Daten der Startseite
+- [ ] Datenschutzerklärung: Eintrag `scroll-hinweis-gezeigt` (sessionStorage) ergänzen und rechtlich prüfen lassen
+- [ ] Eigene Unterseiten für KI-Vorqualifizierer und Automatisierung & Monitoring (Karten verlinken vorerst auf „Software nach Maß“ und „Gefunden werden“)
+- [ ] Bild/Video für Karte 02: `public/media/ki-vorqualifizierer.webp`, `.mp4`, `.webm` (bis dahin das Tablet-Bild)
+- [ ] Einstiegstext, Seitenbeschreibung und FAQ nennen noch die bisherigen vier Leistungen: an das 3-Stufen-Angebot anpassen?
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

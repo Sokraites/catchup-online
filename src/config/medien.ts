@@ -40,8 +40,8 @@ export const medien = {
     playbackRate: 1.0,
     objectPosition: '50% 50%',
   },
-  '04-software-nach-mass': {
-    // Noch kein eigenes Medium: bis dahin das bisherige Bild
+  'ki-vorqualifizierer': {
+    // Noch kein eigenes Medium: bis dahin das Tablet mit Terminen und Aufträgen
     alt: 'Tablet mit einer eigenen Anwendung eines Betriebs: Aufträge, Termine und Auslastung auf einen Blick.',
     playbackRate: 1.0,
     objectPosition: '50% 50%',

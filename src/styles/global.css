@@ -1166,6 +1166,15 @@ html[data-stufe='leicht'] .pfad-meldung {
     grid-column: 1 / -1;
   }
 }
+/* Drei Produktkarten (3-Stufen-Angebot): am breiten Bildschirm nebeneinander statt einer übergroßen dritten Karte */
+@media (min-width: 64rem) {
+  #leistungen .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  #leistungen .cards > .card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
 
 /* Kopfleiste: Logo, Termin-Knopf und Stufen-Schalter brechen nie um, das Menü gibt nach */
 .brand,

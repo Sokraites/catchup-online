@@ -20,6 +20,10 @@ export function organisation() {
     logo: `${site.url}/logo.png`,
     image: `${site.url}/og.png`,
     knowsLanguage: 'de',
+    areaServed: [
+      { '@type': 'State', name: site.einsatzgebiet.bundesland, containedInPlace: { '@type': 'Country', name: site.einsatzgebiet.land } },
+      { '@type': 'Country', name: site.einsatzgebiet.land },
+    ],
     ...(telefon.link && !telefon.anzeige.platzhalter ? { telephone: telefon.link } : {}),
     ...(!email.platzhalter ? { email: email.text } : {}),
   };
@@ -43,6 +47,34 @@ export function leistung(name: string, beschreibung: string, pfad: string) {
     description: beschreibung,
     url: new URL(pfad, site.url).href,
     provider: { '@id': orgId },
+  };
+}
+
+/** Das 3-Stufen-Angebot als Katalog der Organisation (ohne Preise). */
+export function angebote(liste: { nummer: string; stufe: string; titel: string; kurz: string; href: string }[]) {
+  return {
+    '@type': 'ProfessionalService',
+    '@id': orgId,
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `Leistungen von ${site.name}`,
+      itemListElement: liste.map((p, i) => ({
+        '@type': 'Offer',
+        position: i + 1,
+        itemOffered: {
+          '@type': 'Service',
+          name: p.titel,
+          description: p.kurz,
+          category: `${p.nummer} · ${p.stufe}`,
+          url: new URL(p.href, site.url).href,
+          provider: { '@id': orgId },
+          areaServed: [
+            { '@type': 'State', name: site.einsatzgebiet.bundesland },
+            { '@type': 'Country', name: site.einsatzgebiet.land },
+          ],
+        },
+      })),
+    },
   };
 }
 

@@ -62,6 +62,10 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Farbwelt | Aus der Vergleichsseite des Partners: dunkel mit Lila. Basis: Hintergrund `#0D0D13`, Flächen `#15151E`/`#1B1B26`, Linien `#272735`, Text `#EDECF6`, gedämpft `#9C9AB1`, Akzent `#7C4DFF`, hell `#A98BFF`, tief `#5B2BE0`. Kontraste werden geprüft und bei Bedarf angepasst. | 20.10.2026 |
 | Stufen | Leicht: ruhig und schick, ohne Bewegung. Mittel: geringe Bewegung, Farbwelt je Abschnitt, Hauptpunkte blenden ein, kein Monitor. Schwer: alles, was möglich ist (Monitor, Aussicht, Effekte). | 27.10.2026 |
 | Farbwelten Stufe Mittel | Jeder Abschnitt eigene dunkle Grundfarbe und Akzentfarbe, sanfter Wechsel beim Scrollen. Werte in `src/styles/farbwelten.css`, Kontraste siehe unten. | 27.10.2026 |
+| 3-Stufen-Angebot | Startseite zeigt drei Produktkarten: 01 · Fundament „Next-Gen Web & KI-Sichtbarkeit (GEO)“, 02 · Konversion „24/7 KI-Vorqualifizierer“, 03 · Laufender Vorsprung „Prozess-Automatisierung & GEO-Monitoring“ (`src/content/produkte.ts`), dazu ein Angebotskatalog in den strukturierten Daten. Menü und Unterseiten bleiben bei den bisherigen Leistungen. Ersetzt die frühere Linie „KI-Agenten nicht bewerben“. | 27.10.2026 |
+| Einsatzgebiet (strukturierte Daten) | `areaServed`: Rheinland-Pfalz und Deutschland (`src/config/site.ts`). Auf der Seite selbst steht weiter keine Region. | 27.10.2026 |
+| Überschriften Wort für Wort | Mit GSAP ScrollTrigger (Wunsch der Gründer). Auf der Startseite ist GSAP ohnehin geladen, auf Unterseiten wird es nur in Mittel nachgeladen. | 27.10.2026 |
+| Scroll-Hinweis | Einmal pro Sitzung, gemerkt in `sessionStorage` (`scroll-hinweis-gezeigt`, endet mit dem Tab). Muss vor dem Livegang in die Datenschutzerklärung. | 27.10.2026 |
 
 ## In Klärung
 
@@ -103,3 +107,5 @@ Geprüft nach WCAG 2.2 AA: Fließtext und kleine Schrift mindestens 4,5:1, groß
 
 Ergebnis: Alle Kombinationen erfüllen AA auch für kleine Schrift. Keine Farbe musste angepasst werden; die Palette gilt wie vorgeschlagen.
 axe kann den Kontrast über der festen Farb-Ebene nicht selbst messen (meldet „nicht prüfbar“), deshalb diese Rechnung.
+
+Nachtrag 27.10.2026 (zweite Runde): Keine Farbe geändert. Titel in Karten nehmen beim Überfahren den Akzent an (Spalte „Akzent auf Karte“, mindestens 5,01:1). Der goldene Glanz des Schimmers (`#f6e2b5`) liegt auf allen Grundfarben bei 13,97 bis 15,19:1.

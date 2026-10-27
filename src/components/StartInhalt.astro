@@ -3,7 +3,8 @@ import Faq from './Faq.astro';
 import Kontakt from './Kontakt.astro';
 import Medium from './Medium.astro';
 import { site, REFERENZEN } from '../config/site';
-import { leistungen, ablauf, kiZusatz } from '../content/leistungen';
+import { ablauf } from '../content/leistungen';
+import { produkte } from '../content/produkte';
 import { faqStart } from '../content/faq';
 import { referenzen } from '../content/referenzen';
 
@@ -43,10 +44,10 @@ import { referenzen } from '../content/referenzen';
     <h2 id="leistungen-titel">Alles, was deine Webseite braucht, um Kunden zu bringen.</h2>
     <ul class="cards">
       {
-        leistungen.map((l) => (
+        produkte.map((l) => (
           <li class="card">
             <Medium name={l.medium} class="card-bild" />
-            <span class="card-nr" aria-hidden="true">{l.nummer}</span>
+            <span class="card-nr">{l.nummer} · {l.stufe}</span>
             <h3>
               <a class="card-link" href={l.href}>{l.titel}</a>
             </h3>
@@ -56,7 +57,6 @@ import { referenzen } from '../content/referenzen';
         ))
       }
     </ul>
-    <p class="leistungen-zusatz">{kiZusatz}</p>
   </div>
 </section>
 

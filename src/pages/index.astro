@@ -5,7 +5,8 @@ import BrowserLeisten from '../components/BrowserLeisten.astro';
 import MonitorGehaeuse from '../components/MonitorGehaeuse.astro';
 import '../styles/monitor.css';
 import { faqStart } from '../content/faq';
-import { faqSeite, website } from '../lib/schema';
+import { angebote, faqSeite, website } from '../lib/schema';
+import { produkte } from '../content/produkte';
 ---
 
 <!--
@@ -13,7 +14,7 @@ import { faqSeite, website } from '../lib/schema';
   Ohne JavaScript oder bei reduzierter Bewegung ist das hier eine ganz normale Seite:
   Alle Abschnitte stehen als echter Text untereinander.
 -->
-<Base schema={[website(), faqSeite(faqStart)]}>
+<Base schema={[website(), angebote(produkte), faqSeite(faqStart)]}>
   <div class="buehne" data-monitor>
     <div class="monitor">
       <div class="monitor-geraet" data-epoche="0">

@@ -53,6 +53,8 @@ export const site = {
     inhaltlichVerantwortlich: PLATZHALTER('Name und Anschrift der inhaltlich verantwortlichen Person'),
     hosting: PLATZHALTER('Hosting-Anbieter mit Anschrift'),
   },
+  /** Einsatzgebiet für die strukturierten Daten (areaServed): zuerst das Land bzw. Bundesland, dann der Staat. */
+  einsatzgebiet: { bundesland: 'Rheinland-Pfalz', land: 'Deutschland' },
   /** Standard-Beschreibung für Suchmaschinen und Vorschauen. */
   beschreibung:
     'Neue Webseiten, Modernisierung, Suchmaschinenoptimierung und Auffindbarkeit bei KI-Suchsystemen für Betriebe.',

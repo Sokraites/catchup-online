@@ -52,9 +52,6 @@ html[data-stufe='mittel'] .farbwelt {
   background-color: var(--farbe-hero);
   transition: background-color 1.2s;
 }
-html[data-stufe='mittel'] body .farbwelt {
-  transition-timing-function: ease-in-out !important;
-}
 html[data-stufe='mittel'] .farbwelt[data-welt='leistungen'] { background-color: var(--farbe-leistungen); }
 html[data-stufe='mittel'] .farbwelt[data-welt='nutzen'] { background-color: var(--farbe-nutzen); }
 html[data-stufe='mittel'] .farbwelt[data-welt='auffindbarkeit'] { background-color: var(--farbe-auffindbarkeit); }
@@ -102,6 +99,10 @@ html[data-stufe='mittel'] main .card-more {
 html[data-stufe='mittel'] main a:not(.button, .card-link):hover {
   color: var(--ink);
 }
+html[data-stufe='mittel'] main .card a:hover,
+html[data-stufe='mittel'] main .card:has(.card-link:focus-visible) .card-link {
+  color: var(--akzent);
+}
 html[data-stufe='mittel'] main .button-ghost:hover {
   border-color: var(--akzent);
 }
@@ -114,7 +115,7 @@ html[data-stufe='mittel'] body .section {
 html[data-stufe='mittel'] body .section::before {
   width: calc(min(var(--wrap), 100%) - 2 * var(--gutter));
   background: linear-gradient(90deg, transparent, var(--akzent) 15%, var(--akzent) 85%, transparent);
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 /* Karten: Rand mit Gold und Akzent; beim Überfahren (Maus) oder Tastatur-Fokus heller und leicht angehoben */
@@ -165,24 +166,22 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   }
   html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     transform: translateY(-4px);
-    box-shadow:
-      0 22px 48px -18px rgb(0 0 0 / 0.75),
-      0 0 36px -10px color-mix(in srgb, var(--akzent) 45%, transparent);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
   }
 
-  /* Überschriften Wort für Wort */
+  /* Überschriften Wort für Wort: Ausgangszustand, eingeblendet wird mit GSAP (src/scripts/mittel.ts) */
   html[data-stufe='mittel'] .wortweise .wort {
     display: inline-block;
     opacity: 0;
-    translate: 0 0.4em;
-    transition:
-      opacity 0.5s,
-      translate 0.5s;
-    transition-delay: calc(var(--i, 0) * 60ms);
   }
-  html[data-stufe='mittel'] .wortweise.worte-an .wort {
-    opacity: 1;
-    translate: none;
+
+  /* Kategorie-Zeile: einmaliger Schimmer beim ersten Sichtbarwerden (Akzent mit goldenem Glanz) */
+  html[data-stufe='mittel'] main .eyebrow.eyebrow-schimmer {
+    background: linear-gradient(100deg, var(--akzent) 0%, var(--akzent) 38%, #f6e2b5 50%, var(--akzent) 62%, var(--akzent) 100%) 0 0 / 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: eyebrow-schimmer 1.5s 1 both;
   }
 
   /* Scroll-Hinweis am unteren Rand der ersten Ansicht: pulsiert einmal, verschwindet nach 5 s oder beim Scrollen */
@@ -197,7 +196,7 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     pointer-events: none;
     opacity: 0.75;
     transition: opacity 0.8s;
-    animation: hinweis-puls 1.8s 0.8s 1 backwards;
+    animation: hinweis-puls 1.8s 0.6s 2 backwards;
   }
   html[data-stufe='mittel'] .scroll-hinweis::before {
     content: '';
@@ -226,9 +225,15 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card:hover {
     transform: translateY(-4px);
-    box-shadow:
-      0 22px 48px -18px rgb(0 0 0 / 0.75),
-      0 0 36px -10px color-mix(in srgb, var(--akzent) 45%, transparent);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+  }
+}
+@keyframes eyebrow-schimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
   }
 }
 @keyframes hinweis-puls {
