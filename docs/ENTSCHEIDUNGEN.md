@@ -72,7 +72,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Thema | Stand |
 |---|---|
 | Hosting-Anbieter und Domain | Gründer bucht selbst (Vorschlag: deutscher Anbieter wie netcup, Hetzner oder all-inkl, Domain beim selben Anbieter). |
-| Monitor-Zeitreise | **Entschieden: Startseiten-Animation so beibehalten (Gründer, 21.10.2026), ist jetzt die Startseite.** Epochen: großer Röhrenmonitor 1990, kleinerer Röhrenmonitor 1997, Flachbildschirm 2004, Breitbild 2010, schmaler Rand 2016, heute randlos. Mit Gehäusekante und Standfuß (Handy ohne Fuß). Bildschirm durchsichtig, Kacheln scheinen durch. Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
+| Monitor-Zeitreise | **Entschieden: Startseiten-Animation so beibehalten (Gründer, 21.10.2026), ist jetzt die Startseite.** **Stand 27.10.2026: läuft nur noch in Stufe Schwer** (Zeile „Stufen“ oben); Leicht und Mittel zeigen die normale Seite. Epochen: großer Röhrenmonitor 1990, kleinerer Röhrenmonitor 1997, Flachbildschirm 2004, Breitbild 2010, schmaler Rand 2016, heute randlos. Mit Gehäusekante und Standfuß (Handy ohne Fuß). Bildschirm durchsichtig, Kacheln scheinen durch. Entwurf liegt vor (`/entwurf/monitor/`, private Vorschau). Entscheidung durch Gründer offen. |
 | Wirkung der Kachel-Freischaltung | Vorläufig umgesetzt: Lichtwelle über das Raster, Auge freut sich, Meldung „Du hast den Weg gefunden“ mit Termin-Knopf. Alternativen vorgeschlagen, Gründer wählt. |
 | Kachel-Pfad | Vorschlag umgesetzt: Maus 7/7 → 14/14 → 4/18 → 11/20 → 3/10, Touch 7/7 → 13/2 → 4/3 → 16/6 → 10/4 (Reihe/Spalte). Bestätigung offen. |
 
