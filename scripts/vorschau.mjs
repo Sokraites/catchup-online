@@ -5,7 +5,7 @@
 // - Eine kleine Statusanzeige unten links zeigt, ob Skripte laufen und ob „Bewegung reduzieren“ an ist.
 // Ergebnis: .vorschau/index.html, .vorschau/site/…, .vorschau/dateien.json
 //   npm run build && npm run vorschau
-import { mkdirSync, rmSync, readdirSync, readFileSync, writeFileSync, statSync, copyFileSync } from 'node:fs';
+import { mkdirSync, rmSync, readdirSync, readFileSync, writeFileSync, statSync, copyFileSync, cpSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { buildSync } from 'esbuild';
 
@@ -21,8 +21,16 @@ const css = (pfad) =>
 // Skripte samt nachgeladenen Teilen (z. B. 3D) zu einer Datei bündeln, damit sie direkt in der Seite stehen können.
 // Das Foto der Aussicht liegt im Skript als absoluter Pfad: in der Vorschau direkt als Datenadresse einbetten
 const fotoDaten = `data:image/webp;base64,${readFileSync(join('dist', 'aussicht', 'fenster.webp')).toString('base64')}`;
+// Nachgeladene Teile (z. B. GSAP) werden hier mitgebündelt. Die Vorab-Lade-Hilfe von Vite würde trotzdem
+// Dateien unter /_astro/ anfragen, die es in der Vorschau nicht gibt: In einer Arbeitskopie durch einen
+// Platzhalter ersetzen, der die Ladefunktion direkt aufruft.
+const SKRIPTE = join(AUS, '.skripte');
+cpSync(join('dist', '_astro'), join(SKRIPTE, '_astro'), { recursive: true });
+for (const datei of readdirSync(join(SKRIPTE, '_astro'))) {
+  if (/^preload-helper\..+\.js$/.test(datei)) writeFileSync(join(SKRIPTE, '_astro', datei), 'export const t = (laden) => laden();\n');
+}
 const js = (pfad) =>
-  buildSync({ entryPoints: [join('dist', pfad)], bundle: true, format: 'esm', write: false, minify: true, logLevel: 'error' })
+  buildSync({ entryPoints: [join(SKRIPTE, pfad)], bundle: true, format: 'esm', write: false, minify: true, logLevel: 'error' })
     .outputFiles[0].text.replace(/<\/script/gi, '<\\/script').split('"/aussicht/fenster.webp"').join(`"${fotoDaten}"`);
 
 const STATUS = `
@@ -64,6 +72,10 @@ function seite(quelle, tiefe, { fragment = false } = {}) {
     return `${attr}="${zurWurzel}site/${ziel}${anker ? '#' + anker : ''}"`;
   });
   html = html.replace(/url\(\/((?:monitore|ki)\/)/g, `url(${zurWurzel}site/$1`);
+  // Bildvarianten (srcset, z. B. Hochformat fürs Handy) ebenso
+  html = html.replace(/srcset="([^"]*)"/g, (_, liste) =>
+    `srcset="${liste.replace(/(^|,\s*)\/(\S+)/g, (__, vor, pfad) => `${vor}${zurWurzel}site/${pfad}`)}"`,
+  );
   // Videoquellen stehen als JSON im Attribut data-quellen (Medium.astro): gleich umschreiben
   html = html.replace(/&quot;src&quot;:&quot;\/([^&]*)&quot;/g, (_, pfad) => `&quot;src&quot;:&quot;${zurWurzel}site/${pfad}&quot;`);
   html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">');
@@ -102,4 +114,5 @@ for (const datei of alle('dist')) {
 schreibe('index.html', seite('index.html', 0, { fragment: true }));
 
 writeFileSync(join(AUS, 'dateien.json'), JSON.stringify(liste, null, 2));
+rmSync(SKRIPTE, { recursive: true, force: true });
 console.log(`${Object.keys(liste).length + 1} Dateien in ${AUS}`);
