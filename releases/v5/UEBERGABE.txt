@@ -1,0 +1,71 @@
+CATCH UP – ÜBERGABE VERSION 5
+==============================================================================
+
+Stand:        28.10.2026
+Version:      v5 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 5e79363 (GitHub: Sokraites/catchup-online, Branch claude/stufe-mittel-sichtbar-z7pvbx)
+ZIP:          releases/v5/catchup-seite-v5.zip (70 Dateien, 12,6 MB)
+Prüfsumme:    SHA-256-Prüfsumme
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+TEIL A – WAS IST NEU (alles in der Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Lebendiger Hintergrund statt der festen Linien: weiche Lichtwolken, die
+    langsam atmen und wandern. Am breiten Bildschirm leuchtet es zusätzlich
+    neben der Textspalte, zwischen den Abschnitten liegt ein atmendes Lichtband.
+  - Eine Grundfarbe (dunkles Blau) und drei Akzentfarben, die beim Scrollen
+    fließend wechseln: Lime oben, Pink in der Mitte, Violett zum Schluss.
+    Der Wechsel läuft als weiche Welle über den Hintergrund.
+  - Knöpfe und Karten leuchten in der Akzentfarbe, beim Überfahren (Maus) und
+    beim Antippen (Handy) stärker.
+  - Inhalte blenden nacheinander ein, aber schneller als vorher: Nichts wartet
+    mehr auf eine große Animations-Bibliothek. Bilder werden vorab geladen.
+  - Startseite in Mittel lädt schneller (größter Inhalt nach 2,4 statt 2,6–2,9 s).
+  - Am Handy folgt der Hintergrund beim Wischen leicht dem Finger und rastet
+    danach weich wieder ein.
+  - Wechsel zwischen Leicht und Mittel ohne Neuladen. Leicht und Schwer sehen
+    genauso aus wie vorher.
+
+
+TEIL B – ENTSCHEIDUNGEN, DIE DU PRÜFEN SOLLTEST
+------------------------------------------------------------------------------
+1) PINK ETWAS HELLER
+   Vorgeschlagen war #ec4899. Kleine pinke Schrift auf Karten wäre damit schon
+   ohne Hintergrund-Effekt knapp an der Lesbarkeitsgrenze. Verwendet: #f472b6.
+   Ändern: src/styles/farbwelten.css (--akzent-pink).
+
+2) HINTERGRUND HINTER TEXT BEWUSST ZART
+   Hinter Text dürfen die Lichtwolken nur etwa 12–15 % stark sein, sonst wird
+   grauer Text schlecht lesbar (gemessen: überall mindestens 4,5:1). Kräftig
+   leuchtet es dort, wo kein Text steht: Lichtbänder und Seitenränder.
+
+3) WECHSEL MIT „SCHWER“ LÄDT NEU
+   Leicht ↔ Mittel wechselt sofort. Mit Schwer lädt die Seite neu, weil Schwer
+   die ganze Seite in den Monitor umbaut. Ein Umbau ohne Neuladen wäre
+   aufwendig und fehleranfällig.
+
+4) ABSCHNITTS-ERKENNUNG
+   Gewünscht war „threshold 0.3“. Sehr lange Abschnitte werden nie zu 30 %
+   sichtbar und hätten nie umgeschaltet. Umgesetzt: Die Farbe wechselt, wenn
+   ein Abschnitt die Bildschirmmitte erreicht.
+
+5) TEXT IM STUFEN-MENÜ
+   Die Beschreibung von „Mittel“ im Stufen-Menü erwähnt den neuen Hintergrund
+   noch nicht. Texte waren laut Auftrag tabu. Ändern: src/config/stufen.ts.
+
+
+TEIL C – FÜR ENTWICKLER
+------------------------------------------------------------------------------
+  Hintergrund:   src/components/Aurora.astro, src/scripts/aurora.ts, CSS in
+                 src/styles/farbwelten.css (Abschnitt „Lebendiger Hintergrund“)
+  Farben:        --akzent am <html> (data-welt aus src/scripts/mittel.ts);
+                 färbende Elemente gleiten über ihre nicht vererbte Kopie --a
+                 (ein gleitender Wert am <html> hätte die Reaktionszeit verdoppelt)
+  Einblenden:    src/scripts/hervor.ts (Mittel: 80 ms, höchstens 4 Schritte),
+                 Überschriften in src/scripts/mittel.ts (starteWortweise)
+  Stufenwechsel: src/scripts/stufe.ts (Ereignis „stufe-gewechselt“), Base.astro
+  Schwer:        Monitor-Zeitreise wird nur in Schwer geladen (src/pages/index.astro),
+                 Vorladen per Platzhalter __SCHWER_VORLADEN__ (scripts/nachbereiten.mjs)
+  Geprüft:       Chromium 390/768/1440 px. Nicht geprüft: echtes iPhone/Android.

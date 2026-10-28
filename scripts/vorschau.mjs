@@ -79,6 +79,8 @@ function seite(quelle, tiefe, { fragment = false } = {}) {
   // Videoquellen stehen als JSON im Attribut data-quellen (Medium.astro): gleich umschreiben
   html = html.replace(/&quot;src&quot;:&quot;\/([^&]*)&quot;/g, (_, pfad) => `&quot;src&quot;:&quot;${zurWurzel}site/${pfad}&quot;`);
   html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8"><meta name="robots" content="noindex">');
+  // Vorlade-Liste für Stufe Schwer zeigt auf /_astro/…: In der Vorschau steckt alles schon in der Seite
+  html = html.replace(/var vorladen = '[^']*'/, "var vorladen = ''");
   if (!quelle.startsWith("referenzen/")) html = html.replace(/<\/body>/, `${STATUS}</body>`);
   if (fragment) {
     // Hauptseite: Die Vorschau-Umgebung setzt das Grundgerüst selbst.
