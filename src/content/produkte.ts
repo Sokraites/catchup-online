@@ -38,3 +38,31 @@ export const produkte: {
     medium: '03-gefunden-werden',
   },
 ];
+
+/**
+ * Abschnitt „Unsere Zusammenarbeit“ der Startseite: dieselben drei Stufen, aus Sicht der Zusammenarbeit.
+ * Texte wörtlich aus dem Auftrag der Gründer (28.10.2026), Entwurf zur Prüfung.
+ */
+export const zusammenarbeit: { badge: string; titel: string; text: string; href: string; linkText: string }[] = [
+  {
+    badge: 'Stufe 1 — Der Türöffner',
+    titel: 'Next-Gen Web & KI-Sichtbarkeit',
+    text: 'Extrem hochwertige, blitzschnelle Webseite mit modernen 3D-Scroll-Effekten als optischem Wow-Faktor. Sauberes Schema.org-Markup (JSON-LD), klare Entitäts-Verknüpfungen und strukturierte FAQ-Matrizen, damit ChatGPT, Perplexity und Google AI dein Unternehmen als Top-Empfehlung ausspielen.',
+    href: '/webseiten-erstellen/',
+    linkText: 'Mehr erfahren',
+  },
+  {
+    badge: 'Stufe 2 — Das Add-on',
+    titel: 'Der 24/7 KI-Vorqualifizierer',
+    text: 'Keine nervigen Standard-Chatbots, sondern ein intelligentes Anfrage-System (Voice- oder Text-Agent), das Kundenanfragen sofort qualifiziert, Termine bucht und strukturierte Daten direkt ins Postfach oder CRM legt.',
+    href: '/software-nach-mass/',
+    linkText: 'Mehr erfahren',
+  },
+  {
+    badge: 'Stufe 3 — Der Retainer',
+    titel: 'Prozess-Automatisierung & GEO-Monitoring',
+    text: 'Laufende Betreuung für technisches Hosting, monatliches Monitoring der KI-Auffindbarkeit und schrittweise Automatisierung interner Abläufe — z.B. automatisierte Angebotserstellung.',
+    href: '/termin/',
+    linkText: 'Gespräch vereinbaren',
+  },
+];

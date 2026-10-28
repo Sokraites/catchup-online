@@ -14,6 +14,7 @@
   --farbe-software: #141020;
   --farbe-idee: #1a1512;
   --farbe-ablauf: #0f1418;
+  --farbe-zusammenarbeit: #0f1a14;
   --farbe-faq: #101318;
   --farbe-kontakt: #12101e;
 
@@ -25,8 +26,12 @@
   --akzent-software: #a78bfa;
   --akzent-idee: #fbbf24;
   --akzent-ablauf: #7dd3fc;
+  --akzent-zusammenarbeit: #6ee7a0;
   --akzent-faq: #94a3b8;
   --akzent-kontakt: #818cf8;
+
+  /* Lichtstrahl: im Einstieg Lime/Gelbgrün, sonst die Akzentfarbe des Abschnitts */
+  --strahl-hero: #c3f53c;
 
   --ease-mittel: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -58,6 +63,7 @@ html[data-stufe='mittel'] .farbwelt[data-welt='auffindbarkeit'] { background-col
 html[data-stufe='mittel'] .farbwelt[data-welt='software'] { background-color: var(--farbe-software); }
 html[data-stufe='mittel'] .farbwelt[data-welt='idee'] { background-color: var(--farbe-idee); }
 html[data-stufe='mittel'] .farbwelt[data-welt='ablauf'] { background-color: var(--farbe-ablauf); }
+html[data-stufe='mittel'] .farbwelt[data-welt='zusammenarbeit'] { background-color: var(--farbe-zusammenarbeit); }
 html[data-stufe='mittel'] .farbwelt[data-welt='faq'] { background-color: var(--farbe-faq); }
 html[data-stufe='mittel'] .farbwelt[data-welt='kontakt'] { background-color: var(--farbe-kontakt); }
 
@@ -71,6 +77,7 @@ html[data-stufe='mittel'] main #auffindbarkeit { --welt: var(--farbe-auffindbark
 html[data-stufe='mittel'] main[data-welt='software'] { --welt: var(--farbe-software); --akzent: var(--akzent-software); }
 html[data-stufe='mittel'] main #idee { --welt: var(--farbe-idee); --akzent: var(--akzent-idee); }
 html[data-stufe='mittel'] main #ablauf { --welt: var(--farbe-ablauf); --akzent: var(--akzent-ablauf); }
+html[data-stufe='mittel'] main #zusammenarbeit { --welt: var(--farbe-zusammenarbeit); --akzent: var(--akzent-zusammenarbeit); }
 html[data-stufe='mittel'] main #faq { --welt: var(--farbe-faq); --akzent: var(--akzent-faq); }
 html[data-stufe='mittel'] main[data-welt='kontakt'],
 html[data-stufe='mittel'] main #kontakt { --welt: var(--farbe-kontakt); --akzent: var(--akzent-kontakt); }
@@ -85,12 +92,23 @@ html[data-stufe='mittel'] main section {
 /* Akzent: Kategorie-Zeile, Überschrift, Links */
 html[data-stufe='mittel'] main .eyebrow {
   color: var(--akzent);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--akzent) 20%, transparent);
 }
 html[data-stufe='mittel'] body main .eyebrow::before {
   background: linear-gradient(90deg, var(--akzent), transparent);
 }
 html[data-stufe='mittel'] main h2 {
   color: var(--akzent);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--akzent) 15%, transparent);
+}
+@media (min-width: 768px) {
+  html[data-stufe='mittel'] main .eyebrow {
+    text-shadow: 0 0 12px color-mix(in srgb, var(--akzent) 20%, transparent);
+  }
+  html[data-stufe='mittel'] main h2 {
+    text-shadow: 0 0 20px color-mix(in srgb, var(--akzent) 15%, transparent);
+  }
 }
 html[data-stufe='mittel'] main a:not(.button, .card-link),
 html[data-stufe='mittel'] main .card-more {
@@ -118,30 +136,54 @@ html[data-stufe='mittel'] body .section::before {
   opacity: 0.25;
 }
 
-/* Karten: Rand mit Gold und Akzent; beim Überfahren (Maus) oder Tastatur-Fokus heller und leicht angehoben */
+/* Karten: Glas mit Haarlinie, Tiefe über Schatten und eine helle Oberkante.
+   Handy: etwas dichtere Fläche statt Unschärfe (spart Rechenleistung), Tablet Unschärfe 6 px, Desktop 8 px. */
 html[data-stufe='mittel'] body .card {
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    linear-gradient(140deg, rgb(216 183 122 / 0.45), color-mix(in srgb, var(--akzent) 14%, transparent) 42%, transparent 72%) border-box;
+  --karte-pad: 24px;
+  padding: var(--karte-pad);
+  background: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.3),
+    inset 0 1px 0 rgb(255 255 255 / 0.05);
 }
-html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
-  background:
-    linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
-    linear-gradient(140deg, var(--akzent), color-mix(in srgb, var(--akzent) 30%, transparent) 45%, transparent 75%) border-box;
+html[data-stufe='mittel'] body .card .card-bild {
+  width: calc(100% + 2 * var(--karte-pad));
+  margin: calc(-1 * var(--karte-pad)) calc(-1 * var(--karte-pad)) 1.25rem;
+  border-radius: 15px 15px 0 0;
 }
-@media (hover: hover) and (pointer: fine) {
-  html[data-stufe='mittel'] body .card:hover {
-    background:
-      linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
-      linear-gradient(140deg, var(--akzent), color-mix(in srgb, var(--akzent) 30%, transparent) 45%, transparent 75%) border-box;
+@media (min-width: 768px) {
+  html[data-stufe='mittel'] body .card {
+    --karte-pad: 28px;
+    background: rgb(255 255 255 / 0.03);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
   }
 }
-/* Touch: Antippen hinterlässt keinen Hover-Zustand */
-@media (hover: none) {
-  html[data-stufe='mittel'] body .card:hover:not(:has(.card-link:focus-visible)) {
-    background:
-      linear-gradient(var(--surface), var(--surface)) padding-box,
-      linear-gradient(140deg, rgb(216 183 122 / 0.45), color-mix(in srgb, var(--akzent) 14%, transparent) 42%, transparent 72%) border-box;
+@media (min-width: 1025px) {
+  html[data-stufe='mittel'] body .card {
+    --karte-pad: 32px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+}
+/* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
+html[data-stufe='mittel'] body .stufen-karte {
+  border-top: 3px solid var(--akzent);
+}
+html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
+  box-shadow:
+    0 12px 32px rgb(0 0 0 / 0.4),
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 0 20px color-mix(in srgb, var(--akzent) 10%, transparent);
+}
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  html[data-stufe='mittel'] body .card:hover {
+    box-shadow:
+      0 12px 32px rgb(0 0 0 / 0.4),
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 0 20px color-mix(in srgb, var(--akzent) 10%, transparent);
   }
 }
 
@@ -153,6 +195,10 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   }
   html[data-stufe='mittel'] body .hervor.hervor-an {
     translate: none;
+  }
+  /* Ausblenden beim Laden sofort (sonst blenden Punkte außerhalb des Bildes 0,6 s lang aus); nur das Einblenden ist weich */
+  html[data-stufe='mittel'] body .hervor:not(.hervor-an) {
+    transition: none;
   }
   html[data-stufe='mittel'] body .card,
   html[data-stufe='mittel'] body .hervor {
@@ -166,7 +212,6 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   }
   html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
   }
 
   /* Überschriften Wort für Wort: Ausgangszustand, eingeblendet wird mit GSAP (src/scripts/mittel.ts) */
@@ -222,10 +267,9 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     opacity: 0;
   }
 }
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
   }
 }
 @keyframes eyebrow-schimmer {
@@ -249,4 +293,121 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     opacity: 0.75;
     transform: none;
   }
+}
+
+/* ---------- Lichtstrahl (src/scripts/lichtstrahl.ts) ----------
+   Liegt über der Farb-Ebene (z -1) und unter Kacheln und Inhalt. Die Farbe ist eine registrierte
+   CSS-Variable, damit sie per Übergang wechseln kann; das Skript liest sie in jedem Bild. */
+@property --strahl-farbe {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #c3f53c;
+}
+.lichtstrahl {
+  display: none;
+}
+html[data-stufe='mittel'] .lichtstrahl {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  --strahl-farbe: var(--strahl-hero);
+  transition: --strahl-farbe 1.2s;
+}
+html[data-stufe='mittel'] .lichtstrahl[data-welt='leistungen'] { --strahl-farbe: var(--akzent-leistungen); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='nutzen'] { --strahl-farbe: var(--akzent-nutzen); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='auffindbarkeit'] { --strahl-farbe: var(--akzent-auffindbarkeit); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='software'] { --strahl-farbe: var(--akzent-software); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='idee'] { --strahl-farbe: var(--akzent-idee); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='ablauf'] { --strahl-farbe: var(--akzent-ablauf); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='zusammenarbeit'] { --strahl-farbe: var(--akzent-zusammenarbeit); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='faq'] { --strahl-farbe: var(--akzent-faq); }
+html[data-stufe='mittel'] .lichtstrahl[data-welt='kontakt'] { --strahl-farbe: var(--akzent-kontakt); }
+
+/* ---------- Knöpfe: Pillenform, Akzent-Verlauf, dunkle Schrift, Leuchten ----------
+   Gilt im Inhalt und in der Kopfleiste (Terminbuch und Kachel-Meldung behalten ihr Aussehen).
+   Der Verlauf wird unten nur 15 % dunkler: So hat die dunkle Schrift überall mindestens 4,8:1. */
+html[data-stufe='mittel'] :is(main, .site-header) .button {
+  --knopf: var(--akzent, var(--akzent-hero));
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--knopf) 0%, color-mix(in srgb, var(--knopf) 85%, black) 100%);
+  color: var(--bg);
+  font-weight: 600;
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--knopf) 35%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.3);
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s,
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+/* Größe: im Inhalt nach Gerät; die Kopfleiste behält ihre Maße, damit sie einzeilig bleibt */
+html[data-stufe='mittel'] main .button {
+  padding: 14px 28px;
+}
+@media (min-width: 768px) {
+  html[data-stufe='mittel'] main .button {
+    padding: 12px 24px;
+  }
+}
+html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
+  background: transparent;
+  border-color: var(--knopf);
+  color: var(--knopf);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--knopf) 15%, transparent);
+}
+html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:hover {
+  background: color-mix(in srgb, var(--knopf) 10%, transparent);
+  color: var(--knopf);
+}
+@media (hover: hover) and (pointer: fine) {
+  html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--knopf) 50%, transparent),
+      0 4px 12px rgb(0 0 0 / 0.4);
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
+    transform: translateY(-2px);
+  }
+}
+html[data-stufe='mittel'] :is(main, .site-header) .button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--knopf) 25%, transparent),
+    0 1px 3px rgb(0 0 0 / 0.3);
+}
+
+/* ---------- Leuchten der Kartennummern (zusätzlich zum goldenen Schimmer) ---------- */
+html[data-stufe='mittel'] main .card-nr {
+  text-shadow: 0 0 20px color-mix(in srgb, var(--akzent) 30%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] main .hervor-an .card-nr {
+    text-shadow:
+      0 0 16px rgb(216 183 122 / 0.55),
+      0 0 20px color-mix(in srgb, var(--akzent) 30%, transparent);
+  }
+}
+
+/* ---------- Stufen-Abzeichen: Stufe 1 Akzent, Stufe 2 heller, Stufe 3 am hellsten ---------- */
+html[data-stufe='mittel'] main .stufe-badge {
+  border-color: transparent;
+  background: var(--akzent);
+  color: var(--bg);
+  font-weight: 600;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--akzent) 30%, transparent);
+}
+html[data-stufe='mittel'] main .stufen-karte[data-rang='2'] .stufe-badge {
+  background: color-mix(in srgb, var(--akzent) 72%, white);
+}
+html[data-stufe='mittel'] main .stufen-karte[data-rang='3'] .stufe-badge {
+  background: color-mix(in srgb, var(--akzent) 45%, white);
 }

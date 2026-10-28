@@ -19,9 +19,10 @@ export function starteMittel() {
   starteScrollHinweis();
 }
 
-/** Der Abschnitt, der gerade die Bildschirmmitte kreuzt, bestimmt die Farbe der Hintergrund-Ebene. */
+/** Der Abschnitt, der gerade die Bildschirmmitte kreuzt, bestimmt die Farbe von Hintergrund-Ebene und Lichtstrahl. */
 function starteFarbwelten() {
   const ebene = document.querySelector<HTMLElement>('.farbwelt');
+  const strahl = document.querySelector<HTMLElement>('.lichtstrahl');
   const main = document.querySelector<HTMLElement>('main');
   if (!ebene || !main) return;
   const seitenWelt = (main.dataset.welt as Welt) || 'hero';
@@ -31,7 +32,12 @@ function starteFarbwelten() {
 
   const beobachter = new IntersectionObserver(
     (meldungen) => {
-      for (const m of meldungen) if (m.isIntersecting) ebene.dataset.welt = weltVon(m.target as HTMLElement);
+      for (const m of meldungen) {
+        if (!m.isIntersecting) continue;
+        const welt = weltVon(m.target as HTMLElement);
+        ebene.dataset.welt = welt;
+        if (strahl) strahl.dataset.welt = welt;
+      }
     },
     // schmales Band in der Bildschirmmitte
     { rootMargin: '-45% 0px -50% 0px' },

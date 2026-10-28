@@ -184,6 +184,19 @@ Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der S
 - [ ] Bild/Video für Karte 02: `public/media/ki-vorqualifizierer.webp`, `.mp4`, `.webm` (bis dahin das Tablet-Bild)
 - [ ] Einstiegstext, Seitenbeschreibung und FAQ nennen noch die bisherigen vier Leistungen: an das 3-Stufen-Angebot anpassen?
 
+## Stufe Mittel: Lichtstrahl, 3D-UI, Zusammenarbeit (28.10.2026)
+
+- [x] Lichtstrahl (`src/components/Lichtstrahl.astro`, `src/scripts/lichtstrahl.ts`): Canvas 2D, Handy 3 / Tablet 5 / Desktop 8 Fasern, Puls 0,3–0,8 Hz (Handy halb), Deckkraft 0,15–0,6, Breite 2–5 px, Farbe je Welt per CSS-Übergang (Einstieg Lime), Ursprung folgt dem Scrollen (±20 px, 0,1 s)
+- [x] Lesbarkeit: In der Inhaltsspalte wird der Strahl gedämpft; gemessen an den gezeichneten Bildpunkten bei voller Stärke mindestens 4,56:1 für jede Textfarbe (390/768/1440 px)
+- [x] Knöpfe als Pillen mit Akzent-Verlauf, dunkler Schrift und Leuchten; Rahmen-Knöpfe in Akzentfarbe; Kopfleiste behält ihre Maße
+- [x] Karten als Glas (Haarlinie, Schatten, Oberkante, Unschärfe Tablet 6 px / Desktop 8 px), Innenabstand 24/28/32 px, Anheben nur ab Tablet mit Maus
+- [x] Leuchten für Kartennummern, Kategorie-Zeile und Überschriften (Handy schwächer)
+- [x] Neue Sektion „Unsere Zusammenarbeit“ (`#zusammenarbeit`, Farbwelt Grün) mit Stufen-Abzeichen und Akzent-Oberkante
+- [x] Behoben: Hauptpunkte außerhalb des Bildes blendeten beim Laden 0,6 s lang aus (axe maß halb durchsichtige Abzeichen)
+- [ ] FAQ „Was kostet die laufende Betreuung?“ mit Preis: nicht eingebaut (Projektregel „Keine Preise“), Freigabe der Gründer nötig
+- [ ] Unschärfe hinter Glas-Karten auf echten Geräten prüfen (ohne Grafikkarte halbiert sie die Bildrate)
+- [ ] „Unsere Zusammenarbeit“ wiederholt die drei Produktkarten aus „Leistungen“: zusammenführen?
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

@@ -1168,12 +1168,27 @@ html[data-stufe='leicht'] .pfad-meldung {
 }
 /* Drei Produktkarten (3-Stufen-Angebot): am breiten Bildschirm nebeneinander statt einer übergroßen dritten Karte */
 @media (min-width: 64rem) {
-  #leistungen .cards {
+  #leistungen .cards,
+  #zusammenarbeit .cards {
     grid-template-columns: repeat(3, 1fr);
   }
-  #leistungen .cards > .card:last-child:nth-child(odd) {
+  #leistungen .cards > .card:last-child:nth-child(odd),
+  #zusammenarbeit .cards > .card:last-child:nth-child(odd) {
     grid-column: auto;
   }
+}
+/* Stufen-Abzeichen in „Unsere Zusammenarbeit“ (oben rechts in der Karte); farbig nur in Stufe Mittel */
+.stufe-badge {
+  display: block;
+  width: fit-content;
+  margin: 0 0 1rem auto;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.35;
 }
 
 /* Kopfleiste: Logo, Termin-Knopf und Stufen-Schalter brechen nie um, das Menü gibt nach */

@@ -4,7 +4,7 @@ import Kontakt from './Kontakt.astro';
 import Medium from './Medium.astro';
 import { site, REFERENZEN } from '../config/site';
 import { ablauf } from '../content/leistungen';
-import { produkte } from '../content/produkte';
+import { produkte, zusammenarbeit } from '../content/produkte';
 import { faqStart } from '../content/faq';
 import { referenzen } from '../content/referenzen';
 
@@ -151,6 +151,27 @@ import { referenzen } from '../content/referenzen';
         ))
       }
     </ol>
+  </div>
+</section>
+
+<section class="section" id="zusammenarbeit" data-welt="zusammenarbeit" aria-labelledby="zusammenarbeit-titel">
+  <div class="wrap">
+    <p class="eyebrow">Drei Stufen</p>
+    <h2 id="zusammenarbeit-titel">Unsere Zusammenarbeit</h2>
+    <ul class="cards">
+      {
+        zusammenarbeit.map((s, i) => (
+          <li class="card stufen-karte" data-rang={i + 1}>
+            <span class="stufe-badge">{s.badge}</span>
+            <h3>
+              <a class="card-link" href={s.href}>{s.titel}</a>
+            </h3>
+            <p>{s.text}</p>
+            <span class="card-more" aria-hidden="true">{s.linkText} →</span>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
 

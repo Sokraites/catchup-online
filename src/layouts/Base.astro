@@ -6,6 +6,7 @@ import { graph, organisation } from '../lib/schema';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Kacheln from '../components/Kacheln.astro';
+import Lichtstrahl from '../components/Lichtstrahl.astro';
 import Terminbuch from '../components/Terminbuch.astro';
 import StufenWahl from '../components/StufenWahl.astro';
 import { standardStufe, stufenSchluessel } from '../config/stufen';
@@ -83,6 +84,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
     <div class="farbwelt" aria-hidden="true" data-welt={welt}></div>
+    <Lichtstrahl welt={welt} />
     <Kacheln />
     <Header />
     <main id="inhalt" data-welt={welt}>
