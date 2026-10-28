@@ -11,17 +11,23 @@ import { ruhig } from './stufe';
 
 const HINWEIS_GEZEIGT = 'scroll-hinweis-gezeigt';
 
+let gestartet = false;
+
 export function starteMittel() {
+  if (gestartet) return;
+  gestartet = true;
   starteFarbwelten();
+  starteTippen();
+  ladeBilderVor();
   if (ruhig()) return;
-  void starteWortweise();
+  starteWortweise();
   starteSchimmer();
   starteScrollHinweis();
 }
 
 /**
  * Der Abschnitt, der gerade die Bildschirmmitte kreuzt, bestimmt die eine Akzentfarbe der Seite:
- * <html data-welt="…"> setzt --akzent (farbwelten.css), Knöpfe, Karten, Überschriften und Lichtstrahl lesen sie.
+ * <html data-welt="…"> setzt --akzent (farbwelten.css), Knöpfe, Karten, Überschriften und Hintergrund lesen sie.
  */
 function starteFarbwelten() {
   const html = document.documentElement;
@@ -48,16 +54,28 @@ function starteFarbwelten() {
 }
 
 /**
- * Überschriften (h2) blenden Wort für Wort ein (GSAP ScrollTrigger: 60 ms Abstand, 0,5 s, 12 px).
- * „power1.out“ ist dieselbe Kurve wie cubic-bezier(0.25, 0.46, 0.45, 0.94) der übrigen Übergänge.
+ * Überschriften (h2) blenden Wort für Wort ein (80 ms Abstand, ab dem 7. Wort gemeinsam, 0,45 s, 12 px von unten),
+ * schon kurz bevor sie ins Bild kommen.
+ * Reines CSS mit einem Beobachter: Es muss keine Bibliothek nachgeladen werden, bevor eine Überschrift erscheint.
  * Vorgelesen wird weiter der ganze Satz (aria-label), die Wort-Teile sind für Hilfstechnik ausgeblendet.
  */
-async function starteWortweise() {
+function starteWortweise() {
   const ueberschriften = [...document.querySelectorAll<HTMLElement>('main h2')].filter(
     (h) => h.textContent?.trim() && [...h.childNodes].every((n) => n.nodeType === Node.TEXT_NODE),
   );
   if (!ueberschriften.length) return;
 
+  const beobachter = new IntersectionObserver(
+    (meldungen) => {
+      for (const m of meldungen) {
+        if (!m.isIntersecting) continue;
+        m.target.classList.add('wortweise-an');
+        beobachter.unobserve(m.target);
+      }
+    },
+    // schon kurz bevor sie ins Bild kommt: Niemand soll auf eine Überschrift warten
+    { rootMargin: '0px 0px 15% 0px' },
+  );
   for (const h of ueberschriften) {
     const text = h.textContent!.trim().replace(/\s+/g, ' ');
     h.setAttribute('aria-label', text);
@@ -67,26 +85,12 @@ async function starteWortweise() {
       const s = document.createElement('span');
       s.className = 'wort';
       s.setAttribute('aria-hidden', 'true');
+      s.style.setProperty('--i', String(Math.min(i, 6)));
       s.textContent = wort;
       h.append(s);
     });
     h.classList.add('wortweise');
-  }
-
-  try {
-    // Auf der Startseite ist GSAP schon geladen (Monitor-Code), sonst wird es hier nachgeladen
-    const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')]);
-    gsap.registerPlugin(ScrollTrigger);
-    for (const h of ueberschriften) {
-      gsap.fromTo(
-        h.querySelectorAll('.wort'),
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power1.out', scrollTrigger: { trigger: h, start: 'top 88%', once: true } },
-      );
-    }
-  } catch {
-    // GSAP nicht ladbar: Überschriften sofort zeigen
-    ueberschriften.forEach((h) => h.classList.remove('wortweise'));
+    beobachter.observe(h);
   }
 }
 
@@ -132,4 +136,50 @@ function starteScrollHinweis() {
   };
   addEventListener('scroll', ausblenden, { passive: true });
   setTimeout(ausblenden, 5000);
+}
+
+/**
+ * Tipp-Feedback am Handy: Knöpfe und Karten leuchten beim Antippen auf (Safari setzt :active nur unzuverlässig).
+ * Wird aus dem Tippen ein Wischen (Scrollen), meldet der Browser „pointercancel“: Dann erlischt es sofort.
+ */
+function starteTippen() {
+  const ZIEL = 'main .card, main .button, .site-header .button';
+  let aktiv: Element | null = null;
+  let aus = 0;
+  const loesche = () => {
+    aktiv?.classList.remove('getippt');
+    aktiv = null;
+  };
+  addEventListener(
+    'pointerdown',
+    (e) => {
+      if (e.pointerType === 'mouse') return;
+      clearTimeout(aus);
+      loesche();
+      aktiv = (e.target as Element).closest(ZIEL);
+      aktiv?.classList.add('getippt');
+    },
+    { passive: true },
+  );
+  addEventListener('pointercancel', loesche, { passive: true });
+  addEventListener(
+    'pointerup',
+    () => {
+      aus = window.setTimeout(loesche, 350);
+    },
+    { passive: true },
+  );
+}
+
+/**
+ * Bilder weiter unten schon laden, sobald die Seite steht (statt erst beim Hinscrollen):
+ * Sonst sieht man beim Scrollen kurz leere Flächen. Nicht im Datensparmodus.
+ */
+function ladeBilderVor() {
+  const sparen = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  if (sparen) return;
+  const los = () => document.querySelectorAll<HTMLImageElement>('main img[loading="lazy"]').forEach((b) => (b.loading = 'eager'));
+  const spaeter = () => ('requestIdleCallback' in window ? requestIdleCallback(los, { timeout: 3000 }) : setTimeout(los, 1500));
+  if (document.readyState === 'complete') spaeter();
+  else addEventListener('load', spaeter, { once: true });
 }

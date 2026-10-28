@@ -18,9 +18,12 @@ const PFAD_FARBE = '169, 139, 255';
 const FUNKEN_DAUER = 650;
 const PULS_DAUER = 900;
 
+let gestartet = false;
+
 export function starteKacheln() {
   const canvas = document.querySelector<HTMLCanvasElement>('canvas.kacheln');
-  if (!canvas) return;
+  if (gestartet || !canvas) return;
+  gestartet = true;
   const ctx = canvas.getContext('2d')!;
   const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   /** Stufe „schwer“: Effekte aufgedreht (längeres Nachleuchten, Funkeln auch mit der Maus). */

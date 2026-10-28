@@ -3,7 +3,8 @@
  *
  * Gesetzt wird sie schon im <head> (Base.astro), bevor die Seite gezeichnet wird: <html data-stufe="…">.
  * Hier: Abfragen für die anderen Skripte und die Bedienung (Hinweis beim ersten Besuch, Schalter oben rechts).
- * Eine Änderung lädt die Seite neu, damit jede Stufe sauber von vorn startet.
+ * Wechsel zwischen Leicht und Mittel passiert sofort, ohne Neuladen (Ereignis „stufe-gewechselt“, Base.astro).
+ * Ist Schwer beteiligt, lädt die Seite neu: Schwer baut die Seite in den Monitor um, das startet sauber nur von vorn.
  */
 import { stufen, stufenSchluessel, type StufeId } from '../config/stufen';
 
@@ -27,12 +28,20 @@ function waehle(id: StufeId) {
   // Speicher gesperrt (z. B. privates Fenster, eingebettete Vorschau): Wahl nur für diesen Tab merken.
   // window.name übersteht das Neuladen, ohne die Adresse zu ändern.
   if (!merke(id)) window.name = `${stufenSchluessel}:${id}`;
-  if (id === stufe()) {
+  const bisher = stufe();
+  if (id === bisher) {
     delete html.dataset.stufeOffen;
     zeigeStand();
     return;
   }
-  location.reload();
+  if (id === 'schwer' || bisher === 'schwer') {
+    location.reload();
+    return;
+  }
+  html.dataset.stufe = id;
+  delete html.dataset.stufeOffen;
+  zeigeStand();
+  dispatchEvent(new CustomEvent('stufe-gewechselt', { detail: id }));
 }
 
 function zeigeStand() {
@@ -81,7 +90,11 @@ export function starteStufenWahl() {
   });
 
   document.querySelectorAll<HTMLElement>('[data-stufe-waehlen]').forEach((k) =>
-    k.addEventListener('click', () => waehle(k.dataset.stufeWaehlen as StufeId)),
+    k.addEventListener('click', () => {
+      waehle(k.dataset.stufeWaehlen as StufeId);
+      // ohne Neuladen gewechselt: Menü schließen, Fokus zurück auf den Knopf
+      menueZu(true);
+    }),
   );
   // Schließen ohne Wahl: Darstellung bleibt, der Hinweis kommt nicht wieder
   document.querySelector('[data-stufen-zu]')?.addEventListener('click', () => waehle(stufe()));

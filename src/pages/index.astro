@@ -40,8 +40,6 @@ import { produkte } from '../content/produkte';
 </Base>
 
 <script>
-  import { starteMonitor } from '../scripts/monitor';
-  import { starteMonitorTabs } from '../scripts/monitor-tabs';
   import { stufe } from '../scripts/stufe';
 
   // Stufe „Schwer“ am Desktop: Aussicht durchs Fenster neben dem Monitor (Platz schon vor dem ersten Aufbau schaffen)
@@ -54,7 +52,12 @@ import { produkte } from '../content/produkte';
     dispatchEvent(new Event('monitor-neu'));
   };
   if (mitAussicht) html.classList.add('aussicht-an');
-  starteMonitorTabs(starteMonitor());
+  // Monitor-Zeitreise (mit GSAP) nur in Schwer laden: Leicht und Mittel brauchen sie nicht und laden so schneller
+  if (stufe() === 'schwer') {
+    void Promise.all([import('../scripts/monitor'), import('../scripts/monitor-tabs')]).then(([{ starteMonitor }, { starteMonitorTabs }]) =>
+      starteMonitorTabs(starteMonitor()),
+    );
+  }
   if (mitAussicht) {
     // erst laden, wenn die Seite steht: Der Inhalt hat Vorrang
     const los = () =>

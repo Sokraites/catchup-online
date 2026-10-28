@@ -1,26 +1,35 @@
-/* ---------- Stufe Mittel: Akzentfarben und Politur ----------
-   Jeder Themenbereich hat eine eigene Akzentfarbe. Es gibt genau eine Quelle dafür: --akzent am <html>.
-   src/scripts/mittel.ts setzt beim Scrollen <html data-welt="…">, die Farbe gleitet in 1,2 s hinüber.
-   Knöpfe, Karten, Überschriften und der Lichtstrahl lesen nur diese eine Variable (über ihre Kopie --a).
-   (Die frühere Hintergrund-Ebene .farbwelt ist entfallen: Der Lichtstrahl ersetzt sie.)
-   Das ersetzt in Mittel die Monitor-Dramaturgie der Stufe Schwer.
+/* ---------- Stufe Mittel: Farbsystem, lebendiger Hintergrund, Neon-Glow ----------
+   Eine Grundfarbe für alles (dunkles Blau) und drei Akzentfarben, die je Abschnitt wechseln:
+   Lime im Einstieg, Pink im mittleren Teil, Violett zum Abschluss.
+   Es gibt genau eine Quelle dafür: --akzent am <html>. src/scripts/mittel.ts setzt beim Scrollen
+   <html data-welt="…">; Hintergrund (src/scripts/aurora.ts), Knöpfe, Karten, Überschriften und Leuchten folgen in 1,2 s.
    Jede Regel beginnt mit html[data-stufe='mittel']: Leicht und Schwer bleiben unberührt.
    Kontraste nach WCAG 2.2 AA geprüft, Werte in docs/ENTSCHEIDUNGEN.md. */
 
 :root {
-  /* Akzentfarben je Welt: Kategorie-Zeile, Überschrift, Links, Knöpfe, Karten, Lichtstrahl */
-  --akzent-hero: #a98bff;
-  --akzent-leistungen: #8b9dff;
-  --akzent-nutzen: #6ee7a0;
-  --akzent-auffindbarkeit: #c084fc;
-  --akzent-software: #a78bfa;
-  --akzent-idee: #fbbf24;
-  --akzent-ablauf: #7dd3fc;
-  --akzent-zusammenarbeit: #6ee7a0;
-  --akzent-faq: #94a3b8;
-  --akzent-kontakt: #818cf8;
+  /* Die drei Akzentfarben. Pink ist etwas heller als #ec4899: So bleibt kleine pinke Schrift auf Karten lesbar. */
+  --akzent-lime: #c8f542;
+  --akzent-pink: #f472b6;
+  --akzent-violett: #a78bfa;
 
   --ease-mittel: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Grundfarbe: dunkles Blau für Seite, Kopfleiste und Flächen.
+   Kleine Akzente der anderen Stufen (Links im Fuß, Kategorie-Zeilen, Nummern, Fokusrahmen) nehmen die Akzentfarbe an;
+   das Logo behält sein Lila. */
+html[data-stufe='mittel'] {
+  --bg: #0d1220;
+  --surface: #141b2d;
+  --surface-2: #1a2236;
+  --line: #26304a;
+  --accent-2: var(--akzent);
+}
+html[data-stufe='mittel'] :is(.brand svg, .footer-brand svg) {
+  color: #a98bff;
+}
+html[data-stufe='mittel'] .auge-form {
+  stroke: #a98bff;
 }
 
 /* Eine Bewegungskurve für alle Übergänge */
@@ -30,25 +39,31 @@ html[data-stufe='mittel'] *::after {
   transition-timing-function: var(--ease-mittel) !important;
 }
 
-/* Die eine Akzentfarbe: --akzent am <html>. Beim Weltwechsel springt sie (der Browser rechnet die Seite einmal neu).
-   Das Gleiten (1,2 s) übernimmt jedes färbende Element selbst über --a, eine nicht vererbte Kopie von --akzent.
-   So rechnet der Browser während des Übergangs nur diese Elemente neu, nicht die ganze Seite: Tippen bleibt flott.
-   Ältere Browser ohne @property springen einfach um. */
-html[data-stufe='mittel'] { --akzent: var(--akzent-hero); }
-html[data-stufe='mittel'][data-welt='leistungen'] { --akzent: var(--akzent-leistungen); }
-html[data-stufe='mittel'][data-welt='nutzen'] { --akzent: var(--akzent-nutzen); }
-html[data-stufe='mittel'][data-welt='auffindbarkeit'] { --akzent: var(--akzent-auffindbarkeit); }
-html[data-stufe='mittel'][data-welt='software'] { --akzent: var(--akzent-software); }
-html[data-stufe='mittel'][data-welt='idee'] { --akzent: var(--akzent-idee); }
-html[data-stufe='mittel'][data-welt='ablauf'] { --akzent: var(--akzent-ablauf); }
-html[data-stufe='mittel'][data-welt='zusammenarbeit'] { --akzent: var(--akzent-zusammenarbeit); }
-html[data-stufe='mittel'][data-welt='faq'] { --akzent: var(--akzent-faq); }
-html[data-stufe='mittel'][data-welt='kontakt'] { --akzent: var(--akzent-kontakt); }
+/* Die eine Akzentfarbe: --akzent am <html>, je Welt (Zuordnung der Abschnitte: src/config/farbwelten.ts).
+   Beim Weltwechsel springt sie (der Browser rechnet die Seite einmal neu). Das Gleiten (1,2 s) übernimmt jedes
+   färbende Element selbst über --a, eine nicht vererbte Kopie von --akzent. So rechnet der Browser während des
+   Übergangs nur diese Elemente neu, nicht die ganze Seite: Tippen bleibt flott. */
+html[data-stufe='mittel'],
+html[data-stufe='mittel'][data-welt='leistungen'],
+html[data-stufe='mittel'][data-welt='software'] {
+  --akzent: var(--akzent-lime);
+}
+html[data-stufe='mittel'][data-welt='nutzen'],
+html[data-stufe='mittel'][data-welt='auffindbarkeit'],
+html[data-stufe='mittel'][data-welt='idee'],
+html[data-stufe='mittel'][data-welt='ablauf'] {
+  --akzent: var(--akzent-pink);
+}
+html[data-stufe='mittel'][data-welt='zusammenarbeit'],
+html[data-stufe='mittel'][data-welt='faq'],
+html[data-stufe='mittel'][data-welt='kontakt'] {
+  --akzent: var(--akzent-violett);
+}
 
 @property --a {
   syntax: '<color>';
   inherits: false;
-  initial-value: #a98bff;
+  initial-value: #c8f542;
 }
 /* Alle Elemente, die die Akzentfarbe zeigen (Karten und Knöpfe stehen unten bei ihren eigenen Übergängen) */
 html[data-stufe='mittel'] main .eyebrow,
@@ -60,6 +75,7 @@ html[data-stufe='mittel'] main .card-nr,
 html[data-stufe='mittel'] main .stufe-badge,
 html[data-stufe='mittel'] body .section,
 html[data-stufe='mittel'] body .section::before,
+html[data-stufe='mittel'] body .section::after,
 html[data-stufe='mittel'] body .card,
 html[data-stufe='mittel'] :is(main, .site-header) .button {
   --a: var(--akzent);
@@ -72,7 +88,8 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
   html[data-stufe='mittel'] main .card-more,
   html[data-stufe='mittel'] main .stufe-badge,
   html[data-stufe='mittel'] body .section,
-  html[data-stufe='mittel'] body .section::before {
+  html[data-stufe='mittel'] body .section::before,
+  html[data-stufe='mittel'] body .section::after {
     transition: --a 1.2s;
     /* Farbwechsel: weich hinein und heraus (stärker als die gemeinsame Bewegungskurve oben) */
     transition-timing-function: ease-in-out !important;
@@ -122,32 +139,65 @@ html[data-stufe='mittel'] main .button-ghost:hover {
   border-color: var(--a);
 }
 
-/* Abschnitte: Hauch der Akzentfarbe oben, feine Linie in der Akzentfarbe des beginnenden Abschnitts */
+/* Abschnitte: kein harter Schnitt. Am Übergang liegt ein atmendes Lichtband in der Akzentfarbe, genau im
+   Abstand zwischen zwei Abschnitten (dort steht kein Text), darüber eine feine leuchtende Linie. */
 html[data-stufe='mittel'] body .section {
   border-bottom: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--a) 5%, transparent), transparent 42%);
+  background: none;
 }
 html[data-stufe='mittel'] body .section::before {
+  z-index: 1;
   width: calc(min(var(--wrap), 100%) - 2 * var(--gutter));
   background: linear-gradient(90deg, transparent, var(--a) 15%, var(--a) 85%, transparent);
-  opacity: 0.25;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--a) 60%, transparent);
+  opacity: 0.55;
+}
+html[data-stufe='mittel'] body .section::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  /* So hoch wie der Abstand zwischen zwei Abschnitten erlaubt: oben bis 0,4, unten bis 0,6 Band-Höhen */
+  --band: calc(var(--section-space) * 1.55);
+  left: 0;
+  right: 0;
+  top: calc(var(--band) * -0.4);
+  height: var(--band);
+  pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--a) 62%, transparent), color-mix(in srgb, var(--a) 20%, transparent) 45%, transparent 100%);
+  opacity: 0.8;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] body .section::after {
+    animation: band-atmen 2.6s ease-in-out infinite alternate;
+  }
+}
+@keyframes band-atmen {
+  from {
+    opacity: 0.45;
+    scale: 0.85 0.9;
+  }
+  to {
+    opacity: 1;
+    scale: 1.05 1;
+  }
 }
 
-/* Karten: Glas mit Haarlinie, Tiefe über Schatten, Innenschatten und eine helle Oberkante in der Akzentfarbe.
-   Ersetzt die Karten-Optik der anderen Stufen (Goldrand) vollständig.
-   Handy: keine Unschärfe (spart Rechenleistung), dafür Rand 1,5 px und kräftigerer Innenschatten.
-   Tablet Unschärfe 6 px, Desktop 8 px. */
+/* Karten: Glas mit 1,5 px Haarlinie in der Akzentfarbe, Innenschatten und heller Oberkante.
+   Die Fläche ist halb deckend dunkelblau: Sie dämpft den Hintergrund dahinter, so bleibt Text auf Karten gut lesbar.
+   Handy: keine Unschärfe (spart Rechenleistung), dafür kräftigeres Leuchten. Tablet Unschärfe 6 px, Desktop 8 px. */
 html[data-stufe='mittel'] body .card {
   --karte-pad: 24px;
   padding: var(--karte-pad);
-  background: rgb(255 255 255 / 0.055);
-  border: 1.5px solid color-mix(in srgb, var(--a) 22%, rgb(255 255 255 / 0.14));
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.065), rgb(255 255 255 / 0.03)),
+    rgb(13 18 32 / 0.55);
+  border: 1.5px solid color-mix(in srgb, var(--a) 45%, transparent);
   border-radius: 16px;
   box-shadow:
     0 10px 28px rgb(0 0 0 / 0.42),
-    0 0 18px color-mix(in srgb, var(--a) 10%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 45%, rgb(255 255 255 / 0.2)),
-    inset 0 0 28px rgb(255 255 255 / 0.05);
+    0 0 22px color-mix(in srgb, var(--a) 20%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
+    inset 0 0 28px color-mix(in srgb, var(--a) 7%, transparent);
 }
 html[data-stufe='mittel'] body .card .card-bild {
   width: calc(100% + 2 * var(--karte-pad));
@@ -157,17 +207,13 @@ html[data-stufe='mittel'] body .card .card-bild {
 @media (min-width: 768px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 28px;
-    background: rgb(255 255 255 / 0.035);
-    border: 1px solid color-mix(in srgb, var(--a) 16%, rgb(255 255 255 / 0.1));
     box-shadow:
       0 8px 24px rgb(0 0 0 / 0.3),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 30%, rgb(255 255 255 / 0.12)),
-      inset 0 0 20px rgb(255 255 255 / 0.03);
+      0 0 16px color-mix(in srgb, var(--a) 12%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--a) 40%, rgb(255 255 255 / 0.15)),
+      inset 0 0 24px color-mix(in srgb, var(--a) 5%, transparent);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
-  }
-  html[data-stufe='mittel'] body .card .card-bild {
-    border-radius: 15px 15px 0 0;
   }
 }
 @media (min-width: 1025px) {
@@ -181,20 +227,24 @@ html[data-stufe='mittel'] body .card .card-bild {
 html[data-stufe='mittel'] body .stufen-karte {
   border-top: 3px solid var(--a);
 }
-html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
+/* Leuchtender Rand: beim Überfahren (Maus), beim Antippen (Handy, Klasse .getippt aus mittel.ts) und mit der Tastatur */
+html[data-stufe='mittel'] body .card:has(.card-link:focus-visible),
+html[data-stufe='mittel'] body .card.getippt {
+  border-color: color-mix(in srgb, var(--a) 85%, transparent);
   box-shadow:
     0 12px 32px rgb(0 0 0 / 0.4),
-    0 0 24px color-mix(in srgb, var(--a) 22%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
-    inset 0 0 24px rgb(255 255 255 / 0.04);
+    0 0 32px color-mix(in srgb, var(--a) 38%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
+    inset 0 0 28px color-mix(in srgb, var(--a) 10%, transparent);
 }
-@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+@media (hover: hover) and (pointer: fine) {
   html[data-stufe='mittel'] body .card:hover {
+    border-color: color-mix(in srgb, var(--a) 85%, transparent);
     box-shadow:
       0 12px 32px rgb(0 0 0 / 0.4),
-      0 0 24px color-mix(in srgb, var(--a) 22%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
-      inset 0 0 24px rgb(255 255 255 / 0.04);
+      0 0 32px color-mix(in srgb, var(--a) 32%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
+      inset 0 0 28px color-mix(in srgb, var(--a) 8%, transparent);
   }
 }
 
@@ -202,7 +252,7 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   /* Hauptpunkte blenden über „translate“ ein, damit „transform“ frei bleibt fürs Anheben */
   html[data-stufe='mittel'] body .hervor {
     transform: none;
-    translate: 0 16px;
+    translate: 0 14px;
   }
   html[data-stufe='mittel'] body .hervor.hervor-an {
     translate: none;
@@ -215,8 +265,8 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   html[data-stufe='mittel'] body .hervor {
     transition:
       --a 1.2s,
-      opacity 0.6s,
-      translate 0.6s,
+      opacity 0.45s,
+      translate 0.45s,
       transform 0.3s,
       box-shadow 0.3s,
       background 0.2s,
@@ -226,10 +276,19 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     transform: translateY(-4px);
   }
 
-  /* Überschriften Wort für Wort: Ausgangszustand, eingeblendet wird mit GSAP (src/scripts/mittel.ts) */
+  /* Überschriften Wort für Wort (src/scripts/mittel.ts): 80 ms Abstand, 0,5 s, 12 px von unten */
   html[data-stufe='mittel'] .wortweise .wort {
     display: inline-block;
     opacity: 0;
+    translate: 0 12px;
+  }
+  html[data-stufe='mittel'] .wortweise-an .wort {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 0.45s,
+      translate 0.45s;
+    transition-delay: calc(var(--i, 0) * 80ms);
   }
 
   /* Kategorie-Zeile: einmaliger Schimmer beim ersten Sichtbarwerden (Akzent mit goldenem Glanz) */
@@ -262,7 +321,7 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     top: 0;
     width: 1px;
     height: 38px;
-    background: linear-gradient(to bottom, transparent, var(--akzent-hero));
+    background: linear-gradient(to bottom, transparent, var(--akzent-lime));
   }
   html[data-stufe='mittel'] .scroll-hinweis::after {
     content: '';
@@ -271,8 +330,8 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
     bottom: 2px;
     width: 9px;
     height: 9px;
-    border-right: 1px solid var(--akzent-hero);
-    border-bottom: 1px solid var(--akzent-hero);
+    border-right: 1px solid var(--akzent-lime);
+    border-bottom: 1px solid var(--akzent-lime);
     transform: translateX(-50%) rotate(45deg);
   }
   html[data-stufe='mittel'] .scroll-hinweis-weg {
@@ -307,36 +366,226 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   }
 }
 
-/* ---------- Lichtstrahl (src/scripts/lichtstrahl.ts) ----------
-   Liegt direkt über dem Seitengrund und unter Kacheln und Inhalt. Kein deckender Layer dazwischen:
-   Seitengrund (body) → Lichtstrahl (z 0) → Kacheln (z 0, später im HTML) → Inhalt (z 1+).
-   Die Farbe liest das Skript aus --akzent. */
-.lichtstrahl {
+/* ---------- Lebendiger Hintergrund („Aurora“, src/scripts/aurora.ts) ----------
+   Schichten: Seitengrund (body) → Aurora (z 0) → Kacheln (z 0, später im HTML) → Inhalt (z 1+). Nichts Deckendes dazwischen.
+   Jede Ebene hat vier weiche Lichtwolken (Handy drei). Sie atmen (Deckkraft und Größe, 0,3–0,4 Hz) und wandern langsam.
+   Die Stärke einer Ebene (--staerke) berechnet das Skript aus ihrer Farbe, so dass Text lesbar bleibt.
+   Animiert werden nur opacity, scale und translate: Das erledigt die Grafikkarte, auch auf dem Handy. */
+.aurora {
   display: none;
 }
-html[data-stufe='mittel'] .lichtstrahl {
+html[data-stufe='mittel'] .aurora {
   display: block;
   position: fixed;
-  inset: 0;
+  inset: -6vh -6vw;
   z-index: 0;
-  width: 100%;
-  height: 100%;
+  overflow: hidden;
   pointer-events: none;
+  contain: strict;
+}
+html[data-stufe='mittel'] .aurora-ebene {
+  --farbe: var(--akzent);
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.9s ease-in-out;
+}
+html[data-stufe='mittel'] :is(.aurora-wolken, .aurora-rand) {
+  position: absolute;
+  inset: 0;
+}
+html[data-stufe='mittel'] .aurora-wolken {
+  opacity: var(--staerke, 0.13);
+}
+/* Ränder neben der Textspalte (nur wenn dort Platz ist): kräftiger, die Maske hält die Textspalte frei */
+html[data-stufe='mittel'] .aurora-rand {
+  display: none;
+}
+@media (min-width: 1100px) {
+  html[data-stufe='mittel'] .aurora-rand {
+    display: block;
+    opacity: 0.6;
+    --frei: calc(min(var(--wrap), 100vw) / 2 - var(--gutter) + 6vw + 12px);
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - var(--frei) - 6rem), transparent calc(50% - var(--frei)), transparent calc(50% + var(--frei)), #000 calc(50% + var(--frei) + 6rem));
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - var(--frei) - 6rem), transparent calc(50% - var(--frei)), transparent calc(50% + var(--frei)), #000 calc(50% + var(--frei) + 6rem));
+  }
+}
+html[data-stufe='mittel'] .aurora-rand i:nth-child(1) {
+  left: -6vw;
+  top: 4%;
+  width: 34vw;
+  height: 80%;
+}
+html[data-stufe='mittel'] .aurora-rand i:nth-child(2) {
+  right: -6vw;
+  top: 18%;
+  width: 34vw;
+  height: 78%;
+}
+/* Die alte Farbe geht erst, wenn die neue schon zur Hälfte da ist: keine dunkle Lücke dazwischen */
+html[data-stufe='mittel'] .aurora-ebene.weg {
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out 0.55s;
+}
+/* Farbwechsel: Die neue Farbe wächst als weiche Welle über die alte (Liquid Morph, 1,2 s) */
+html[data-stufe='mittel'] .aurora-ebene:is(.morph-start, .morph) {
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent);
+  mask-image: radial-gradient(closest-side, #000 62%, transparent);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 50% var(--morph-y, 115%);
+  mask-position: 50% var(--morph-y, 115%);
+  -webkit-mask-size: 0% 0%;
+  mask-size: 0% 0%;
+}
+html[data-stufe='mittel'] .aurora-ebene.morph {
+  -webkit-mask-size: 360% 360%;
+  mask-size: 360% 360%;
+  transition:
+    opacity 0.9s ease-in-out,
+    -webkit-mask-size 1.2s ease-in-out,
+    mask-size 1.2s ease-in-out;
+  transition-timing-function: ease-in-out !important;
+}
+html[data-stufe='mittel'] .aurora i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--farbe), color-mix(in srgb, var(--farbe) 55%, transparent) 45%, transparent);
+}
+/* Zwei breite Wellenbänder und zwei runde Leuchtflecken */
+html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
+  left: -14%;
+  top: 2%;
+  width: 82vmax;
+  height: 44vmax;
+  rotate: -14deg;
+}
+html[data-stufe='mittel'] .aurora-wolken i:nth-child(2) {
+  right: -18%;
+  top: 26%;
+  width: 62vmax;
+  height: 62vmax;
+}
+html[data-stufe='mittel'] .aurora-wolken i:nth-child(3) {
+  left: -8%;
+  bottom: -6%;
+  width: 96vmax;
+  height: 40vmax;
+  rotate: 9deg;
+}
+html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
+  left: 28%;
+  top: 38%;
+  width: 42vmax;
+  height: 42vmax;
+}
+/* Handy: drei Wolken, etwas größer, damit der schmale Bildschirm gut gefüllt ist */
+@media (max-width: 767px) {
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
+    display: none;
+  }
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
+    width: 110vmax;
+    height: 52vmax;
+  }
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(2) {
+    width: 78vmax;
+    height: 78vmax;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] .aurora i {
+    will-change: opacity, scale, translate;
+  }
+  html[data-stufe='mittel'] .aurora-rand i:nth-child(1) {
+    animation:
+      aurora-atmen 1.7s ease-in-out -0.4s infinite alternate,
+      aurora-wandern-3 21s ease-in-out infinite;
+  }
+  html[data-stufe='mittel'] .aurora-rand i:nth-child(2) {
+    animation:
+      aurora-atmen 1.45s ease-in-out -1s infinite alternate,
+      aurora-wandern-1 25s ease-in-out infinite reverse;
+  }
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
+    animation:
+      aurora-atmen 1.5s ease-in-out infinite alternate,
+      aurora-wandern-1 19s ease-in-out infinite;
+  }
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(2) {
+    animation:
+      aurora-atmen 1.3s ease-in-out -0.6s infinite alternate,
+      aurora-wandern-2 23s ease-in-out infinite;
+  }
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(3) {
+    animation:
+      aurora-atmen 1.6s ease-in-out -1.1s infinite alternate,
+      aurora-wandern-3 27s ease-in-out infinite;
+  }
+  html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
+    animation:
+      aurora-atmen 1.25s ease-in-out -0.3s infinite alternate,
+      aurora-wandern-2 17s ease-in-out -6s infinite reverse;
+  }
+}
+/* Ruhige Darstellung: stehende Wolken in mittlerer Stärke */
+@media (prefers-reduced-motion: reduce) {
+  html[data-stufe='mittel'] .aurora i {
+    opacity: 0.75;
+  }
+}
+@keyframes aurora-atmen {
+  from {
+    opacity: 0.3;
+    scale: 0.9;
+  }
+  to {
+    opacity: 1;
+    scale: 1.08;
+  }
+}
+@keyframes aurora-wandern-1 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 7vw 5vh;
+  }
+}
+@keyframes aurora-wandern-2 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: -8vw 6vh;
+  }
+}
+@keyframes aurora-wandern-3 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 6vw -7vh;
+  }
 }
 
-/* ---------- Knöpfe: Pillenform, Akzent-Verlauf, dunkle Schrift, Leuchten ----------
+/* ---------- Knöpfe: Pillenform, Akzent-Verlauf, dunkle Schrift, Neon-Leuchten ----------
    Gilt im Inhalt und in der Kopfleiste (Terminbuch und Kachel-Meldung behalten ihr Aussehen).
-   Der Verlauf wird unten nur 15 % dunkler: So hat die dunkle Schrift überall mindestens 4,8:1. */
+   Der Verlauf geht von etwas heller zur reinen Akzentfarbe: Die dunkle Schrift hat überall mindestens 6,8:1. */
 html[data-stufe='mittel'] :is(main, .site-header) .button {
   --knopf: var(--a);
   border: 1px solid transparent;
   border-radius: 999px;
-  background: linear-gradient(180deg, var(--knopf) 0%, color-mix(in srgb, var(--knopf) 85%, black) 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--knopf) 78%, white) 0%, var(--knopf) 100%);
   color: var(--bg);
   font-weight: 600;
   box-shadow:
-    0 0 16px color-mix(in srgb, var(--knopf) 35%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.3);
+    0 0 20px color-mix(in srgb, var(--knopf) 40%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.3),
+    inset 0 1px 0 rgb(255 255 255 / 0.4);
   transition:
     --a 1.2s,
     transform 0.3s,
@@ -349,10 +598,10 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
 @media (hover: none), (pointer: coarse) {
   html[data-stufe='mittel'] :is(main, .site-header) .button {
     box-shadow:
-      0 0 24px color-mix(in srgb, var(--knopf) 55%, transparent),
+      0 0 26px color-mix(in srgb, var(--knopf) 55%, transparent),
       0 0 4px color-mix(in srgb, var(--knopf) 60%, transparent),
       0 3px 8px rgb(0 0 0 / 0.35),
-      inset 0 1px 0 rgb(255 255 255 / 0.35);
+      inset 0 1px 0 rgb(255 255 255 / 0.4);
   }
   html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
     background: color-mix(in srgb, var(--knopf) 8%, transparent);
@@ -381,27 +630,35 @@ html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:hover {
   background: color-mix(in srgb, var(--knopf) 10%, transparent);
   color: var(--knopf);
 }
+/* Überfahren (nur mit Maus) und Antippen (Handy): stärkeres Leuchten, 2 px angehoben */
 @media (hover: hover) and (pointer: fine) {
   html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
     box-shadow:
-      0 0 24px color-mix(in srgb, var(--knopf) 50%, transparent),
-      0 4px 12px rgb(0 0 0 / 0.4);
+      0 0 32px color-mix(in srgb, var(--knopf) 55%, transparent),
+      0 4px 12px rgb(0 0 0 / 0.4),
+      inset 0 1px 0 rgb(255 255 255 / 0.4);
   }
 }
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
+html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
+  box-shadow:
+    0 0 32px color-mix(in srgb, var(--knopf) 65%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) and (pointer: fine) {
+    html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
+      transform: translateY(-2px);
+    }
+  }
+  html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
     transform: translateY(-2px);
   }
-}
-html[data-stufe='mittel'] :is(main, .site-header) .button:active {
-  transform: translateY(0);
-  box-shadow:
-    0 0 10px color-mix(in srgb, var(--knopf) 25%, transparent),
-    0 1px 3px rgb(0 0 0 / 0.3);
 }
 
 /* ---------- Leuchten der Kartennummern (zusätzlich zum goldenen Schimmer) ---------- */
 html[data-stufe='mittel'] main .card-nr {
+  color: var(--a);
   text-shadow: 0 0 20px color-mix(in srgb, var(--a) 30%, transparent);
 }
 @media (prefers-reduced-motion: no-preference) {

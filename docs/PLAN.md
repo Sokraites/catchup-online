@@ -214,6 +214,24 @@ Ursache „auf dem iPhone nichts zu sehen“: Der Strahl wurde über der ganzen 
 - [ ] Auf einem echten iPhone ansehen (geprüft nur im Testbrowser Chromium; Safari/WebKit war hier nicht verfügbar)
 - [ ] Wenn auf dem iPhone weiter nichts zu sehen ist: Stufen-Schalter oben rechts prüfen. Die Wahl wird auf dem Gerät gemerkt; wer einmal „Leicht“ gewählt hat, sieht immer Leicht.
 
+## Stufe Mittel neu: lebendiger Hintergrund, Neon-Glow, 3 Akzentfarben (28.10.2026, abends)
+
+- [x] Farbsystem: Grund `#0D1220`, Akzente Lime / Pink / Violett je Abschnitt, eine Variable `--akzent`, Übergang 1,2 s
+- [x] Lichtstrahl (Linien) ersetzt durch atmende Lichtwolken (CSS, 0,3–0,4 Hz), Handy 3 / Desktop 4 Wolken, Desktop zusätzlich Lichter neben der Textspalte
+- [x] Farbwechsel als weiche Welle (Maske wächst von unten bzw. beim Hochscrollen von oben, 1,2 s)
+- [x] Lichtband an jedem Abschnittsübergang (im Abstand zwischen den Abschnitten, atmet), feine leuchtende Linie
+- [x] Knöpfe: Pille, Leuchten 20 px (Handy 26 px), beim Überfahren/Antippen 32 px und 2 px angehoben, Mindesthöhe 48 px
+- [x] Karten: Glas, 1,5 px Rand in Akzentfarbe, Innenschatten, Leuchten beim Überfahren und Antippen (Tipp-Feedback per Skript, weil Safari `:active` unzuverlässig setzt)
+- [x] Einblenden mit 80 ms Abstand (höchstens 4 Schritte), Start vor dem Sichtbarwerden; Überschriften ohne GSAP
+- [x] Ladezeit: Bilder vorab, Monitor-Zeitreise nur in Schwer; Mittel LCP 2,4 s, Unterseiten 2,0 s
+- [x] Handy: Hintergrund folgt dem Finger um wenige Pixel und rastet weich ein; „Bewegung reduzieren“: alles steht, Farbe wechselt
+- [x] Stufenwechsel Leicht ↔ Mittel ohne Neuladen
+- [x] Lesbarkeit gemessen (alle Wolken und Bänder gleichzeitig am hellsten, jede Textzeile): mindestens 4,5:1 auf Start- und Unterseiten bei 390/768/1440 px
+- [x] Leicht und Schwer bildpunktgleich (Schwer auch mit laufender Monitor-Animation); pruefen, Funktionstest ohne Befund; längste Reaktion 120 ms
+- [ ] Auf echtem iPhone und Android ansehen (geprüft nur im Testbrowser Chromium)
+- [ ] Mit Schwer wechselt die Stufe weiter mit Neuladen (Schwer baut die Seite in den Monitor um)
+- [ ] Beschreibung der Stufe Mittel im Stufen-Menü (`src/config/stufen.ts`) nennt den neuen Hintergrund noch nicht (Text, nicht angefasst)
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

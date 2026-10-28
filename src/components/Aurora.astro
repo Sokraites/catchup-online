@@ -1,0 +1,40 @@
+---
+/**
+ * Lebendiger Hintergrund der Stufe Mittel („Aurora“): weiche, atmende Lichtwolken in der Akzentfarbe.
+ * Zwei Ebenen, damit ein Farbwechsel als fließende Überblendung laufen kann (src/scripts/aurora.ts).
+ * Je Ebene: Wolken hinter dem ganzen Bildschirm (so schwach, dass Text lesbar bleibt) und am breiten Bildschirm
+ * kräftigere Lichter an den Rändern neben der Textspalte.
+ * Reine Dekoration: für Hilfstechnik ausgeblendet, ohne JavaScript und in Leicht/Schwer unsichtbar.
+ */
+const ebenen = [false, true];
+---
+
+<div class="aurora" aria-hidden="true">
+  {
+    ebenen.map((weg) => (
+      <div class:list={['aurora-ebene', { weg }]}>
+        <div class="aurora-wolken">
+          <i />
+          <i />
+          <i />
+          <i />
+        </div>
+        <div class="aurora-rand">
+          <i />
+          <i />
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  import { starteAurora } from '../scripts/aurora';
+  import { stufe } from '../scripts/stufe';
+  // Die Wolken stehen schon per CSS in der richtigen Farbe; das Skript (Stärke, Wechsel, Parallaxe) kommt,
+  // wenn der Browser Luft hat. Safari kennt requestIdleCallback nicht: dort kurz warten.
+  if (stufe() === 'mittel') {
+    if ('requestIdleCallback' in window) requestIdleCallback(starteAurora, { timeout: 1000 });
+    else setTimeout(starteAurora, 200);
+  }
+</script>

@@ -1,5 +1,6 @@
 // Läuft nach `astro build` (Teil von `npm run build`):
 // 1. Schalter REFERENZEN aus → Projektseite und Vorschaubild nicht mit ausliefern.
+//    Danach: Liste der Monitor-Teile zum Vorladen in Stufe Schwer eintragen (Startseite).
 // 2. dist/_headers für Cloudflare Pages schreiben: Sicherheits-Header und eine Content-Security-Policy,
 //    die genau die eingebetteten Skripte der Seite per Prüfsumme erlaubt (sonst nur eigene Dateien).
 // 3. Kurzer Bericht: Dateizahl und größte Datei.
@@ -15,6 +16,19 @@ const alle = (ordner) =>
 // 1. Referenzen
 if (!REFERENZEN) {
   rmSync(join(DIST, 'referenzen'), { recursive: true, force: true });
+}
+
+// 1b. Stufe Schwer: Teile der Monitor-Zeitreise, die die Startseite nachlädt, im Kopf vorladen lassen
+//     (Platzhalter __SCHWER_VORLADEN__ in Base.astro). Andere Seiten bekommen eine leere Liste.
+for (const datei of alle(DIST).filter((d) => d.endsWith('.html'))) {
+  let html = readFileSync(datei, 'utf8');
+  if (!html.includes('__SCHWER_VORLADEN__')) continue;
+  const teile = new Set();
+  for (const [, src] of html.matchAll(/<script type="module" src="\/(_astro\/index\.astro[^"]+)"/g)) {
+    for (const [, teil] of readFileSync(join(DIST, src), 'utf8').matchAll(/["`](?:\.\/|_astro\/)(monitor[\w-]*\.[\w-]+\.js)["`]/g)) teile.add(`/_astro/${teil}`);
+  }
+  html = html.replace('__SCHWER_VORLADEN__', [...teile].join(' '));
+  writeFileSync(datei, html);
 }
 
 // 2. Prüfsummen aller eingebetteten, ausführbaren Skripte (JSON-LD wird nicht ausgeführt und braucht keine)
