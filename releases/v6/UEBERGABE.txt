@@ -1,0 +1,60 @@
+CATCH UP – ÜBERGABE VERSION 6
+==============================================================================
+
+Stand:        28.10.2026
+Version:      v6 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 1bf3c8b (GitHub: Sokraites/catchup-online, Branch claude/stufe-mittel-sichtbar-z7pvbx)
+ZIP:          releases/v6/catchup-seite-v6.zip (70 Dateien, 12,7 MB)
+Prüfsumme:    SHA-256-Prüfsumme
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+TEIL A – WAS IST NEU GEGENÜBER v5 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Der Hintergrund leuchtet jetzt deutlich (Stärke 0,35–0,5 statt 0,12) und atmet.
+  - Zwischen den Abschnitten liegt ein breites Lichtband: oben in der Farbe des
+    Abschnitts davor, unten in der neuen Farbe. Der Farbwechsel ist zu sehen.
+  - Knöpfe: 3D-Pillen mit Farbverlauf, Glanzkante und Leuchten; beim Überfahren
+    oder Antippen heben sie sich und leuchten stärker.
+  - Karten: Glas mit leuchtendem Akzentrand; beim Überfahren/Antippen heben sie
+    sich mit tiefem Schatten.
+  - Das letzte Wort jeder Überschrift verläuft von Weiß in die Akzentfarbe
+    (z. B. „aufholen.“), die Kategorie-Zeilen haben einen Farbverlauf.
+  - Spotlight: Im Einstieg und im Kontakt folgt am Computer ein Lichtschein der
+    Maus; am Handy steht er mittig oben.
+  - Leicht und Schwer sehen genau aus wie in v5.
+
+
+TEIL B – ENTSCHEIDUNGEN, DIE DU PRÜFEN SOLLTEST
+------------------------------------------------------------------------------
+1) STREIFEN HINTER DEM TEXT
+   Damit Text auf dem kräftigen Leuchten lesbar bleibt (mindestens 4,5:1), liegt
+   hinter jeder Textzeile ein weich auslaufender dunkler Streifen. In allen
+   Lücken leuchtet der Hintergrund voll. Bitte ansehen, ob dir das gefällt.
+   Die Alternative wäre ein schwächerer Hintergrund ohne Streifen (wie v5).
+
+2) VERLAUF ENDET ETWAS HELLER
+   Der Verlauf in Überschriften endet nicht in der reinen Akzentfarbe, sondern
+   leicht aufgehellt. Sonst war ein pinkes Wort auf pinkem Leuchten am Handy
+   zu schwach (2,6:1 statt mindestens 3:1).
+
+3) SPOTLIGHT AM COMPUTER ETWAS STÄRKER
+   Vorgabe war 0,2. Auf gleichfarbigem Hintergrund war das am Computer kaum zu
+   sehen, darum dort 0,3 (leicht ins Weiße). Am Handy 0,2 wie vorgegeben.
+
+4) Weiter offen aus v5: Text im Stufen-Menü, Wechsel mit „Schwer“ lädt neu.
+
+
+TEIL C – FÜR ENTWICKLER
+------------------------------------------------------------------------------
+  Streifen hinter Text: dimmeHinterText() in src/scripts/mittel.ts legt um jeden
+                 Textblock .zeile-text mit einer inerten, aria-hidden Kopie
+                 (.zeilen-decke) unter dem echten Text; beide mit gleicher
+                 Hülle (.zeile), damit sie gleich umbrechen. CSS: farbwelten.css.
+  Spotlight:     starteSpotlight() in src/scripts/mittel.ts
+  Farbzuordnung: src/config/farbwelten.ts (farbeDerWelt) → <html data-farbe>
+  Wechsel → Leicht ohne Neuladen: entferneTextHuellen() stellt den Text wieder her.
+  Prüfskripte dieser Runde (nicht im Projekt): Kontrast je Textzeile mit allen
+  Effekten am hellsten, Textfarbe ungedimmt, Deckungsgleichheit der Kopie.
+  Geprüft: Chromium 390/768/1440 px. Nicht geprüft: echtes iPhone/Android.
