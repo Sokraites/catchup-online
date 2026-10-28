@@ -27,12 +27,13 @@ const fullTitle = title ? `${title} | ${site.name}` : `${site.name}: ${site.clai
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = `${site.url}/og.png`;
 const jsonLd = JSON.stringify(graph(organisation(), ...schema));
-// Farbwelt der Seite (nur Stufe Mittel sichtbar, siehe src/config/farbwelten.ts)
+// Farbwelt der Seite (nur Stufe Mittel sichtbar, siehe src/config/farbwelten.ts).
+// Steht am <html>: Dort liegt die eine Akzentfarbe (--akzent), die alle Bausteine und der Lichtstrahl lesen.
 const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
 ---
 
 <!doctype html>
-<html lang={site.sprache}>
+<html lang={site.sprache} data-welt={welt}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -83,8 +84,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
-    <div class="farbwelt" aria-hidden="true" data-welt={welt}></div>
-    <Lichtstrahl welt={welt} />
+    <Lichtstrahl />
     <Kacheln />
     <Header />
     <main id="inhalt" data-welt={welt}>

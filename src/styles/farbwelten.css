@@ -1,24 +1,14 @@
-/* ---------- Stufe Mittel: Farbwelten und Politur ----------
-   Jeder Themenbereich hat eine eigene dunkle Grundfarbe und eine Akzentfarbe. Beim Scrollen wechselt die
-   Hintergrund-Ebene sanft (src/scripts/mittel.ts, Zuordnung in src/config/farbwelten.ts).
+/* ---------- Stufe Mittel: Akzentfarben und Politur ----------
+   Jeder Themenbereich hat eine eigene Akzentfarbe. Es gibt genau eine Quelle dafür: --akzent am <html>.
+   src/scripts/mittel.ts setzt beim Scrollen <html data-welt="…">, die Farbe gleitet in 1,2 s hinüber.
+   Knöpfe, Karten, Überschriften und der Lichtstrahl lesen nur diese eine Variable (über ihre Kopie --a).
+   (Die frühere Hintergrund-Ebene .farbwelt ist entfallen: Der Lichtstrahl ersetzt sie.)
    Das ersetzt in Mittel die Monitor-Dramaturgie der Stufe Schwer.
    Jede Regel beginnt mit html[data-stufe='mittel']: Leicht und Schwer bleiben unberührt.
    Kontraste nach WCAG 2.2 AA geprüft, Werte in docs/ENTSCHEIDUNGEN.md. */
 
 :root {
-  /* Grundfarben je Welt */
-  --farbe-hero: #0d0d13;
-  --farbe-leistungen: #12141f;
-  --farbe-nutzen: #0f1a14;
-  --farbe-auffindbarkeit: #1a1220;
-  --farbe-software: #141020;
-  --farbe-idee: #1a1512;
-  --farbe-ablauf: #0f1418;
-  --farbe-zusammenarbeit: #0f1a14;
-  --farbe-faq: #101318;
-  --farbe-kontakt: #12101e;
-
-  /* Akzentfarben je Welt: Kategorie-Zeile, Überschrift, Links, Hover */
+  /* Akzentfarben je Welt: Kategorie-Zeile, Überschrift, Links, Knöpfe, Karten, Lichtstrahl */
   --akzent-hero: #a98bff;
   --akzent-leistungen: #8b9dff;
   --akzent-nutzen: #6ee7a0;
@@ -30,9 +20,6 @@
   --akzent-faq: #94a3b8;
   --akzent-kontakt: #818cf8;
 
-  /* Lichtstrahl: im Einstieg Lime/Gelbgrün, sonst die Akzentfarbe des Abschnitts */
-  --strahl-hero: #c3f53c;
-
   --ease-mittel: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -43,122 +30,144 @@ html[data-stufe='mittel'] *::after {
   transition-timing-function: var(--ease-mittel) !important;
 }
 
-/* Hintergrund-Ebene: liegt unter den Kacheln (z 0) und dem Inhalt (z 1).
-   Der Wechsel ändert nur die Farbe (kein Neuberechnen des Layouts) und läuft neben allem anderen her. */
-.farbwelt {
-  display: none;
-}
-html[data-stufe='mittel'] .farbwelt {
-  display: block;
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-color: var(--farbe-hero);
-  transition: background-color 1.2s;
-}
-html[data-stufe='mittel'] .farbwelt[data-welt='leistungen'] { background-color: var(--farbe-leistungen); }
-html[data-stufe='mittel'] .farbwelt[data-welt='nutzen'] { background-color: var(--farbe-nutzen); }
-html[data-stufe='mittel'] .farbwelt[data-welt='auffindbarkeit'] { background-color: var(--farbe-auffindbarkeit); }
-html[data-stufe='mittel'] .farbwelt[data-welt='software'] { background-color: var(--farbe-software); }
-html[data-stufe='mittel'] .farbwelt[data-welt='idee'] { background-color: var(--farbe-idee); }
-html[data-stufe='mittel'] .farbwelt[data-welt='ablauf'] { background-color: var(--farbe-ablauf); }
-html[data-stufe='mittel'] .farbwelt[data-welt='zusammenarbeit'] { background-color: var(--farbe-zusammenarbeit); }
-html[data-stufe='mittel'] .farbwelt[data-welt='faq'] { background-color: var(--farbe-faq); }
-html[data-stufe='mittel'] .farbwelt[data-welt='kontakt'] { background-color: var(--farbe-kontakt); }
+/* Die eine Akzentfarbe: --akzent am <html>. Beim Weltwechsel springt sie (der Browser rechnet die Seite einmal neu).
+   Das Gleiten (1,2 s) übernimmt jedes färbende Element selbst über --a, eine nicht vererbte Kopie von --akzent.
+   So rechnet der Browser während des Übergangs nur diese Elemente neu, nicht die ganze Seite: Tippen bleibt flott.
+   Ältere Browser ohne @property springen einfach um. */
+html[data-stufe='mittel'] { --akzent: var(--akzent-hero); }
+html[data-stufe='mittel'][data-welt='leistungen'] { --akzent: var(--akzent-leistungen); }
+html[data-stufe='mittel'][data-welt='nutzen'] { --akzent: var(--akzent-nutzen); }
+html[data-stufe='mittel'][data-welt='auffindbarkeit'] { --akzent: var(--akzent-auffindbarkeit); }
+html[data-stufe='mittel'][data-welt='software'] { --akzent: var(--akzent-software); }
+html[data-stufe='mittel'][data-welt='idee'] { --akzent: var(--akzent-idee); }
+html[data-stufe='mittel'][data-welt='ablauf'] { --akzent: var(--akzent-ablauf); }
+html[data-stufe='mittel'][data-welt='zusammenarbeit'] { --akzent: var(--akzent-zusammenarbeit); }
+html[data-stufe='mittel'][data-welt='faq'] { --akzent: var(--akzent-faq); }
+html[data-stufe='mittel'][data-welt='kontakt'] { --akzent: var(--akzent-kontakt); }
 
-/* Welt je Seite (Unterseiten) und je Abschnitt (Startseite) */
-html[data-stufe='mittel'] main { --welt: var(--farbe-hero); --akzent: var(--akzent-hero); }
-html[data-stufe='mittel'] main[data-welt='leistungen'],
-html[data-stufe='mittel'] main #leistungen { --welt: var(--farbe-leistungen); --akzent: var(--akzent-leistungen); }
-html[data-stufe='mittel'] main #nutzen { --welt: var(--farbe-nutzen); --akzent: var(--akzent-nutzen); }
-html[data-stufe='mittel'] main[data-welt='auffindbarkeit'],
-html[data-stufe='mittel'] main #auffindbarkeit { --welt: var(--farbe-auffindbarkeit); --akzent: var(--akzent-auffindbarkeit); }
-html[data-stufe='mittel'] main[data-welt='software'] { --welt: var(--farbe-software); --akzent: var(--akzent-software); }
-html[data-stufe='mittel'] main #idee { --welt: var(--farbe-idee); --akzent: var(--akzent-idee); }
-html[data-stufe='mittel'] main #ablauf { --welt: var(--farbe-ablauf); --akzent: var(--akzent-ablauf); }
-html[data-stufe='mittel'] main #zusammenarbeit { --welt: var(--farbe-zusammenarbeit); --akzent: var(--akzent-zusammenarbeit); }
-html[data-stufe='mittel'] main #faq { --welt: var(--farbe-faq); --akzent: var(--akzent-faq); }
-html[data-stufe='mittel'] main[data-welt='kontakt'],
-html[data-stufe='mittel'] main #kontakt { --welt: var(--farbe-kontakt); --akzent: var(--akzent-kontakt); }
-
-/* Flächen (Karten, Chips, Hinweise) nehmen einen Hauch der Welt auf */
-html[data-stufe='mittel'] main,
-html[data-stufe='mittel'] main section {
-  --surface: color-mix(in srgb, var(--welt) 95%, white);
-  --surface-2: color-mix(in srgb, var(--welt) 91%, white);
+@property --a {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #a98bff;
+}
+/* Alle Elemente, die die Akzentfarbe zeigen (Karten und Knöpfe stehen unten bei ihren eigenen Übergängen) */
+html[data-stufe='mittel'] main .eyebrow,
+html[data-stufe='mittel'] main .eyebrow::before,
+html[data-stufe='mittel'] main h2,
+html[data-stufe='mittel'] main a,
+html[data-stufe='mittel'] main .card-more,
+html[data-stufe='mittel'] main .card-nr,
+html[data-stufe='mittel'] main .stufe-badge,
+html[data-stufe='mittel'] body .section,
+html[data-stufe='mittel'] body .section::before,
+html[data-stufe='mittel'] body .card,
+html[data-stufe='mittel'] :is(main, .site-header) .button {
+  --a: var(--akzent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] main .eyebrow,
+  html[data-stufe='mittel'] main .eyebrow::before,
+  html[data-stufe='mittel'] main h2,
+  html[data-stufe='mittel'] main a:not(.button),
+  html[data-stufe='mittel'] main .card-more,
+  html[data-stufe='mittel'] main .stufe-badge,
+  html[data-stufe='mittel'] body .section,
+  html[data-stufe='mittel'] body .section::before {
+    transition: --a 1.2s;
+    /* Farbwechsel: weich hinein und heraus (stärker als die gemeinsame Bewegungskurve oben) */
+    transition-timing-function: ease-in-out !important;
+  }
+  /* Kartennummer: dazu der goldene Schimmer aus global.css */
+  html[data-stufe='mittel'] main .card-nr {
+    transition:
+      --a 1.2s,
+      text-shadow 1.2s 0.4s;
+    transition-timing-function: ease-in-out, ease !important;
+  }
 }
 
 /* Akzent: Kategorie-Zeile, Überschrift, Links */
 html[data-stufe='mittel'] main .eyebrow {
-  color: var(--akzent);
+  color: var(--a);
   letter-spacing: 0.05em;
-  text-shadow: 0 0 8px color-mix(in srgb, var(--akzent) 20%, transparent);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--a) 20%, transparent);
 }
 html[data-stufe='mittel'] body main .eyebrow::before {
-  background: linear-gradient(90deg, var(--akzent), transparent);
+  background: linear-gradient(90deg, var(--a), transparent);
 }
 html[data-stufe='mittel'] main h2 {
-  color: var(--akzent);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--akzent) 15%, transparent);
+  color: var(--a);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--a) 15%, transparent);
 }
 @media (min-width: 768px) {
   html[data-stufe='mittel'] main .eyebrow {
-    text-shadow: 0 0 12px color-mix(in srgb, var(--akzent) 20%, transparent);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--a) 20%, transparent);
   }
   html[data-stufe='mittel'] main h2 {
-    text-shadow: 0 0 20px color-mix(in srgb, var(--akzent) 15%, transparent);
+    text-shadow: 0 0 20px color-mix(in srgb, var(--a) 15%, transparent);
   }
 }
 html[data-stufe='mittel'] main a:not(.button, .card-link),
 html[data-stufe='mittel'] main .card-more {
-  color: var(--akzent);
+  color: var(--a);
 }
 html[data-stufe='mittel'] main a:not(.button, .card-link):hover {
   color: var(--ink);
 }
 html[data-stufe='mittel'] main .card a:hover,
 html[data-stufe='mittel'] main .card:has(.card-link:focus-visible) .card-link {
-  color: var(--akzent);
+  color: var(--a);
 }
 html[data-stufe='mittel'] main .button-ghost:hover {
-  border-color: var(--akzent);
+  border-color: var(--a);
 }
 
 /* Abschnitte: Hauch der Akzentfarbe oben, feine Linie in der Akzentfarbe des beginnenden Abschnitts */
 html[data-stufe='mittel'] body .section {
   border-bottom: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--akzent) 5%, transparent), transparent 42%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--a) 5%, transparent), transparent 42%);
 }
 html[data-stufe='mittel'] body .section::before {
   width: calc(min(var(--wrap), 100%) - 2 * var(--gutter));
-  background: linear-gradient(90deg, transparent, var(--akzent) 15%, var(--akzent) 85%, transparent);
+  background: linear-gradient(90deg, transparent, var(--a) 15%, var(--a) 85%, transparent);
   opacity: 0.25;
 }
 
-/* Karten: Glas mit Haarlinie, Tiefe über Schatten und eine helle Oberkante.
-   Handy: etwas dichtere Fläche statt Unschärfe (spart Rechenleistung), Tablet Unschärfe 6 px, Desktop 8 px. */
+/* Karten: Glas mit Haarlinie, Tiefe über Schatten, Innenschatten und eine helle Oberkante in der Akzentfarbe.
+   Ersetzt die Karten-Optik der anderen Stufen (Goldrand) vollständig.
+   Handy: keine Unschärfe (spart Rechenleistung), dafür Rand 1,5 px und kräftigerer Innenschatten.
+   Tablet Unschärfe 6 px, Desktop 8 px. */
 html[data-stufe='mittel'] body .card {
   --karte-pad: 24px;
   padding: var(--karte-pad);
-  background: rgb(255 255 255 / 0.05);
-  border: 1px solid rgb(255 255 255 / 0.08);
+  background: rgb(255 255 255 / 0.055);
+  border: 1.5px solid color-mix(in srgb, var(--a) 22%, rgb(255 255 255 / 0.14));
   border-radius: 16px;
   box-shadow:
-    0 8px 24px rgb(0 0 0 / 0.3),
-    inset 0 1px 0 rgb(255 255 255 / 0.05);
+    0 10px 28px rgb(0 0 0 / 0.42),
+    0 0 18px color-mix(in srgb, var(--a) 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--a) 45%, rgb(255 255 255 / 0.2)),
+    inset 0 0 28px rgb(255 255 255 / 0.05);
 }
 html[data-stufe='mittel'] body .card .card-bild {
   width: calc(100% + 2 * var(--karte-pad));
   margin: calc(-1 * var(--karte-pad)) calc(-1 * var(--karte-pad)) 1.25rem;
-  border-radius: 15px 15px 0 0;
+  border-radius: 14.5px 14.5px 0 0;
 }
 @media (min-width: 768px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 28px;
-    background: rgb(255 255 255 / 0.03);
+    background: rgb(255 255 255 / 0.035);
+    border: 1px solid color-mix(in srgb, var(--a) 16%, rgb(255 255 255 / 0.1));
+    box-shadow:
+      0 8px 24px rgb(0 0 0 / 0.3),
+      inset 0 1px 0 color-mix(in srgb, var(--a) 30%, rgb(255 255 255 / 0.12)),
+      inset 0 0 20px rgb(255 255 255 / 0.03);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
+  }
+  html[data-stufe='mittel'] body .card .card-bild {
+    border-radius: 15px 15px 0 0;
   }
 }
 @media (min-width: 1025px) {
@@ -170,20 +179,22 @@ html[data-stufe='mittel'] body .card .card-bild {
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
 html[data-stufe='mittel'] body .stufen-karte {
-  border-top: 3px solid var(--akzent);
+  border-top: 3px solid var(--a);
 }
 html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   box-shadow:
     0 12px 32px rgb(0 0 0 / 0.4),
-    inset 0 1px 0 rgb(255 255 255 / 0.08),
-    0 0 20px color-mix(in srgb, var(--akzent) 10%, transparent);
+    0 0 24px color-mix(in srgb, var(--a) 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
+    inset 0 0 24px rgb(255 255 255 / 0.04);
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   html[data-stufe='mittel'] body .card:hover {
     box-shadow:
       0 12px 32px rgb(0 0 0 / 0.4),
-      inset 0 1px 0 rgb(255 255 255 / 0.08),
-      0 0 20px color-mix(in srgb, var(--akzent) 10%, transparent);
+      0 0 24px color-mix(in srgb, var(--a) 22%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
+      inset 0 0 24px rgb(255 255 255 / 0.04);
   }
 }
 
@@ -203,6 +214,7 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
   html[data-stufe='mittel'] body .card,
   html[data-stufe='mittel'] body .hervor {
     transition:
+      --a 1.2s,
       opacity 0.6s,
       translate 0.6s,
       transform 0.3s,
@@ -222,7 +234,7 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
 
   /* Kategorie-Zeile: einmaliger Schimmer beim ersten Sichtbarwerden (Akzent mit goldenem Glanz) */
   html[data-stufe='mittel'] main .eyebrow.eyebrow-schimmer {
-    background: linear-gradient(100deg, var(--akzent) 0%, var(--akzent) 38%, #f6e2b5 50%, var(--akzent) 62%, var(--akzent) 100%) 0 0 / 250% 100%;
+    background: linear-gradient(100deg, var(--a) 0%, var(--a) 38%, #f6e2b5 50%, var(--a) 62%, var(--a) 100%) 0 0 / 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -296,13 +308,9 @@ html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
 }
 
 /* ---------- Lichtstrahl (src/scripts/lichtstrahl.ts) ----------
-   Liegt über der Farb-Ebene (z -1) und unter Kacheln und Inhalt. Die Farbe ist eine registrierte
-   CSS-Variable, damit sie per Übergang wechseln kann; das Skript liest sie in jedem Bild. */
-@property --strahl-farbe {
-  syntax: '<color>';
-  inherits: false;
-  initial-value: #c3f53c;
-}
+   Liegt direkt über dem Seitengrund und unter Kacheln und Inhalt. Kein deckender Layer dazwischen:
+   Seitengrund (body) → Lichtstrahl (z 0) → Kacheln (z 0, später im HTML) → Inhalt (z 1+).
+   Die Farbe liest das Skript aus --akzent. */
 .lichtstrahl {
   display: none;
 }
@@ -314,24 +322,13 @@ html[data-stufe='mittel'] .lichtstrahl {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  --strahl-farbe: var(--strahl-hero);
-  transition: --strahl-farbe 1.2s;
 }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='leistungen'] { --strahl-farbe: var(--akzent-leistungen); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='nutzen'] { --strahl-farbe: var(--akzent-nutzen); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='auffindbarkeit'] { --strahl-farbe: var(--akzent-auffindbarkeit); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='software'] { --strahl-farbe: var(--akzent-software); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='idee'] { --strahl-farbe: var(--akzent-idee); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='ablauf'] { --strahl-farbe: var(--akzent-ablauf); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='zusammenarbeit'] { --strahl-farbe: var(--akzent-zusammenarbeit); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='faq'] { --strahl-farbe: var(--akzent-faq); }
-html[data-stufe='mittel'] .lichtstrahl[data-welt='kontakt'] { --strahl-farbe: var(--akzent-kontakt); }
 
 /* ---------- Knöpfe: Pillenform, Akzent-Verlauf, dunkle Schrift, Leuchten ----------
    Gilt im Inhalt und in der Kopfleiste (Terminbuch und Kachel-Meldung behalten ihr Aussehen).
    Der Verlauf wird unten nur 15 % dunkler: So hat die dunkle Schrift überall mindestens 4,8:1. */
 html[data-stufe='mittel'] :is(main, .site-header) .button {
-  --knopf: var(--akzent, var(--akzent-hero));
+  --knopf: var(--a);
   border: 1px solid transparent;
   border-radius: 999px;
   background: linear-gradient(180deg, var(--knopf) 0%, color-mix(in srgb, var(--knopf) 85%, black) 100%);
@@ -341,14 +338,32 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
     0 0 16px color-mix(in srgb, var(--knopf) 35%, transparent),
     0 2px 6px rgb(0 0 0 / 0.3);
   transition:
+    --a 1.2s,
     transform 0.3s,
     box-shadow 0.3s,
     background-color 0.3s,
     border-color 0.3s,
     color 0.3s;
 }
+/* Handy und Tablet ohne Maus: kein Hover, darum leuchten die Knöpfe von Anfang an kräftiger */
+@media (hover: none), (pointer: coarse) {
+  html[data-stufe='mittel'] :is(main, .site-header) .button {
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--knopf) 55%, transparent),
+      0 0 4px color-mix(in srgb, var(--knopf) 60%, transparent),
+      0 3px 8px rgb(0 0 0 / 0.35),
+      inset 0 1px 0 rgb(255 255 255 / 0.35);
+  }
+  html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
+    background: color-mix(in srgb, var(--knopf) 8%, transparent);
+    box-shadow:
+      0 0 18px color-mix(in srgb, var(--knopf) 30%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--knopf) 12%, transparent);
+  }
+}
 /* Größe: im Inhalt nach Gerät; die Kopfleiste behält ihre Maße, damit sie einzeilig bleibt */
 html[data-stufe='mittel'] main .button {
+  min-height: 48px;
   padding: 14px 28px;
 }
 @media (min-width: 768px) {
@@ -387,27 +402,27 @@ html[data-stufe='mittel'] :is(main, .site-header) .button:active {
 
 /* ---------- Leuchten der Kartennummern (zusätzlich zum goldenen Schimmer) ---------- */
 html[data-stufe='mittel'] main .card-nr {
-  text-shadow: 0 0 20px color-mix(in srgb, var(--akzent) 30%, transparent);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--a) 30%, transparent);
 }
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] main .hervor-an .card-nr {
     text-shadow:
       0 0 16px rgb(216 183 122 / 0.55),
-      0 0 20px color-mix(in srgb, var(--akzent) 30%, transparent);
+      0 0 20px color-mix(in srgb, var(--a) 30%, transparent);
   }
 }
 
 /* ---------- Stufen-Abzeichen: Stufe 1 Akzent, Stufe 2 heller, Stufe 3 am hellsten ---------- */
 html[data-stufe='mittel'] main .stufe-badge {
   border-color: transparent;
-  background: var(--akzent);
+  background: var(--a);
   color: var(--bg);
   font-weight: 600;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--akzent) 30%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--a) 30%, transparent);
 }
 html[data-stufe='mittel'] main .stufen-karte[data-rang='2'] .stufe-badge {
-  background: color-mix(in srgb, var(--akzent) 72%, white);
+  background: color-mix(in srgb, var(--a) 72%, white);
 }
 html[data-stufe='mittel'] main .stufen-karte[data-rang='3'] .stufe-badge {
-  background: color-mix(in srgb, var(--akzent) 45%, white);
+  background: color-mix(in srgb, var(--a) 45%, white);
 }

@@ -3,21 +3,27 @@
  *
  * - Fasern: gemeinsamer Ursprung links oben (außerhalb des Bildes), Bögen nach rechts unten.
  *   Handy 3 (halbe Pulsfrequenz), Tablet 5, Desktop 8. Jede Faser hat eigenen Farbton, Takt und Phase.
- * - Puls: Deckkraft 0,15–0,6 und Breite 2–5 px, Frequenz 0,3–0,8 Hz.
- * - Farbe: CSS-Variable --strahl-farbe am Canvas (mit @property registriert). Sie wechselt per CSS-Übergang,
- *   synchron zur Farbwelt (mittel.ts setzt data-welt an beiden). Hier wird sie nur gelesen.
- * - Lesbarkeit zuerst: Über der Inhaltsspalte wird der Strahl so weit gedämpft, dass gedämpfter Text (#a9a7bd)
- *   auch auf einer Karte mindestens 4,5:1 behält. Daneben (am breiten Bildschirm) leuchtet er voll.
+ * - Puls: Deckkraft Handy 0,5–0,8, sonst 0,4–0,9; Breite 3–8 px; Frequenz 0,3–0,8 Hz.
+ *   Jede Faser besteht aus 5 übereinanderliegenden Strichen (breiter Schein bis heller Kern).
+ * - Farbe: die eine Akzentfarbe --akzent (am <html>). Ändert mittel.ts <html data-welt>, wird die neue Farbe
+ *   einmal gelesen und hier im Skript in 1,2 s überblendet (wie der CSS-Übergang der übrigen Bausteine).
+ * - Lesbarkeit zuerst: Gedämpft wird nur hinter Text (jede Textzeile, Rahmen-Knöpfe, ganze Karten), so weit,
+ *   dass gedämpfter Text (#a9a7bd) und Text in Akzentfarbe auch auf einer Karte mindestens 4,5:1 behalten.
+ *   In den Lücken leuchtet er voll. Die Textflächen werden einmal vermessen (Seitenkoordinaten) und nur bei
+ *   Größenänderungen neu.
  * - Scrollen: Der Ursprung folgt der Bewegung um höchstens 20 px und zieht mit 0,1 s Verzögerung nach.
- * - „Bewegung reduzieren“: ein stehendes Bild, neu gezeichnet nur bei Farbwechsel oder Größenänderung.
- * - Sparsam: halbe Auflösung (weiche Leuchtlinien verlieren dadurch nichts), Farben werden nur während eines
- *   Farbwechsels neu gelesen, höchstens 30 Bilder pro Sekunde (für 0,3–0,8 Hz Puls reicht das; jedes neue Bild
- *   zwingt den Browser, die Unschärfe hinter den Glas-Karten neu zu berechnen).
+ *   Beim Scrollen wird die Dämpfung großzügiger, damit sie dem Text nicht hinterherläuft.
+ * - „Bewegung reduzieren“: ein stehendes Bild, neu gezeichnet nur bei Scrollen, Farbwechsel oder Größenänderung.
+ * - Sparsam: halbe Auflösung (weiche Leuchtlinien verlieren dadurch nichts), Farben werden nur einmal pro
+ *   Farbwechsel gelesen, Textstücke einer Zeile zusammengefasst, höchstens 30 Bilder pro Sekunde (für 0,3–0,8 Hz Puls reicht das;
+ *   jedes neue Bild zwingt den Browser, die Unschärfe hinter den Glas-Karten neu zu berechnen).
  */
 import { ruhig } from './stufe';
 
 type RGB = [number, number, number];
 type Faser = { t: number; farbton: number; hell: number; frequenz: number; phase: number };
+/** Textfläche in Seitenkoordinaten */
+type Flaeche = { x: number; y: number; b: number; h: number };
 
 const WEISS: RGB = [255, 255, 255];
 const GEDAEMPFT: RGB = [0xa9, 0xa7, 0xbd];
@@ -25,17 +31,31 @@ const GEDAEMPFT: RGB = [0xa9, 0xa7, 0xbd];
 const ZIEL_KONTRAST = 4.6;
 /** Was über dem Strahl noch liegt: Kachel-Linie, Schachbrett, Karten-Fläche (Anteile Weiß) */
 const UEBERLAGERUNG = [0.035, 0.018, 0.05];
-/** Schichten einer Faser: breiter Schein, Mitte, heller Kern (Breite × Grundbreite, Anteil der Deckkraft) */
+/** Schichten einer Faser: breiter Schein bis heller Kern (Breite × Grundbreite, Anteil der Deckkraft) */
 const SCHICHTEN: [number, number][] = [
-  [4, 0.18],
-  [2, 0.35],
+  [5, 0.08],
+  [3.2, 0.14],
+  [2.2, 0.24],
+  [1.5, 0.45],
   [1, 1],
 ];
-const SPITZE = 0.6;
+/** Deckkraft im Puls [schwach, stark]. Handy höher am unteren Ende, damit der Strahl auch im Tief sichtbar bleibt. */
+const DECKKRAFT_HANDY: [number, number] = [0.5, 0.8];
+const DECKKRAFT: [number, number] = [0.4, 0.9];
+/** Breite des Kerns im Puls (px) */
+const BREITE: [number, number] = [3, 8];
+/** Hier wird gedämpft: jeder Text in diesen Bereichen. Karten und Rahmen-Knöpfe als Ganzes (ihr Inhalt zählt nicht extra). */
+const BEREICHE = 'main, .site-footer';
+const GANZ = '.card, .button-ghost';
+/** Rand um jede Textfläche (px), in vier weichen Stufen; deckt auch den Abstand zwischen zwei Zeilen */
+const RAND = 18;
+const RAND_STUFEN = [1, 0.66, 0.33, 0];
 /** Zeichenauflösung im Verhältnis zur Bildschirmgröße */
 const AUFLOESUNG = 0.5;
-/** So lange nach einem Farbwechsel werden Farben in jedem Bild neu gelesen (CSS-Übergang 1,2 s) */
-const WECHSEL_MS = 1500;
+/** Dauer eines Farbwechsels (wie der CSS-Übergang der übrigen Bausteine) */
+const WECHSEL_MS = 1200;
+/** weich hinein und heraus */
+const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
 const kanal = (c: number) => {
   c /= 255;
@@ -51,15 +71,15 @@ const mische = (a: RGB, b: RGB, t: number): RGB => [a[0] + (b[0] - a[0]) * t, a[
 /** Deckkraft, die mehrere übereinanderliegende Schichten zusammen erreichen */
 const gestapelt = (a: number) => 1 - SCHICHTEN.reduce((p, [, anteil]) => p * (1 - a * anteil), 1);
 
-/** Höchste Deckkraft einer Faser über dem Grund, bei der gedämpfter Text noch lesbar bleibt. */
-function hoechsteDeckkraft(grund: RGB, farbe: RGB) {
+/** Höchste Deckkraft einer Faser über dem Grund, bei der Text in der Farbe `text` noch lesbar bleibt. */
+function hoechsteDeckkraft(grund: RGB, farbe: RGB, text: RGB) {
   let lo = 0;
   let hi = 1;
   for (let i = 0; i < 12; i++) {
     const a = (lo + hi) / 2;
     let c = mische(mische(grund, farbe, a), farbe, 0.05); // 5 % Akzent-Tönung oben im Abschnitt
     for (const w of UEBERLAGERUNG) c = mische(c, WEISS, w);
-    if (kontrast(GEDAEMPFT, c) >= ZIEL_KONTRAST) lo = a;
+    if (kontrast(text, c) >= ZIEL_KONTRAST) lo = a;
     else hi = a;
   }
   return lo;
@@ -105,7 +125,6 @@ let gestartet = false;
 export function starteLichtstrahl() {
   if (gestartet) return;
   const canvas = document.querySelector<HTMLCanvasElement>('canvas.lichtstrahl');
-  const ebene = document.querySelector<HTMLElement>('.farbwelt');
   const ctx = canvas?.getContext('2d');
   if (!canvas || !ctx) return;
   gestartet = true;
@@ -116,57 +135,112 @@ export function starteLichtstrahl() {
   let handy = false;
   let fasern: Faser[] = [];
   let spalte = { links: 0, rechts: 0 };
-  let farbText = '';
+  let flaechen: Flaeche[] = [];
+  let breiteBisher = -1;
+  let deckkraft = DECKKRAFT;
   let farben: { kern: RGB; rand: RGB }[] = [];
+  let akzent: RGB = [169, 139, 255];
+  let von: RGB = akzent;
+  let ziel: RGB = akzent;
+  let wechselStart = -1e9;
   let innen = 1;
   let spitze = false;
+  let scrollt = false;
+  let pauseBis = 0;
   let versatz = 0;
   let geschw = 0;
   let letztesY = scrollY;
   let zuletzt = performance.now();
   let gezeichnet = 0;
   let mindestAbstand = 0;
-  let wechselBis = performance.now() + WECHSEL_MS;
   let grund: RGB = [13, 13, 19];
+  // Dämpfung hinter Text als eigenes Bild: Es ändert sich nur beim Scrollen, sonst wird es wiederverwendet
+  const maske = document.createElement('canvas');
+  const mctx = maske.getContext('2d')!;
+  let maskeFuer = '';
+  let stand = 0;
 
   function messe() {
     b = innerWidth;
     h = innerHeight;
-    canvas!.width = Math.round(b * AUFLOESUNG);
-    canvas!.height = Math.round(h * AUFLOESUNG);
+    maske.width = canvas!.width = Math.round(b * AUFLOESUNG);
+    maske.height = canvas!.height = Math.round(h * AUFLOESUNG);
     ctx!.setTransform(AUFLOESUNG, 0, 0, AUFLOESUNG, 0, 0);
+    mctx.setTransform(AUFLOESUNG, 0, 0, AUFLOESUNG, 0, 0);
+    maskeFuer = '';
     handy = b < 768;
+    deckkraft = handy ? DECKKRAFT_HANDY : DECKKRAFT;
     mindestAbstand = 1000 / 30 - 2;
     const anzahl = b < 768 ? 3 : b <= 1024 ? 5 : 8;
     fasern = Array.from({ length: anzahl }, (_, i) => {
       const t = i / (anzahl - 1);
       return { t, farbton: (t - 0.5) * 40, hell: Math.sin(i * 2.1) * 0.06, frequenz: 0.3 + ((i * 0.618) % 1) * 0.5, phase: i * 1.7 };
     });
-    const r = document.querySelector<HTMLElement>('main .wrap')?.getBoundingClientRect();
-    spalte = r ? { links: r.left, rechts: r.right } : { links: 0, rechts: b };
-    farbText = '';
-    wechselBis = performance.now() + WECHSEL_MS;
+    // Nur die Höhe geändert (z. B. Adressleiste am Handy): Textflächen bleiben, wo sie sind
+    if (b !== breiteBisher) vermesse();
+    breiteBisher = b;
+    palette();
   }
 
-  /** Farbtöne der Fasern aus der aktuellen Strahlfarbe (nur neu, wenn sie sich geändert hat) */
+  /** Textflächen in Seitenkoordinaten (ein Lesedurchgang, nichts wird geschrieben) */
+  function vermesse() {
+    const r = document.querySelector<HTMLElement>('main .wrap')?.getBoundingClientRect();
+    spalte = r ? { links: r.left, rechts: r.right } : { links: 0, rechts: b };
+    const y0 = scrollY;
+    flaechen = [];
+    const bereich = document.createRange();
+    const merke = (q: DOMRect) => {
+      if (q.width >= 1 && q.height >= 1) flaechen.push({ x: q.left, y: q.top + y0, b: q.width, h: q.height });
+    };
+    document.querySelectorAll<HTMLElement>(BEREICHE).forEach((wurzel) => {
+      wurzel.querySelectorAll<HTMLElement>(GANZ).forEach((el) => merke(el.getBoundingClientRect()));
+      // Nur die tatsächlichen Zeilen jedes Textes, nicht ganze Blöcke: So bleibt neben kurzen Zeilen Licht übrig
+      const gang = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) =>
+          n.textContent?.trim() && !n.parentElement?.closest(GANZ) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT,
+      });
+      for (let n = gang.nextNode(); n; n = gang.nextNode()) {
+        bereich.selectNodeContents(n);
+        for (const q of bereich.getClientRects()) merke(q);
+      }
+    });
+    // Stücke derselben Zeile zu einer Fläche zusammenfassen (weniger zu zeichnen)
+    flaechen.sort((p, q) => p.y - q.y || p.x - q.x);
+    const zusammen: Flaeche[] = [];
+    for (const f of flaechen) {
+      const l = zusammen[zusammen.length - 1];
+      if (l && Math.abs(l.y - f.y) < 3 && Math.abs(l.h - f.h) < 3 && f.x <= l.x + l.b + RAND && f.x >= l.x) {
+        l.b = Math.max(l.b, f.x + f.b - l.x);
+        l.h = Math.max(l.h, f.h);
+      } else zusammen.push({ ...f });
+    }
+    flaechen = zusammen;
+    stand++;
+  }
+
+  /** Zielfarbe lesen (einmal pro Weltwechsel; der Browser muss dafür nicht in jedem Bild neu rechnen) */
+  function liesZiel() {
+    return liesFarbe(getComputedStyle(document.documentElement).getPropertyValue('--akzent')) ?? ziel;
+  }
+
+  /** Farbtöne der Fasern aus der aktuellen Strahlfarbe, dazu die Dämpfung hinter Text */
   function palette() {
-    const text = getComputedStyle(canvas!).getPropertyValue('--strahl-farbe');
-    if (text === farbText) return;
-    farbText = text;
-    const [hu, sa, li] = zuHsl(liesFarbe(text) ?? [195, 245, 60]);
+    const [hu, sa, li] = zuHsl(akzent);
     farben = fasern.map((f) => {
       const rand = vonHsl([(hu + f.farbton + 360) % 360, sa, Math.min(0.85, Math.max(0.35, li + f.hell))]);
       return { rand, kern: mische(rand, WEISS, 0.35) };
     });
+    // Gedämpfter Text und Text in Akzentfarbe (Überschriften, Links) müssen lesbar bleiben
+    const grenze = Math.min(...farben.flatMap((f) => [GEDAEMPFT, akzent].map((t) => hoechsteDeckkraft(grund, f.kern, t))));
+    innen = Math.min(1, grenze / gestapelt(deckkraft[1]));
   }
 
   function zeichne(zeit: number) {
-    // Farben nur lesen, solange ein Farbwechsel läuft (sonst bleibt alles gleich)
-    if (zeit === 0 || performance.now() < wechselBis) {
+    // Während eines Farbwechsels gleitet die Farbe hier im Skript (ohne Bewegung: sofort am Ziel)
+    const t = still ? 1 : Math.min(1, (performance.now() - wechselStart) / WECHSEL_MS);
+    if (t < 1 || akzent !== ziel) {
+      akzent = t < 1 ? mische(von, ziel, weich(t)) : ziel;
       palette();
-      grund = liesFarbe(getComputedStyle(ebene ?? document.body).backgroundColor) ?? grund;
-      const grenze = Math.min(...farben.map((f) => hoechsteDeckkraft(grund, f.kern)));
-      innen = Math.min(1, grenze / gestapelt(SPITZE));
     }
 
     ctx!.globalCompositeOperation = 'source-over';
@@ -179,8 +253,8 @@ export function starteLichtstrahl() {
     fasern.forEach((f, i) => {
       const takt = handy ? f.frequenz / 2 : f.frequenz;
       const welle = spitze ? 1 : still ? 0.5 : 0.5 + 0.5 * Math.sin(2 * Math.PI * takt * sek + f.phase);
-      const deckkraft = 0.15 + (SPITZE - 0.15) * welle;
-      const breite = 2 + 3 * welle;
+      const alpha = deckkraft[0] + (deckkraft[1] - deckkraft[0]) * welle;
+      const breite = BREITE[0] + (BREITE[1] - BREITE[0]) * welle;
       const ex = b * (0.45 + 0.65 * f.t);
       const ey = h * (1.15 - 0.55 * f.t);
       const c1x = ox + b * 0.32;
@@ -192,37 +266,49 @@ export function starteLichtstrahl() {
         ctx!.beginPath();
         ctx!.moveTo(ox, oy);
         ctx!.bezierCurveTo(c1x, c1y, c2x, c2y, ex, ey);
-        ctx!.strokeStyle = rgba(anteil === 1 ? kern : rand, deckkraft * anteil);
+        ctx!.strokeStyle = rgba(anteil === 1 ? kern : rand, alpha * anteil);
         ctx!.lineWidth = breite * mal;
         ctx!.stroke();
       }
     });
 
-    // Über der Inhaltsspalte dämpfen (Lesbarkeit), außerhalb mit weichem Übergang voll leuchten lassen
-    const weich = 48;
-    const l = Math.max(0, spalte.links - weich);
-    const r = Math.min(b, spalte.rechts + weich);
-    const maske = ctx!.createLinearGradient(0, 0, b, 0);
-    const voll = 'rgba(0,0,0,1)';
-    const gedaempft = `rgba(0,0,0,${innen.toFixed(3)})`;
-    if (l > 0) {
-      maske.addColorStop(0, voll);
-      maske.addColorStop(l / b, voll);
-    }
-    maske.addColorStop(Math.max(0, spalte.links) / b, gedaempft);
-    maske.addColorStop(Math.min(b, spalte.rechts) / b, gedaempft);
-    if (r < b) {
-      maske.addColorStop(r / b, voll);
-      maske.addColorStop(1, voll);
-    }
-    ctx!.globalCompositeOperation = 'destination-in';
-    ctx!.fillStyle = maske;
-    ctx!.fillRect(0, 0, b, h);
+    // Hinter Text dämpfen (Lesbarkeit), in den Lücken voll leuchten lassen.
+    ctx!.globalCompositeOperation = 'destination-out';
+    ctx!.drawImage(maskeZeichnen(), 0, 0, b, h);
     ctx!.globalCompositeOperation = 'source-over';
+  }
+
+  /**
+   * Bild der Dämpfung: deckend, wo Text liegt. Vier Stufen mit abnehmendem Rand ergeben eine weiche Kante;
+   * übereinander bleibt vom Strahl genau „innen“ übrig. Beim Scrollen wächst der Rand mit der Geschwindigkeit,
+   * damit die Dämpfung dem Text nie hinterherläuft. Neu gezeichnet nur, wenn sich etwas davon geändert hat.
+   */
+  function maskeZeichnen() {
+    const y0 = Math.round(scrollY);
+    const extra = Math.round(Math.min(80, Math.abs(geschw) * 0.05));
+    const schluessel = `${y0} ${extra} ${innen.toFixed(3)} ${stand} ${b} ${h}`;
+    if (schluessel === maskeFuer) return maske;
+    maskeFuer = schluessel;
+    const schritt = 1 - innen ** (1 / RAND_STUFEN.length);
+    mctx.clearRect(0, 0, b, h);
+    mctx.fillStyle = `rgba(0,0,0,${schritt.toFixed(4)})`;
+    const sichtbar = flaechen.filter((f) => f.y - y0 + f.h + RAND + extra > 0 && f.y - y0 - RAND - extra < h);
+    for (const anteil of RAND_STUFEN) {
+      const rx = RAND * anteil;
+      const ry = RAND * anteil + extra;
+      mctx.beginPath();
+      for (const f of sichtbar) mctx.rect(f.x - rx, f.y - y0 - ry, f.b + 2 * rx, f.h + 2 * ry);
+      // nonzero: überlappende Flächen zählen innerhalb einer Stufe nur einmal
+      mctx.fill('nonzero');
+    }
+    return maske;
   }
 
   function bild(jetzt: number) {
     requestAnimationFrame(bild);
+    // Kurz nach einer Eingabe Pause: Die Antwort auf das Tippen hat Vorrang (der Puls ist so langsam, dass es nicht auffällt)
+    if (jetzt < pauseBis) return;
+    scrollt = scrollY !== letztesY || Math.abs(geschw) > 5;
     if (jetzt - gezeichnet < mindestAbstand) return;
     gezeichnet = jetzt;
     const dt = Math.min(0.1, Math.max(0, (jetzt - zuletzt) / 1000));
@@ -238,26 +324,79 @@ export function starteLichtstrahl() {
     zeichne(jetzt);
   }
 
+  grund = liesFarbe(getComputedStyle(document.body).backgroundColor) ?? grund;
+  akzent = von = ziel = liesZiel();
   messe();
   addEventListener('resize', () => {
     messe();
     if (still) zeichne(0);
   });
+  // Neu vermessen, wenn sich Text bewegt haben kann: Inhalt ändert seine Höhe (Schriften, Frage aufgeklappt,
+  // Bild geladen), Hauptpunkte sind fertig eingeblendet (gleiten 16 px), nach dem Scrollen (Überschriften
+  // gleiten Wort für Wort, bis gut 1 s). Gesammelt, damit es höchstens einmal pro Ruhepause passiert.
+  let warte = 0;
+  const jetztVermessen = () => {
+    vermesse();
+    if (still) zeichne(0);
+  };
+  const bald = (ms: number) => {
+    clearTimeout(warte);
+    // erst wenn der Browser Luft hat, damit es nie einer Eingabe im Weg steht (Safari: kurz warten)
+    warte = window.setTimeout(() => {
+      if ('requestIdleCallback' in window) requestIdleCallback(jetztVermessen, { timeout: 500 });
+      else jetztVermessen();
+    }, ms);
+  };
+  new ResizeObserver(() => bald(100)).observe(document.body);
+  addEventListener('transitionend', () => bald(100), { passive: true });
+  addEventListener('animationend', () => bald(100), { passive: true });
+  addEventListener('scroll', () => bald(1300), { passive: true });
+  void document.fonts?.ready.then(() => bald(0));
+  const pause = () => (pauseBis = performance.now() + 250);
+  addEventListener('pointerdown', pause, { capture: true, passive: true });
+  addEventListener('keydown', pause, { capture: true, passive: true });
+  // Stehendes Bild: Die Dämpfung hängt an der Textposition, also beim Scrollen neu zeichnen
+  if (still) {
+    let geplant = false;
+    addEventListener(
+      'scroll',
+      () => {
+        if (geplant) return;
+        geplant = true;
+        requestAnimationFrame(() => {
+          geplant = false;
+          zeichne(0);
+        });
+      },
+      { passive: true },
+    );
+  }
   // Nur für Prüfungen: alle Fasern in voller Stärke (ungünstigster Fall für die Lesbarkeit)
   (window as unknown as { lichtstrahl: object }).lichtstrahl = {
     spitze(an: boolean) {
       spitze = an;
       if (still) zeichne(0);
     },
-    stand: () => ({ fasern: fasern.length, innen, spalte }),
+    stand: () => ({ fasern: fasern.length, innen, spalte, textflaechen: flaechen.length, deckkraft, scrollt }),
+    /** mittlere Zeit für ein Bild in ms (inklusive Rastern) */
+    zeit(n = 20) {
+      const start = performance.now();
+      for (let i = 0; i < n; i++) {
+        zeichne(start + i * 40);
+        ctx!.getImageData(0, 0, 1, 1);
+      }
+      return (performance.now() - start) / n;
+    },
   };
 
-  // Neue Welt: Farben während des Übergangs wieder in jedem Bild lesen
+  // Neue Welt: von der aktuellen Farbe zur neuen gleiten
   new MutationObserver(() => {
-    wechselBis = performance.now() + WECHSEL_MS;
+    von = akzent;
+    ziel = liesZiel();
+    wechselStart = performance.now();
     // ohne Bewegung springt die Farbe: dann ein neues stehendes Bild
     if (still) requestAnimationFrame(() => zeichne(0));
-  }).observe(canvas, { attributes: true, attributeFilter: ['data-welt'] });
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-welt'] });
 
   if (still) {
     zeichne(0);

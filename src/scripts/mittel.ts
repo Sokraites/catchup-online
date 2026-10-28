@@ -1,5 +1,5 @@
 /**
- * Stufe Mittel: Farbwelten je Abschnitt, Überschriften Wort für Wort, Schimmer auf der Kategorie-Zeile, Scroll-Hinweis.
+ * Stufe Mittel: Akzentfarbe je Abschnitt, Überschriften Wort für Wort, Schimmer auf der Kategorie-Zeile, Scroll-Hinweis.
  * Ersatz für die Monitor-Dramaturgie der Stufe Schwer. Farben und Übergänge: src/styles/farbwelten.css.
  *
  * - Der Inhalt bleibt echter Text. Ohne JavaScript bleibt die Grundfarbe stehen, alles ist sofort sichtbar.
@@ -19,13 +19,17 @@ export function starteMittel() {
   starteScrollHinweis();
 }
 
-/** Der Abschnitt, der gerade die Bildschirmmitte kreuzt, bestimmt die Farbe von Hintergrund-Ebene und Lichtstrahl. */
+/**
+ * Der Abschnitt, der gerade die Bildschirmmitte kreuzt, bestimmt die eine Akzentfarbe der Seite:
+ * <html data-welt="…"> setzt --akzent (farbwelten.css), Knöpfe, Karten, Überschriften und Lichtstrahl lesen sie.
+ */
 function starteFarbwelten() {
-  const ebene = document.querySelector<HTMLElement>('.farbwelt');
-  const strahl = document.querySelector<HTMLElement>('.lichtstrahl');
+  const html = document.documentElement;
   const main = document.querySelector<HTMLElement>('main');
-  if (!ebene || !main) return;
+  if (!main) return;
   const seitenWelt = (main.dataset.welt as Welt) || 'hero';
+  // Steht schon im HTML; in eingebetteten Vorschauen kann das <html>-Element fehlen
+  html.dataset.welt ||= seitenWelt;
   // nur äußere Abschnitte (verschachtelte gehören zu ihrem Abschnitt)
   const abschnitte = [...main.querySelectorAll<HTMLElement>('section')].filter((s) => !s.parentElement?.closest('section'));
   const weltVon = (s: HTMLElement): Welt => ((abschnittsWelten as string[]).includes(s.id) ? (s.id as Welt) : seitenWelt);
@@ -34,9 +38,7 @@ function starteFarbwelten() {
     (meldungen) => {
       for (const m of meldungen) {
         if (!m.isIntersecting) continue;
-        const welt = weltVon(m.target as HTMLElement);
-        ebene.dataset.welt = welt;
-        if (strahl) strahl.dataset.welt = welt;
+        html.dataset.welt = weltVon(m.target as HTMLElement);
       }
     },
     // schmales Band in der Bildschirmmitte

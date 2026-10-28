@@ -197,6 +197,23 @@ Nur Paketierung und Dokumentation, nichts an Inhalt, Design oder Verhalten der S
 - [ ] Unschärfe hinter Glas-Karten auf echten Geräten prüfen (ohne Grafikkarte halbiert sie die Bildrate)
 - [ ] „Unsere Zusammenarbeit“ wiederholt die drei Produktkarten aus „Leistungen“: zusammenführen?
 
+## Stufe Mittel sichtbar machen, auch auf dem Handy (28.10.2026)
+
+Ursache „auf dem iPhone nichts zu sehen“: Der Strahl wurde über der ganzen Inhaltsspalte auf rund 10 % gedämpft. Auf dem Handy ist die Spalte so breit wie der Bildschirm, also blieb überall nur ein Hauch übrig (stärkste Stelle etwa 6 % Deckkraft). Knöpfe und Karten waren aktiv, auf dem Handy aber kaum vom alten Aussehen zu unterscheiden.
+
+- [x] Stufen-Auswahl geprüft: ohne gespeicherte Wahl immer Mittel (außer bei „Bewegung reduzieren“: Leicht); `localStorage.clear()` → Mittel
+- [x] Dämpfung nur noch hinter Textzeilen, Rahmen-Knöpfen und Karten; in den Lücken volle Stärke (Handy und Desktop)
+- [x] Strahl kräftiger: Deckkraft Handy 0,5–0,8, sonst 0,4–0,9; Breite 3–8 px; 5 Schichten je Faser; Fasern Handy 3 / Tablet 5 / Desktop 8
+- [x] Hintergrund-Ebene `.farbwelt` entfernt (lag zwar unter dem Strahl, ist aber durch ihn ersetzt); Schichten: Grund → Strahl → Kacheln → Inhalt
+- [x] Eine Akzentfarbe `--akzent` am `<html>`, gesetzt beim Scrollen; Knöpfe, Karten, Überschriften, Links und Strahl gleiten in 1,2 s mit
+- [x] Karten: Glas mit Akzent-Oberkante und Innenschatten; Handy Rand 1,5 px und kräftiger (ohne Unschärfe), Tablet Unschärfe 6 px, Desktop 8 px
+- [x] Knöpfe: Pille mit Leuchten, ohne Maus (Handy/Tablet) kräftigeres Leuchten, Mindesthöhe 48 px
+- [x] Lesbarkeit gemessen (Strahl voll, jede Textzeile): mindestens 4,95:1 auf Start- und Unterseiten bei 390/768/1440 px
+- [x] Leicht und Schwer bildpunktgleich zum vorigen Stand; `npm run pruefen` und Funktionstest ohne Befund
+- [x] Lighthouse (Handy): Mittel 94–96, Barrierefreiheit 100; längste Reaktion 104 ms
+- [ ] Auf einem echten iPhone ansehen (geprüft nur im Testbrowser Chromium; Safari/WebKit war hier nicht verfügbar)
+- [ ] Wenn auf dem iPhone weiter nichts zu sehen ist: Stufen-Schalter oben rechts prüfen. Die Wahl wird auf dem Gerät gemerkt; wer einmal „Leicht“ gewählt hat, sieht immer Leicht.
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
