@@ -232,6 +232,20 @@ Ursache „auf dem iPhone nichts zu sehen“: Der Strahl wurde über der ganzen 
 - [ ] Mit Schwer wechselt die Stufe weiter mit Neuladen (Schwer baut die Seite in den Monitor um)
 - [ ] Beschreibung der Stufe Mittel im Stufen-Menü (`src/config/stufen.ts`) nennt den neuen Hintergrund noch nicht (Text, nicht angefasst)
 
+## Stufe Mittel: Wow-Kalibrierung (28.10.2026, nachts)
+
+- [x] Wolken kräftig (Stärke 0,45–0,5, atmen 0,35–0,5), weichere Kanten; Lichtband zwischen Abschnitten 0,4 mit Farbübergang
+- [x] Lesbarkeit: Streifen nur hinter Textzeilen (auf deckungsgleicher Textkopie), Messung nach jeder Änderung; keine Zeile unter 4,5:1 (große Schrift 3:1)
+- [x] Prüfung, dass die Schrift selbst nicht gedimmt wird (hellster Punkt je Zeile = Textfarbe) und dass die Kopie gleich umbricht
+- [x] Premium-Knöpfe (Verlauf 135°, Glanzkante, Leuchten, 3 px Anheben), Rahmen-Knöpfe mit 1,5 px Rand auf dunklem Grund
+- [x] Glas-Karten (1,5 px Akzentrand, Leuchten außen, Überfahren/Antippen: 6 px Anheben, tiefer Schatten, stärkeres Leuchten)
+- [x] Verlauf im letzten Wort jeder Überschrift, Kategorie-Zeilen im Akzent-Verlauf
+- [x] Spotlight in Einstieg und Kontakt (Maus folgt, Handy statisch)
+- [x] Wechsel Mittel → Leicht ohne Neuladen räumt alle Hüllen ab: Leicht danach bildpunktgleich
+- [x] Leicht und Schwer bildpunktgleich zu v5; pruefen, Funktionstest ohne Befund; längste Reaktion 152 ms; Lighthouse Mittel 94–97, LCP 2,0–2,5 s
+- [ ] Auf echtem iPhone und Android ansehen
+- [ ] Gesamteindruck der Streifen hinter Text vom Gründer bewerten lassen (Alternative: weniger kräftiger Hintergrund, dafür ohne Streifen)
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

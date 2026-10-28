@@ -29,3 +29,22 @@ export const seitenWelten: Record<string, Welt> = {
   '/software-nach-mass/': 'software',
   '/termin/': 'kontakt',
 };
+
+/**
+ * Stufe Mittel: drei Akzentfarben (Werte in src/styles/farbwelten.css, --akzent-lime usw.).
+ * Lime im Einstieg, Pink im mittleren Teil, Violett zum Abschluss.
+ */
+export type Farbe = 'lime' | 'pink' | 'violett';
+
+export const farbeDerWelt: Record<Welt, Farbe> = {
+  hero: 'lime',
+  leistungen: 'lime',
+  software: 'lime',
+  nutzen: 'pink',
+  auffindbarkeit: 'pink',
+  idee: 'pink',
+  ablauf: 'pink',
+  zusammenarbeit: 'violett',
+  faq: 'violett',
+  kontakt: 'violett',
+};

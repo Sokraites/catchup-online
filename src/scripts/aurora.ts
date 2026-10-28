@@ -5,8 +5,8 @@
  *   Sie laufen auf der Grafikkarte weiter, auch wenn die Seite gerade rechnet. Hier passiert nur:
  * - Farbe: Ändert mittel.ts <html data-welt>, wird die neue Akzentfarbe (--akzent) einmal gelesen. Die zweite Ebene
  *   bekommt sie und wächst als weiche Welle in 1,2 s von unten (beim Hochscrollen von oben) über die alte.
- * - Lesbarkeit: Die Stärke jeder Ebene wird aus ihrer Farbe berechnet, so dass gedämpfter Text (#a9a7bd) und Text in
- *   Akzentfarbe auch auf Karten mindestens 4,5:1 behalten, wenn alle Wolken gleichzeitig am hellsten sind.
+ * - Stärke: 0,5 (Lime 0,45), die Wolken atmen zwischen 70 und 100 % davon. Lesbar bleibt Text durch einen weichen
+ *   Schein in der Grundfarbe direkt um die Schrift (--halo in farbwelten.css), nicht durch einen schwachen Hintergrund.
  * - Bewegung: Beim Scrollen gleitet der Hintergrund ein paar Pixel mit (Parallaxe), beim Wischen am Handy folgt er
  *   dem Finger um wenige Pixel und rastet danach weich wieder ein. Nur transform, nichts muss neu gezeichnet werden.
  * - „Bewegung reduzieren“: alles steht, die Farbe wechselt ohne Welle.
@@ -15,14 +15,6 @@ import { ruhig } from './stufe';
 
 type RGB = [number, number, number];
 
-const GEDAEMPFT: RGB = [0xa9, 0xa7, 0xbd];
-const WEISS: RGB = [255, 255, 255];
-/** etwas über 4,5:1 als Reserve */
-const ZIEL_KONTRAST = 4.7;
-/** Was über den Wolken noch liegt: Kachel-Linie, Schachbrett (Anteile Weiß) */
-const UEBERLAGERUNG = [0.035, 0.018];
-/** Reserve für die kurze Überlappung zweier Ebenen während eines Farbwechsels */
-const RESERVE = 0.8;
 const MORPH_MS = 1200;
 
 const kanal = (c: number) => {
@@ -30,12 +22,6 @@ const kanal = (c: number) => {
   return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 };
 const helligkeit = ([r, g, b]: RGB) => 0.2126 * kanal(r) + 0.7152 * kanal(g) + 0.0722 * kanal(b);
-const kontrast = (a: RGB, b: RGB) => {
-  const x = helligkeit(a);
-  const y = helligkeit(b);
-  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
-};
-const mische = (a: RGB, b: RGB, t: number): RGB => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 
 /** Liest rgb(), rgba(), #rrggbb und color(srgb …). */
 function liesFarbe(text: string): RGB | null {
@@ -49,17 +35,8 @@ function liesFarbe(text: string): RGB | null {
   return null;
 }
 
-/** Höchste Deckkraft der Wolken, bei der gedämpfter Text und Text in der Farbe selbst noch lesbar bleiben */
-function staerke(grund: RGB, farbe: RGB) {
-  let beste = 0;
-  for (let a = 0; a <= 0.4; a += 0.005) {
-    let c = mische(grund, farbe, a);
-    for (const w of UEBERLAGERUNG) c = mische(c, WEISS, w);
-    if (kontrast(GEDAEMPFT, c) < ZIEL_KONTRAST || kontrast(farbe, c) < ZIEL_KONTRAST) break;
-    beste = a;
-  }
-  return beste * RESERVE;
-}
+/** Stärke der Wolken: kräftig (Lesbarkeit sichert der Schein um die Schrift). Sehr helle Farben (Lime) etwas weniger. */
+const staerke = (farbe: RGB) => (helligkeit(farbe) > 0.5 ? 0.45 : 0.5);
 
 const rgb = (c: RGB) => `rgb(${c.map(Math.round).join(' ')})`;
 const begrenze = (x: number, g: number) => Math.max(-g, Math.min(g, x));
@@ -73,7 +50,6 @@ export function starteAurora() {
   const html = document.documentElement;
   const ebenen = [...aurora.querySelectorAll<HTMLElement>('.aurora-ebene')];
   const still = ruhig();
-  const grund = liesFarbe(getComputedStyle(document.body).backgroundColor) ?? [13, 18, 32];
   let aktiv = 0;
   let farbe: RGB = [0, 0, 0];
   let ende = 0;
@@ -81,7 +57,7 @@ export function starteAurora() {
   const liesAkzent = () => liesFarbe(getComputedStyle(html).getPropertyValue('--akzent')) ?? farbe;
   const faerbe = (ebene: HTMLElement, f: RGB) => {
     ebene.style.setProperty('--farbe', rgb(f));
-    ebene.style.setProperty('--staerke', staerke(grund, f).toFixed(3));
+    ebene.style.setProperty('--staerke', String(staerke(f)));
   };
 
   // ---------- Farbe und fließender Wechsel ----------

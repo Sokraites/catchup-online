@@ -10,7 +10,7 @@ import Aurora from '../components/Aurora.astro';
 import Terminbuch from '../components/Terminbuch.astro';
 import StufenWahl from '../components/StufenWahl.astro';
 import { standardStufe, stufenSchluessel } from '../config/stufen';
-import { seitenWelten } from '../config/farbwelten';
+import { seitenWelten, farbeDerWelt } from '../config/farbwelten';
 
 interface Props {
   /** Seitentitel ohne Firmennamen; der Name wird angehängt. */
@@ -33,7 +33,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
 ---
 
 <!doctype html>
-<html lang={site.sprache} data-welt={welt}>
+<html lang={site.sprache} data-welt={welt} data-farbe={farbeDerWelt[welt]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -106,7 +106,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
     <script>
       import { starteStufenWahl } from '../scripts/stufe';
       import { starteHervor } from '../scripts/hervor';
-      import { starteMittel } from '../scripts/mittel';
+      import { starteMittel, entferneTextHuellen } from '../scripts/mittel';
       import { starteAurora } from '../scripts/aurora';
       import { starteKacheln } from '../scripts/kacheln';
       import { stufe } from '../scripts/stufe';
@@ -122,6 +122,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
           starteKacheln();
         } else {
           document.querySelectorAll('.hervor').forEach((el) => el.classList.add('hervor-an'));
+          entferneTextHuellen();
         }
       });
     </script>

@@ -39,25 +39,69 @@ html[data-stufe='mittel'] *::after {
   transition-timing-function: var(--ease-mittel) !important;
 }
 
-/* Die eine Akzentfarbe: --akzent am <html>, je Welt (Zuordnung der Abschnitte: src/config/farbwelten.ts).
+/* Die eine Akzentfarbe: --akzent am <html>, je Farbe (Zuordnung der Abschnitte: src/config/farbwelten.ts).
    Beim Weltwechsel springt sie (der Browser rechnet die Seite einmal neu). Das Gleiten (1,2 s) übernimmt jedes
    färbende Element selbst über --a, eine nicht vererbte Kopie von --akzent. So rechnet der Browser während des
    Übergangs nur diese Elemente neu, nicht die ganze Seite: Tippen bleibt flott. */
-html[data-stufe='mittel'],
-html[data-stufe='mittel'][data-welt='leistungen'],
-html[data-stufe='mittel'][data-welt='software'] {
+html[data-stufe='mittel'] {
   --akzent: var(--akzent-lime);
 }
-html[data-stufe='mittel'][data-welt='nutzen'],
-html[data-stufe='mittel'][data-welt='auffindbarkeit'],
-html[data-stufe='mittel'][data-welt='idee'],
-html[data-stufe='mittel'][data-welt='ablauf'] {
+html[data-stufe='mittel'][data-farbe='pink'] {
   --akzent: var(--akzent-pink);
 }
-html[data-stufe='mittel'][data-welt='zusammenarbeit'],
-html[data-stufe='mittel'][data-welt='faq'],
-html[data-stufe='mittel'][data-welt='kontakt'] {
+html[data-stufe='mittel'][data-farbe='violett'] {
   --akzent: var(--akzent-violett);
+}
+
+/* Lesbarkeit: Der Hintergrund leuchtet kräftig (35–50 %). Damit Text trotzdem mindestens 4,5:1 hat, liegt hinter
+   jeder einzelnen Textzeile ein weich auslaufender Streifen in der Grundfarbe. Er endet, wo die Zeile endet.
+   Die Streifen liegen auf einer unsichtbaren, deckungsgleichen Kopie des Textes unter dem echten Text
+   (src/scripts/mittel.ts, dimmeHinterText): So liegt nie ein Streifen über Schrift. Das Layout ändert sich nicht. */
+html[data-stufe='mittel'] .zeile-text {
+  display: block;
+  position: relative;
+}
+html[data-stufe='mittel'] .zeilen-decke {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  pointer-events: none;
+  user-select: none;
+}
+/* In der Kopie: keine Animationen, keine eigenen Hintergründe, nur der Streifen */
+html[data-stufe='mittel'] .zeilen-decke * {
+  color: transparent !important;
+  background: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+html[data-stufe='mittel'] .zeilen-decke .wort {
+  opacity: 1 !important;
+  translate: none !important;
+}
+/* Zeilen-Hülle: gleich im echten Text und in der Kopie (gleicher Umbruch); nur in der Kopie mit Streifen */
+html[data-stufe='mittel'] .zeile-text .zeile {
+  padding-block: 0.15em;
+  border-radius: 3px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+html[data-stufe='mittel'] .zeilen-decke .zeile {
+  background: rgb(13 18 32 / 0.9) !important;
+  box-shadow: 0 0 22px 10px rgb(13 18 32 / 0.9) !important;
+}
+/* Große Überschriften brauchen nur 3:1: leichterer Streifen, der Hintergrund scheint mehr durch */
+html[data-stufe='mittel'] h2 .zeilen-decke .zeile {
+  background: rgb(13 18 32 / 0.6) !important;
+  box-shadow: 0 0 26px 12px rgb(13 18 32 / 0.6) !important;
+}
+/* In den anderen Stufen (nach einem Wechsel ohne Neuladen) gibt es keine Decke */
+html:not([data-stufe='mittel']) .zeilen-decke {
+  display: none;
 }
 
 @property --a {
@@ -69,6 +113,8 @@ html[data-stufe='mittel'][data-welt='kontakt'] {
 html[data-stufe='mittel'] main .eyebrow,
 html[data-stufe='mittel'] main .eyebrow::before,
 html[data-stufe='mittel'] main h2,
+html[data-stufe='mittel'] main .verlauf,
+html[data-stufe='mittel'] main .eyebrow .zeile-text > .zeile,
 html[data-stufe='mittel'] main a,
 html[data-stufe='mittel'] main .card-more,
 html[data-stufe='mittel'] main .card-nr,
@@ -84,6 +130,8 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
   html[data-stufe='mittel'] main .eyebrow,
   html[data-stufe='mittel'] main .eyebrow::before,
   html[data-stufe='mittel'] main h2,
+  html[data-stufe='mittel'] main h1 .verlauf,
+  html[data-stufe='mittel'] main .eyebrow .zeile-text > .zeile,
   html[data-stufe='mittel'] main a:not(.button),
   html[data-stufe='mittel'] main .card-more,
   html[data-stufe='mittel'] main .stufe-badge,
@@ -107,23 +155,35 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
 html[data-stufe='mittel'] main .eyebrow {
   color: var(--a);
   letter-spacing: 0.05em;
-  text-shadow: 0 0 8px color-mix(in srgb, var(--a) 20%, transparent);
 }
 html[data-stufe='mittel'] body main .eyebrow::before {
   background: linear-gradient(90deg, var(--a), transparent);
 }
 html[data-stufe='mittel'] main h2 {
   color: var(--a);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--a) 15%, transparent);
 }
-@media (min-width: 768px) {
-  html[data-stufe='mittel'] main .eyebrow {
-    text-shadow: 0 0 12px color-mix(in srgb, var(--a) 20%, transparent);
-  }
-  html[data-stufe='mittel'] main h2 {
-    text-shadow: 0 0 20px color-mix(in srgb, var(--a) 15%, transparent);
-  }
+/* Verlauf Weiß → Akzentfarbe: letztes Wort der Hauptüberschrift und jeder Abschnittsüberschrift.
+   Ein weicher dunkler Schatten um die Buchstaben (filter, folgt der Schriftform) hält ihn auf hellem Grund lesbar. */
+html[data-stufe='mittel'] main .verlauf {
+  --a: var(--akzent);
+  /* endet in einer leicht aufgehellten Akzentfarbe: bleibt auch auf einer gleichfarbigen Wolke bei mindestens 3:1 */
+  background: linear-gradient(90deg, #fff 0%, color-mix(in srgb, var(--a) 72%, white) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgb(13 18 32 / 0.6));
 }
+/* Kategorie-Zeile im Verlauf Akzentfarbe → heller */
+html[data-stufe='mittel'] main .eyebrow .zeile-text > .zeile {
+  --a: var(--akzent);
+  background: linear-gradient(90deg, var(--a), color-mix(in srgb, var(--a) 45%, white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 html[data-stufe='mittel'] main a:not(.button, .card-link),
 html[data-stufe='mittel'] main .card-more {
   color: var(--a);
@@ -155,7 +215,7 @@ html[data-stufe='mittel'] body .section::before {
 html[data-stufe='mittel'] body .section::after {
   content: '';
   position: absolute;
-  z-index: -1;
+  z-index: -2; /* unter den Streifen hinter dem Text */
   /* So hoch wie der Abstand zwischen zwei Abschnitten erlaubt: oben bis 0,4, unten bis 0,6 Band-Höhen */
   --band: calc(var(--section-space) * 1.55);
   left: 0;
@@ -163,8 +223,27 @@ html[data-stufe='mittel'] body .section::after {
   top: calc(var(--band) * -0.4);
   height: var(--band);
   pointer-events: none;
-  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--a) 62%, transparent), color-mix(in srgb, var(--a) 20%, transparent) 45%, transparent 100%);
-  opacity: 0.8;
+  /* oben die Farbe des Abschnitts davor, unten die eigene: Der Übergang ist zu sehen */
+  background:
+    radial-gradient(70% 55% at 50% 38%, color-mix(in srgb, var(--band-vorher) 40%, transparent), transparent 100%),
+    radial-gradient(70% 55% at 50% 66%, color-mix(in srgb, var(--band-eigen) 40%, transparent), transparent 100%);
+  opacity: 1;
+}
+html[data-stufe='mittel'] body .section {
+  --band-vorher: var(--akzent-lime);
+  --band-eigen: var(--akzent-lime);
+}
+html[data-stufe='mittel'] body .section[data-vorher='pink'] {
+  --band-vorher: var(--akzent-pink);
+}
+html[data-stufe='mittel'] body .section[data-vorher='violett'] {
+  --band-vorher: var(--akzent-violett);
+}
+html[data-stufe='mittel'] body .section[data-farbe='pink'] {
+  --band-eigen: var(--akzent-pink);
+}
+html[data-stufe='mittel'] body .section[data-farbe='violett'] {
+  --band-eigen: var(--akzent-violett);
 }
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .section::after {
@@ -173,31 +252,29 @@ html[data-stufe='mittel'] body .section::after {
 }
 @keyframes band-atmen {
   from {
-    opacity: 0.45;
-    scale: 0.85 0.9;
+    opacity: 0.7;
+    scale: 0.9 0.92;
   }
   to {
     opacity: 1;
-    scale: 1.05 1;
+    scale: 1.06 1;
   }
 }
 
-/* Karten: Glas mit 1,5 px Haarlinie in der Akzentfarbe, Innenschatten und heller Oberkante.
-   Die Fläche ist halb deckend dunkelblau: Sie dämpft den Hintergrund dahinter, so bleibt Text auf Karten gut lesbar.
-   Handy: keine Unschärfe (spart Rechenleistung), dafür kräftigeres Leuchten. Tablet Unschärfe 6 px, Desktop 8 px. */
+/* Karten: Glas mit Tiefe. 1,5 px Rand in der Akzentfarbe, dauerhaftes Leuchten außen, Glanzkante oben.
+   Desktop/Tablet: Unschärfe 12 px hinter der Karte. Handy: ohne Unschärfe (spart Rechenleistung), dafür ein Hauch
+   Akzentfarbe in der Fläche und kräftigeres Leuchten. Text auf Karten schützen die Zeilen-Streifen (oben). */
 html[data-stufe='mittel'] body .card {
   --karte-pad: 24px;
   padding: var(--karte-pad);
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.065), rgb(255 255 255 / 0.03)),
-    rgb(13 18 32 / 0.55);
-  border: 1.5px solid color-mix(in srgb, var(--a) 45%, transparent);
+  background: color-mix(in srgb, var(--a) 6%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--a) 35%, transparent);
   border-radius: 16px;
   box-shadow:
-    0 10px 28px rgb(0 0 0 / 0.42),
-    0 0 22px color-mix(in srgb, var(--a) 20%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
-    inset 0 0 28px color-mix(in srgb, var(--a) 7%, transparent);
+    0 0 48px color-mix(in srgb, var(--a) 22%, transparent),
+    0 12px 32px rgb(0 0 0 / 0.4),
+    inset 0 1px 0 color-mix(in srgb, var(--a) 50%, rgb(255 255 255 / 0.2)),
+    inset 0 0 30px color-mix(in srgb, var(--a) 8%, transparent);
 }
 html[data-stufe='mittel'] body .card .card-bild {
   width: calc(100% + 2 * var(--karte-pad));
@@ -207,44 +284,44 @@ html[data-stufe='mittel'] body .card .card-bild {
 @media (min-width: 768px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 28px;
+    background: rgb(255 255 255 / 0.04);
     box-shadow:
-      0 8px 24px rgb(0 0 0 / 0.3),
-      0 0 16px color-mix(in srgb, var(--a) 12%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 40%, rgb(255 255 255 / 0.15)),
-      inset 0 0 24px color-mix(in srgb, var(--a) 5%, transparent);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+      0 0 40px color-mix(in srgb, var(--a) 15%, transparent),
+      0 10px 28px rgb(0 0 0 / 0.35),
+      inset 0 1px 0 color-mix(in srgb, var(--a) 45%, rgb(255 255 255 / 0.18)),
+      inset 0 0 24px color-mix(in srgb, var(--a) 6%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
 }
 @media (min-width: 1025px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 32px;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
   }
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
 html[data-stufe='mittel'] body .stufen-karte {
   border-top: 3px solid var(--a);
 }
-/* Leuchtender Rand: beim Überfahren (Maus), beim Antippen (Handy, Klasse .getippt aus mittel.ts) und mit der Tastatur */
+/* Überfahren (Maus), Antippen (Handy, Klasse .getippt aus mittel.ts) und Tastatur: Rand und Leuchten stärker,
+   tiefer Schatten, die Karte hebt sich um 6 px */
 html[data-stufe='mittel'] body .card:has(.card-link:focus-visible),
 html[data-stufe='mittel'] body .card.getippt {
-  border-color: color-mix(in srgb, var(--a) 85%, transparent);
+  border-color: color-mix(in srgb, var(--a) 80%, transparent);
   box-shadow:
-    0 12px 32px rgb(0 0 0 / 0.4),
-    0 0 32px color-mix(in srgb, var(--a) 38%, transparent),
+    0 0 60px color-mix(in srgb, var(--a) 30%, transparent),
+    0 20px 60px rgb(0 0 0 / 0.5),
     inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
-    inset 0 0 28px color-mix(in srgb, var(--a) 10%, transparent);
+    inset 0 0 30px color-mix(in srgb, var(--a) 10%, transparent);
 }
 @media (hover: hover) and (pointer: fine) {
   html[data-stufe='mittel'] body .card:hover {
-    border-color: color-mix(in srgb, var(--a) 85%, transparent);
+    border-color: color-mix(in srgb, var(--a) 80%, transparent);
     box-shadow:
-      0 12px 32px rgb(0 0 0 / 0.4),
-      0 0 32px color-mix(in srgb, var(--a) 32%, transparent),
+      0 0 60px color-mix(in srgb, var(--a) 30%, transparent),
+      0 20px 60px rgb(0 0 0 / 0.5),
       inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
-      inset 0 0 28px color-mix(in srgb, var(--a) 8%, transparent);
+      inset 0 0 30px color-mix(in srgb, var(--a) 8%, transparent);
   }
 }
 
@@ -272,8 +349,8 @@ html[data-stufe='mittel'] body .card.getippt {
       background 0.2s,
       border-color 0.2s;
   }
-  html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
-    transform: translateY(-4px);
+  html[data-stufe='mittel'] body .card:is(:has(.card-link:focus-visible), .getippt) {
+    transform: translateY(-6px);
   }
 
   /* Überschriften Wort für Wort (src/scripts/mittel.ts): 80 ms Abstand, 0,5 s, 12 px von unten */
@@ -287,12 +364,13 @@ html[data-stufe='mittel'] body .card.getippt {
     translate: none;
     transition:
       opacity 0.45s,
-      translate 0.45s;
+      translate 0.45s,
+      --a 1.2s;
     transition-delay: calc(var(--i, 0) * 80ms);
   }
 
   /* Kategorie-Zeile: einmaliger Schimmer beim ersten Sichtbarwerden (Akzent mit goldenem Glanz) */
-  html[data-stufe='mittel'] main .eyebrow.eyebrow-schimmer {
+  html[data-stufe='mittel'] main .eyebrow.eyebrow-schimmer .zeile-text > .zeile {
     background: linear-gradient(100deg, var(--a) 0%, var(--a) 38%, #f6e2b5 50%, var(--a) 62%, var(--a) 100%) 0 0 / 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -338,9 +416,9 @@ html[data-stufe='mittel'] body .card.getippt {
     opacity: 0;
   }
 }
-@media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 }
 @keyframes eyebrow-schimmer {
@@ -366,10 +444,60 @@ html[data-stufe='mittel'] body .card.getippt {
   }
 }
 
+/* ---------- Spotlight in Einstieg und Kontakt (src/scripts/mittel.ts, starteSpotlight) ----------
+   Weicher Lichtschein, 600 px, Stärke 0,2 in der Mitte (mit Maus 0,3). Liegt hinter dem Inhalt und unter den Zeilen-Streifen. */
+.spot-rahmen {
+  display: none;
+}
+html[data-stufe='mittel'] main :is(.hero, #kontakt) {
+  position: relative;
+}
+html[data-stufe='mittel'] .spot-rahmen {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+html[data-stufe='mittel'] .spot {
+  --a: var(--akzent);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 600px;
+  height: 600px;
+  margin: -300px 0 0 -300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--a) 20%, transparent),
+    color-mix(in srgb, var(--a) 9%, transparent) 50%,
+    transparent
+  );
+  will-change: transform;
+}
+/* Mit Maus: etwas heller und leicht ins Weiße, damit der Schein auch auf gleichfarbigem Hintergrund zu sehen ist */
+@media (hover: hover) and (pointer: fine) {
+  html[data-stufe='mittel'] .spot {
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, color-mix(in srgb, var(--a) 70%, white) 30%, transparent),
+      color-mix(in srgb, var(--a) 12%, transparent) 50%,
+      transparent
+    );
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] .spot {
+    transition: --a 1.2s;
+  }
+}
+
 /* ---------- Lebendiger Hintergrund („Aurora“, src/scripts/aurora.ts) ----------
    Schichten: Seitengrund (body) → Aurora (z 0) → Kacheln (z 0, später im HTML) → Inhalt (z 1+). Nichts Deckendes dazwischen.
-   Jede Ebene hat vier weiche Lichtwolken (Handy drei). Sie atmen (Deckkraft und Größe, 0,3–0,4 Hz) und wandern langsam.
-   Die Stärke einer Ebene (--staerke) berechnet das Skript aus ihrer Farbe, so dass Text lesbar bleibt.
+   Jede Ebene hat vier große, weiche Lichtwolken (Handy drei, alle mindestens 60vw). Sie atmen (Deckkraft 0,35–0,5,
+   Größe, 0,3–0,4 Hz) und wandern langsam. Lesbar bleibt Text durch den Schein um die Schrift (--halo oben).
    Animiert werden nur opacity, scale und translate: Das erledigt die Grafikkarte, auch auf dem Handy. */
 .aurora {
   display: none;
@@ -394,7 +522,7 @@ html[data-stufe='mittel'] :is(.aurora-wolken, .aurora-rand) {
   inset: 0;
 }
 html[data-stufe='mittel'] .aurora-wolken {
-  opacity: var(--staerke, 0.13);
+  opacity: var(--staerke, 0.5);
 }
 /* Ränder neben der Textspalte (nur wenn dort Platz ist): kräftiger, die Maske hält die Textspalte frei */
 html[data-stufe='mittel'] .aurora-rand {
@@ -450,7 +578,14 @@ html[data-stufe='mittel'] .aurora i {
   position: absolute;
   display: block;
   border-radius: 50%;
-  background: radial-gradient(closest-side, var(--farbe), color-mix(in srgb, var(--farbe) 55%, transparent) 45%, transparent);
+  /* sehr weiche Kanten: vier Stufen bis ganz durchsichtig */
+  background: radial-gradient(
+    closest-side,
+    var(--farbe),
+    color-mix(in srgb, var(--farbe) 70%, transparent) 30%,
+    color-mix(in srgb, var(--farbe) 30%, transparent) 62%,
+    transparent
+  );
 }
 /* Zwei breite Wellenbänder und zwei runde Leuchtflecken */
 html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
@@ -534,9 +669,10 @@ html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
     opacity: 0.75;
   }
 }
+/* Atmen: bei Stärke 0,5 zwischen 0,35 und 0,5 */
 @keyframes aurora-atmen {
   from {
-    opacity: 0.3;
+    opacity: 0.7;
     scale: 0.9;
   }
   to {
@@ -572,87 +708,105 @@ html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
   }
 }
 
-/* ---------- Knöpfe: Pillenform, Akzent-Verlauf, dunkle Schrift, Neon-Leuchten ----------
-   Gilt im Inhalt und in der Kopfleiste (Terminbuch und Kachel-Meldung behalten ihr Aussehen).
-   Der Verlauf geht von etwas heller zur reinen Akzentfarbe: Die dunkle Schrift hat überall mindestens 6,8:1. */
+/* ---------- Knöpfe: Premium-3D ----------
+   Pille mit Verlauf (135°, Akzent → tiefer Akzent), Glanzkante oben, Leuchten in der Akzentfarbe.
+   Überfahren (Maus) bzw. Antippen (Handy): 3 px angehoben, Leuchten stärker, Verlauf heller.
+   Der tiefe Akzent ist nur 16 % dunkler: Die dunkle Schrift hat auch dort mindestens 4,8:1.
+   Gilt im Inhalt und in der Kopfleiste (Terminbuch und Kachel-Meldung behalten ihr Aussehen). */
 html[data-stufe='mittel'] :is(main, .site-header) .button {
   --knopf: var(--a);
-  border: 1px solid transparent;
+  --knopf-tief: color-mix(in srgb, var(--knopf) 84%, black);
+  border: 1px solid color-mix(in srgb, var(--knopf) 70%, white);
   border-radius: 999px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--knopf) 78%, white) 0%, var(--knopf) 100%);
+  background: linear-gradient(135deg, var(--knopf) 0%, var(--knopf-tief) 100%);
   color: var(--bg);
   font-weight: 600;
   box-shadow:
-    0 0 20px color-mix(in srgb, var(--knopf) 40%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.3),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
+    0 0 24px color-mix(in srgb, var(--knopf) 35%, transparent),
+    0 4px 12px rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    inset 0 -2px 6px rgb(0 0 0 / 0.12);
   transition:
     --a 1.2s,
-    transform 0.3s,
-    box-shadow 0.3s,
-    background-color 0.3s,
-    border-color 0.3s,
-    color 0.3s;
+    transform 0.25s,
+    box-shadow 0.25s,
+    background-color 0.25s,
+    border-color 0.25s,
+    color 0.25s;
 }
-/* Handy und Tablet ohne Maus: kein Hover, darum leuchten die Knöpfe von Anfang an kräftiger */
-@media (hover: none), (pointer: coarse) {
-  html[data-stufe='mittel'] :is(main, .site-header) .button {
-    box-shadow:
-      0 0 26px color-mix(in srgb, var(--knopf) 55%, transparent),
-      0 0 4px color-mix(in srgb, var(--knopf) 60%, transparent),
-      0 3px 8px rgb(0 0 0 / 0.35),
-      inset 0 1px 0 rgb(255 255 255 / 0.4);
-  }
-  html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
-    background: color-mix(in srgb, var(--knopf) 8%, transparent);
-    box-shadow:
-      0 0 18px color-mix(in srgb, var(--knopf) 30%, transparent),
-      inset 0 0 12px color-mix(in srgb, var(--knopf) 12%, transparent);
-  }
+/* Rahmen-Knöpfe: 1,5 px Rand in Akzentfarbe auf dunklem Grund (so bleibt die Schrift über dem Leuchten lesbar) */
+html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
+  border: 1.5px solid var(--knopf);
+  background: rgb(13 18 32 / 0.78);
+  color: var(--knopf);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--knopf) 22%, transparent),
+    inset 0 0 14px color-mix(in srgb, var(--knopf) 10%, transparent);
 }
-/* Größe: im Inhalt nach Gerät; die Kopfleiste behält ihre Maße, damit sie einzeilig bleibt */
+/* Größe: im Inhalt nach Gerät, mindestens 48 px hoch; die Kopfleiste behält ihre Maße, damit sie einzeilig bleibt */
 html[data-stufe='mittel'] main .button {
   min-height: 48px;
   padding: 14px 28px;
 }
 @media (min-width: 768px) {
   html[data-stufe='mittel'] main .button {
-    padding: 12px 24px;
+    padding: 12px 26px;
   }
 }
-html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
-  background: transparent;
-  border-color: var(--knopf);
-  color: var(--knopf);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--knopf) 15%, transparent);
-}
-html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:hover {
-  background: color-mix(in srgb, var(--knopf) 10%, transparent);
-  color: var(--knopf);
-}
-/* Überfahren (nur mit Maus) und Antippen (Handy): stärkeres Leuchten, 2 px angehoben */
-@media (hover: hover) and (pointer: fine) {
-  html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
+/* Handy und Tablet ohne Maus: kein Überfahren möglich, darum leuchten die Knöpfe von Anfang an kräftiger */
+@media (hover: none), (pointer: coarse) {
+  html[data-stufe='mittel'] :is(main, .site-header) .button:not(.button-ghost) {
     box-shadow:
-      0 0 32px color-mix(in srgb, var(--knopf) 55%, transparent),
-      0 4px 12px rgb(0 0 0 / 0.4),
-      inset 0 1px 0 rgb(255 255 255 / 0.4);
+      0 0 30px color-mix(in srgb, var(--knopf) 45%, transparent),
+      0 4px 12px rgb(0 0 0 / 0.35),
+      inset 0 1px 0 rgb(255 255 255 / 0.25),
+      inset 0 -2px 6px rgb(0 0 0 / 0.12);
+  }
+  html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--knopf) 32%, transparent),
+      inset 0 0 14px color-mix(in srgb, var(--knopf) 14%, transparent);
   }
 }
-html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
+/* Überfahren und Antippen: gleiche Verstärkung */
+@media (hover: hover) and (pointer: fine) {
+  html[data-stufe='mittel'] :is(main, .site-header) .button:not(.button-ghost):hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--knopf) 82%, white) 0%, var(--knopf) 100%);
+    box-shadow:
+      0 0 40px color-mix(in srgb, var(--knopf) 50%, transparent),
+      0 8px 20px rgb(0 0 0 / 0.4),
+      inset 0 1px 0 rgb(255 255 255 / 0.3),
+      inset 0 -2px 6px rgb(0 0 0 / 0.1);
+  }
+  html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:hover {
+    background:
+      linear-gradient(color-mix(in srgb, var(--knopf) 10%, transparent), color-mix(in srgb, var(--knopf) 10%, transparent)),
+      rgb(13 18 32 / 0.78);
+    color: var(--knopf);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--knopf) 40%, transparent);
+  }
+}
+html[data-stufe='mittel'] :is(main, .site-header) .button:not(.button-ghost):is(:active, .getippt) {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--knopf) 82%, white) 0%, var(--knopf) 100%);
   box-shadow:
-    0 0 32px color-mix(in srgb, var(--knopf) 65%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.35),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
+    0 0 40px color-mix(in srgb, var(--knopf) 55%, transparent),
+    0 8px 20px rgb(0 0 0 / 0.4),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:is(:active, .getippt) {
+  background:
+    linear-gradient(color-mix(in srgb, var(--knopf) 10%, transparent), color-mix(in srgb, var(--knopf) 10%, transparent)),
+    rgb(13 18 32 / 0.78);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--knopf) 45%, transparent);
 }
 @media (prefers-reduced-motion: no-preference) {
   @media (hover: hover) and (pointer: fine) {
     html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
     }
   }
   html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
   }
 }
 
