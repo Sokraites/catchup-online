@@ -1,0 +1,30 @@
+CATCH UP – ÜBERGABE VERSION 7
+==============================================================================
+
+Stand:        28.10.2026
+Version:      v7 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 5af8f01 (GitHub: Sokraites/catchup-online, Branch claude/stufe-mittel-sichtbar-z7pvbx)
+ZIP:          releases/v7/catchup-seite-v7.zip
+Prüfsumme:    SHA-256-Prüfsumme
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v6 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Keine dunklen Balken mehr hinter dem Text. Stattdessen liegt eine sanfte,
+    ganzflächige Abdunklung über den Farbwolken; Text liegt direkt darauf.
+  - Dezenter Lichtstrahl aus feinen, weich geschwungenen Lichtfasern:
+    Handy 3 Fasern (höchstens 25 % Deckkraft), Computer 8 (höchstens 30 %).
+    Hinter Text werden die Fasern nur schwächer, es wird nichts Dunkles gemalt.
+  - Karten aus dunklem Glas mit hauchdünner heller Kante und leichtem Leuchten
+    in der Abschnittsfarbe. Knöpfe heben sich beim Überfahren 2 px.
+  - Mehr Luft zwischen Abschnitten und Karten; das Kachel-Raster ist nur noch
+    ein Hauch.
+  - Leicht und Schwer sehen genau aus wie in v6.
+
+ZU PRÜFEN
+------------------------------------------------------------------------------
+  - Auf echtem iPhone/Android ansehen (geprüft nur im Testbrowser Chromium).
+  - Karten am Handy ohne Unschärfe-Effekt (sonst müsste das Handy die Unschärfe
+    hinter jeder Karte in jedem Bild neu berechnen, weil sich der Strahl bewegt).
