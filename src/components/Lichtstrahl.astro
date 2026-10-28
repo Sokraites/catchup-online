@@ -1,0 +1,21 @@
+---
+/**
+ * Dezenter Lichtstrahl (Lichtfasern) hinter dem Inhalt, nur in Stufe Mittel (src/scripts/lichtstrahl.ts).
+ * Reine Dekoration: für Hilfstechnik ausgeblendet, ohne JavaScript unsichtbar.
+ * Die Farbe kommt aus der Akzentfarbe am <html> (--akzent, gesetzt von src/scripts/mittel.ts).
+ */
+---
+
+<canvas class="lichtstrahl" aria-hidden="true"></canvas>
+
+<script>
+  import { starteLichtstrahl } from '../scripts/lichtstrahl';
+  import { stufe } from '../scripts/stufe';
+  // Erst starten, wenn der Browser Luft hat: Der Inhalt soll zuerst erscheinen.
+  // Safari (iPhone) kennt requestIdleCallback nicht: dort kurz warten.
+  if (stufe() === 'mittel') {
+    const los = () => starteLichtstrahl();
+    if ('requestIdleCallback' in window) requestIdleCallback(los, { timeout: 1200 });
+    else setTimeout(los, 300);
+  }
+</script>

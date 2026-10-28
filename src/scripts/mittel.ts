@@ -14,7 +14,7 @@ const HINWEIS_GEZEIGT = 'scroll-hinweis-gezeigt';
 let gestartet = false;
 
 export function starteMittel() {
-  // Text-Hüllen (Wörter, Verlauf, Streifen, Spotlight): auch nach einem Wechsel Leicht → Mittel wieder anlegen
+  // Text-Hüllen (Wörter, Verlauf, Spotlight): auch nach einem Wechsel Leicht → Mittel wieder anlegen
   baueTextHuellen();
   if (gestartet) return;
   gestartet = true;
@@ -29,15 +29,14 @@ export function starteMittel() {
 let huellen = false;
 
 /**
- * Lesbarkeit gilt immer, auch bei „Bewegung reduzieren“: Überschriften in Wörter teilen (eingeblendet wird nur mit
- * Bewegung), Verlauf im Titel, dann die Streifen hinter den Textblöcken; dazu das Spotlight.
+ * Überschriften in Wörter teilen (eingeblendet wird nur mit Bewegung), Verlauf im letzten Wort, dazu das Spotlight.
+ * Auch bei „Bewegung reduzieren“, damit die Überschriften gleich aussehen.
  */
 function baueTextHuellen() {
   if (huellen) return;
   huellen = true;
   starteWortweise();
   verlaufImTitel();
-  dimmeHinterText();
   starteSpotlight();
 }
 
@@ -48,10 +47,6 @@ function baueTextHuellen() {
 export function entferneTextHuellen() {
   if (!huellen) return;
   huellen = false;
-  document.querySelectorAll('.zeile-text').forEach((t) => {
-    const echt = t.querySelector(':scope > .zeile');
-    t.replaceWith(...(echt ? echt.childNodes : []));
-  });
   document.querySelectorAll<HTMLElement>('main h1 .verlauf').forEach((v) => v.replaceWith(v.textContent ?? ''));
   document.querySelectorAll<HTMLElement>('main h2.wortweise').forEach((h) => {
     h.textContent = h.getAttribute('aria-label');
@@ -232,48 +227,6 @@ function ladeBilderVor() {
   else addEventListener('load', spaeter, { once: true });
 }
 
-/**
- * Lesbarkeit über dem kräftigen Hintergrund: Hinter jeder Textzeile liegt ein weich auslaufender Streifen in der
- * Grundfarbe (farbwelten.css). Gedimmt wird nur genau hinter Text, in den Lücken leuchtet der Hintergrund voll.
- *
- * Die Streifen liegen auf einer Kopie des Textes („Decke“), die genau deckungsgleich unter dem echten Text liegt:
- * gleiche Breite, gleiche Schrift, also gleiche Zeilenumbrüche. So kann der Streifen einer Zeile nie über der Schrift
- * einer anderen liegen. Die Kopie ist unsichtbar, für Hilfstechnik ausgeblendet und nicht bedienbar (inert);
- * im HTML der Seite steht der Text weiterhin genau einmal.
- * Große helle Überschriften (h1, h3) brauchen das nicht (große Schrift: 3:1 genügt).
- * Nur Blöcke, die ausschließlich Zeilen-Inhalt haben (Text, Links, Hervorhebungen); Blöcke mit Absätzen,
- * Listen oder Bildern darin werden übersprungen, ihre inneren Textblöcke bekommen den Streifen einzeln.
- */
-const TEXTBLOECKE =
-  'main :is(h2, p, li, dt, dd, summary, figcaption, blockquote, address, nav.breadcrumb, a:not(.button, .card-link), .card-more, .card-nr), .site-footer :is(p, li, address, a)';
-const NICHT_ZEILE = 'p, ul, ol, li, div, section, h1, h2, h3, h4, details, figure, picture, img, video, svg, button, .button, .medium';
-
-function dimmeHinterText() {
-  document.querySelectorAll<HTMLElement>(TEXTBLOECKE).forEach((el) => {
-    if (!el.textContent?.trim() || el.closest('.zeile-text, .button, .stufe-badge') || el.querySelector(NICHT_ZEILE)) return;
-    // Listenpunkt nur mit einem Link darin: den Link selbst einfassen (er kann eine eigene, höhere Box haben)
-    const eigenerText = [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent!.trim());
-    if (el.matches('li') && !eigenerText) return;
-
-    // echter Text in einen Block, der die Zeilenbreite vorgibt; darunter die Decke mit derselben Breite
-    // Beide Fassungen haben genau denselben Aufbau (Block > Zeilen-Hülle > Inhalt), damit sie gleich umbrechen
-    const echt = document.createElement('span');
-    echt.className = 'zeile';
-    echt.append(...el.childNodes);
-    const kopie = echt.cloneNode(true) as HTMLElement;
-    kopie.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
-    const decke = document.createElement('span');
-    decke.className = 'zeilen-decke';
-    decke.setAttribute('aria-hidden', 'true');
-    decke.inert = true;
-    decke.append(kopie);
-    const text = document.createElement('span');
-    text.className = 'zeile-text';
-    text.append(decke, echt);
-    el.append(text);
-  });
-}
-
 /** Hauptüberschrift (h1): das letzte Wort im Verlauf Weiß → Akzentfarbe, z. B. „aufholen.“ (farbwelten.css) */
 function verlaufImTitel() {
   const h1 = document.querySelector<HTMLElement>('main h1');
@@ -307,7 +260,8 @@ function starteSpotlight() {
 
     const ruhe = () => {
       const r = abschnitt.getBoundingClientRect();
-      return [r.width / 2, Math.min(220, r.height * 0.25)];
+      // Ruhelage mittig oben; am Handy höher, über der Überschrift (dort steht noch kein Fließtext)
+      return [r.width / 2, r.width < 768 ? 40 : Math.min(220, r.height * 0.25)];
     };
     let [x, y] = ruhe();
     let [zx, zy] = [x, y];

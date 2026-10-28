@@ -246,6 +246,17 @@ Ursache „auf dem iPhone nichts zu sehen“: Der Strahl wurde über der ganzen 
 - [ ] Auf echtem iPhone und Android ansehen
 - [ ] Gesamteindruck der Streifen hinter Text vom Gründer bewerten lassen (Alternative: weniger kräftiger Hintergrund, dafür ohne Streifen)
 
+## Stufe Mittel: Relaunch ohne Textbalken (28.10.2026)
+
+- [x] `dimmeHinterText` und alle Streifen hinter Text entfernt
+- [x] Ganzflächige sanfte Abdunklung über den Farbwolken; Text liegt direkt auf dem Grund
+- [x] Lichtstrahl (Bezier-Fasern) wieder aktiv: Handy 3 Fasern, höchstens 0,25; Desktop 8, höchstens 0,3; hinter Text nur schwächer
+- [x] Glas-Karten (0,03 Weiß, 1 px helle Kante, leichtes Akzent-Leuchten, Desktop-Unschärfe 12 px), Knöpfe 2 px Anheben
+- [x] Mehr Abstand zwischen Abschnitten und Karten; Kachel-Raster nur als Hauch
+- [x] Lesbarkeit gemessen (alle Effekte am hellsten): kleine Schrift mindestens 4,72:1 auf allen Inhaltsseiten
+- [x] `npm run build` fehlerfrei, `npm run pruefen` ohne Befund, Funktionstest ohne Befund, Leicht/Schwer bildpunktgleich zu v6
+- [ ] Auf echtem iPhone und Android ansehen
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

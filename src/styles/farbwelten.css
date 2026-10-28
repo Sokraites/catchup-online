@@ -53,57 +53,6 @@ html[data-stufe='mittel'][data-farbe='violett'] {
   --akzent: var(--akzent-violett);
 }
 
-/* Lesbarkeit: Der Hintergrund leuchtet kräftig (35–50 %). Damit Text trotzdem mindestens 4,5:1 hat, liegt hinter
-   jeder einzelnen Textzeile ein weich auslaufender Streifen in der Grundfarbe. Er endet, wo die Zeile endet.
-   Die Streifen liegen auf einer unsichtbaren, deckungsgleichen Kopie des Textes unter dem echten Text
-   (src/scripts/mittel.ts, dimmeHinterText): So liegt nie ein Streifen über Schrift. Das Layout ändert sich nicht. */
-html[data-stufe='mittel'] .zeile-text {
-  display: block;
-  position: relative;
-}
-html[data-stufe='mittel'] .zeilen-decke {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  text-shadow: none;
-  pointer-events: none;
-  user-select: none;
-}
-/* In der Kopie: keine Animationen, keine eigenen Hintergründe, nur der Streifen */
-html[data-stufe='mittel'] .zeilen-decke * {
-  color: transparent !important;
-  background: none !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-  animation: none !important;
-}
-html[data-stufe='mittel'] .zeilen-decke .wort {
-  opacity: 1 !important;
-  translate: none !important;
-}
-/* Zeilen-Hülle: gleich im echten Text und in der Kopie (gleicher Umbruch); nur in der Kopie mit Streifen */
-html[data-stufe='mittel'] .zeile-text .zeile {
-  padding-block: 0.15em;
-  border-radius: 3px;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-html[data-stufe='mittel'] .zeilen-decke .zeile {
-  background: rgb(13 18 32 / 0.9) !important;
-  box-shadow: 0 0 22px 10px rgb(13 18 32 / 0.9) !important;
-}
-/* Große Überschriften brauchen nur 3:1: leichterer Streifen, der Hintergrund scheint mehr durch */
-html[data-stufe='mittel'] h2 .zeilen-decke .zeile {
-  background: rgb(13 18 32 / 0.6) !important;
-  box-shadow: 0 0 26px 12px rgb(13 18 32 / 0.6) !important;
-}
-/* In den anderen Stufen (nach einem Wechsel ohne Neuladen) gibt es keine Decke */
-html:not([data-stufe='mittel']) .zeilen-decke {
-  display: none;
-}
-
 @property --a {
   syntax: '<color>';
   inherits: false;
@@ -114,7 +63,6 @@ html[data-stufe='mittel'] main .eyebrow,
 html[data-stufe='mittel'] main .eyebrow::before,
 html[data-stufe='mittel'] main h2,
 html[data-stufe='mittel'] main .verlauf,
-html[data-stufe='mittel'] main .eyebrow .zeile-text > .zeile,
 html[data-stufe='mittel'] main a,
 html[data-stufe='mittel'] main .card-more,
 html[data-stufe='mittel'] main .card-nr,
@@ -131,7 +79,6 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
   html[data-stufe='mittel'] main .eyebrow::before,
   html[data-stufe='mittel'] main h2,
   html[data-stufe='mittel'] main h1 .verlauf,
-  html[data-stufe='mittel'] main .eyebrow .zeile-text > .zeile,
   html[data-stufe='mittel'] main a:not(.button),
   html[data-stufe='mittel'] main .card-more,
   html[data-stufe='mittel'] main .stufe-badge,
@@ -175,7 +122,7 @@ html[data-stufe='mittel'] main .verlauf {
   filter: drop-shadow(0 0 10px rgb(13 18 32 / 0.6));
 }
 /* Kategorie-Zeile im Verlauf Akzentfarbe → heller */
-html[data-stufe='mittel'] main .eyebrow .zeile-text > .zeile {
+html[data-stufe='mittel'] main .eyebrow {
   --a: var(--akzent);
   background: linear-gradient(90deg, var(--a), color-mix(in srgb, var(--a) 45%, white));
   -webkit-background-clip: text;
@@ -215,7 +162,7 @@ html[data-stufe='mittel'] body .section::before {
 html[data-stufe='mittel'] body .section::after {
   content: '';
   position: absolute;
-  z-index: -2; /* unter den Streifen hinter dem Text */
+  z-index: -2;
   /* So hoch wie der Abstand zwischen zwei Abschnitten erlaubt: oben bis 0,4, unten bis 0,6 Band-Höhen */
   --band: calc(var(--section-space) * 1.55);
   left: 0;
@@ -225,8 +172,8 @@ html[data-stufe='mittel'] body .section::after {
   pointer-events: none;
   /* oben die Farbe des Abschnitts davor, unten die eigene: Der Übergang ist zu sehen */
   background:
-    radial-gradient(70% 55% at 50% 38%, color-mix(in srgb, var(--band-vorher) 40%, transparent), transparent 100%),
-    radial-gradient(70% 55% at 50% 66%, color-mix(in srgb, var(--band-eigen) 40%, transparent), transparent 100%);
+    radial-gradient(70% 55% at 50% 38%, color-mix(in srgb, var(--band-vorher) 24%, transparent), transparent 100%),
+    radial-gradient(70% 55% at 50% 66%, color-mix(in srgb, var(--band-eigen) 24%, transparent), transparent 100%);
   opacity: 1;
 }
 html[data-stufe='mittel'] body .section {
@@ -261,67 +208,61 @@ html[data-stufe='mittel'] body .section[data-farbe='violett'] {
   }
 }
 
-/* Karten: Glas mit Tiefe. 1,5 px Rand in der Akzentfarbe, dauerhaftes Leuchten außen, Glanzkante oben.
-   Desktop/Tablet: Unschärfe 12 px hinter der Karte. Handy: ohne Unschärfe (spart Rechenleistung), dafür ein Hauch
-   Akzentfarbe in der Fläche und kräftigeres Leuchten. Text auf Karten schützen die Zeilen-Streifen (oben). */
+/* Karten: edles, halbdurchsichtiges Dunkelglas mit hauchdünner heller Kante und leichtem Leuchten in der Akzentfarbe.
+   Desktop/Tablet: Unschärfe 12 px hinter der Karte. Handy: ohne Unschärfe (der Lichtstrahl dahinter bewegt sich,
+   die Unschärfe müsste dann in jedem Bild neu berechnet werden), sonst gleich. */
 html[data-stufe='mittel'] body .card {
   --karte-pad: 24px;
   padding: var(--karte-pad);
-  background: color-mix(in srgb, var(--a) 6%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--a) 35%, transparent);
-  border-radius: 16px;
+  background: rgb(255 255 255 / 0.03);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 18px;
   box-shadow:
-    0 0 48px color-mix(in srgb, var(--a) 22%, transparent),
-    0 12px 32px rgb(0 0 0 / 0.4),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 50%, rgb(255 255 255 / 0.2)),
-    inset 0 0 30px color-mix(in srgb, var(--a) 8%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--a) 10%, transparent),
+    0 0 28px color-mix(in srgb, var(--a) 10%, transparent),
+    0 14px 36px rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 html[data-stufe='mittel'] body .card .card-bild {
   width: calc(100% + 2 * var(--karte-pad));
-  margin: calc(-1 * var(--karte-pad)) calc(-1 * var(--karte-pad)) 1.25rem;
-  border-radius: 14.5px 14.5px 0 0;
+  margin: calc(-1 * var(--karte-pad)) calc(-1 * var(--karte-pad)) 1.5rem;
+  border-radius: 17px 17px 0 0;
 }
 @media (min-width: 768px) {
   html[data-stufe='mittel'] body .card {
-    --karte-pad: 28px;
-    background: rgb(255 255 255 / 0.04);
-    box-shadow:
-      0 0 40px color-mix(in srgb, var(--a) 15%, transparent),
-      0 10px 28px rgb(0 0 0 / 0.35),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 45%, rgb(255 255 255 / 0.18)),
-      inset 0 0 24px color-mix(in srgb, var(--a) 6%, transparent);
+    --karte-pad: 30px;
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
   }
 }
 @media (min-width: 1025px) {
   html[data-stufe='mittel'] body .card {
-    --karte-pad: 32px;
+    --karte-pad: 34px;
   }
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
 html[data-stufe='mittel'] body .stufen-karte {
   border-top: 3px solid var(--a);
 }
-/* Überfahren (Maus), Antippen (Handy, Klasse .getippt aus mittel.ts) und Tastatur: Rand und Leuchten stärker,
-   tiefer Schatten, die Karte hebt sich um 6 px */
+/* Überfahren (Maus), Antippen (Handy, Klasse .getippt aus mittel.ts) und Tastatur: Kante in der Akzentfarbe,
+   etwas mehr Leuchten, die Karte hebt sich sanft um 4 px */
 html[data-stufe='mittel'] body .card:has(.card-link:focus-visible),
 html[data-stufe='mittel'] body .card.getippt {
-  border-color: color-mix(in srgb, var(--a) 80%, transparent);
+  border-color: color-mix(in srgb, var(--a) 45%, transparent);
   box-shadow:
-    0 0 60px color-mix(in srgb, var(--a) 30%, transparent),
-    0 20px 60px rgb(0 0 0 / 0.5),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
-    inset 0 0 30px color-mix(in srgb, var(--a) 10%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--a) 18%, transparent),
+    0 0 40px color-mix(in srgb, var(--a) 18%, transparent),
+    0 20px 48px rgb(0 0 0 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
 }
 @media (hover: hover) and (pointer: fine) {
   html[data-stufe='mittel'] body .card:hover {
-    border-color: color-mix(in srgb, var(--a) 80%, transparent);
+    border-color: color-mix(in srgb, var(--a) 45%, transparent);
     box-shadow:
-      0 0 60px color-mix(in srgb, var(--a) 30%, transparent),
-      0 20px 60px rgb(0 0 0 / 0.5),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
-      inset 0 0 30px color-mix(in srgb, var(--a) 8%, transparent);
+      0 0 0 1px color-mix(in srgb, var(--a) 18%, transparent),
+      0 0 40px color-mix(in srgb, var(--a) 18%, transparent),
+      0 20px 48px rgb(0 0 0 / 0.45),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
   }
 }
 
@@ -350,7 +291,7 @@ html[data-stufe='mittel'] body .card.getippt {
       border-color 0.2s;
   }
   html[data-stufe='mittel'] body .card:is(:has(.card-link:focus-visible), .getippt) {
-    transform: translateY(-6px);
+    transform: translateY(-4px);
   }
 
   /* Überschriften Wort für Wort (src/scripts/mittel.ts): 80 ms Abstand, 0,5 s, 12 px von unten */
@@ -370,7 +311,7 @@ html[data-stufe='mittel'] body .card.getippt {
   }
 
   /* Kategorie-Zeile: einmaliger Schimmer beim ersten Sichtbarwerden (Akzent mit goldenem Glanz) */
-  html[data-stufe='mittel'] main .eyebrow.eyebrow-schimmer .zeile-text > .zeile {
+  html[data-stufe='mittel'] main .eyebrow.eyebrow-schimmer {
     background: linear-gradient(100deg, var(--a) 0%, var(--a) 38%, #f6e2b5 50%, var(--a) 62%, var(--a) 100%) 0 0 / 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -418,7 +359,7 @@ html[data-stufe='mittel'] body .card.getippt {
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-4px);
   }
 }
 @keyframes eyebrow-schimmer {
@@ -445,7 +386,7 @@ html[data-stufe='mittel'] body .card.getippt {
 }
 
 /* ---------- Spotlight in Einstieg und Kontakt (src/scripts/mittel.ts, starteSpotlight) ----------
-   Weicher Lichtschein, 600 px, Stärke 0,2 in der Mitte (mit Maus 0,3). Liegt hinter dem Inhalt und unter den Zeilen-Streifen. */
+   Weicher Lichtschein, 600 px, dezent: Stärke 0,12 in der Mitte (mit Maus 0,18). Am Handy steht er ganz oben. Liegt hinter dem Inhalt. */
 .spot-rahmen {
   display: none;
 }
@@ -471,8 +412,8 @@ html[data-stufe='mittel'] .spot {
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--a) 20%, transparent),
-    color-mix(in srgb, var(--a) 9%, transparent) 50%,
+    color-mix(in srgb, var(--a) 12%, transparent),
+    color-mix(in srgb, var(--a) 5%, transparent) 50%,
     transparent
   );
   will-change: transform;
@@ -482,8 +423,8 @@ html[data-stufe='mittel'] .spot {
   html[data-stufe='mittel'] .spot {
     background: radial-gradient(
       closest-side,
-      color-mix(in srgb, color-mix(in srgb, var(--a) 70%, white) 30%, transparent),
-      color-mix(in srgb, var(--a) 12%, transparent) 50%,
+      color-mix(in srgb, color-mix(in srgb, var(--a) 70%, white) 18%, transparent),
+      color-mix(in srgb, var(--a) 8%, transparent) 50%,
       transparent
     );
   }
@@ -491,6 +432,56 @@ html[data-stufe='mittel'] .spot {
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] .spot {
     transition: --a 1.2s;
+  }
+}
+
+/* ---------- Ruhiger Grund für Lesbarkeit ----------
+   Über den Farbwolken liegt ganzflächig ein sanfter dunkler Verlauf (75 % Grundton). So liegt Text überall sauber
+   auf dunklem Grund, ohne Kästen oder Streifen hinter einzelnen Zeilen. Darüber: der dezente Lichtstrahl. */
+html[data-stufe='mittel'] .aurora::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(180deg, rgb(5 5 8 / 0.72) 0%, rgb(5 5 8 / 0.78) 100%);
+}
+
+/* ---------- Lichtstrahl (src/scripts/lichtstrahl.ts) ----------
+   Schichten: Seitengrund → Farbwolken → dunkle Fläche → Lichtstrahl (z 0, später im HTML) → Kacheln → Inhalt. */
+.lichtstrahl {
+  display: none;
+}
+html[data-stufe='mittel'] .lichtstrahl {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Kachel-Raster in Mittel nur als Hauch (keine blockhaften Felder); das Kachel-Leuchten bleibt */
+html[data-stufe='mittel'] .kacheln {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.018) 1px, transparent 1px);
+  background-size:
+    var(--k) var(--k),
+    var(--k) var(--k);
+}
+
+/* Mehr Luft: größere Abstände zwischen den Abschnitten und den Karten */
+html[data-stufe='mittel'] {
+  --section-space: clamp(4.5rem, 13vw, 9rem);
+}
+html[data-stufe='mittel'] main .cards {
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+@media (min-width: 1025px) {
+  html[data-stufe='mittel'] main .cards {
+    gap: 2rem;
   }
 }
 
@@ -802,11 +793,11 @@ html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:is(:active, .get
 @media (prefers-reduced-motion: no-preference) {
   @media (hover: hover) and (pointer: fine) {
     html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
   }
   html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
   }
 }
 
