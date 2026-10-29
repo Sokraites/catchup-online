@@ -1,0 +1,19 @@
+---
+/**
+ * Hintergrund der Stufe Mittel: ein ruhiger Strom aus 0 und 1 in der Akzentfarbe (src/scripts/binaerstrom.ts).
+ * Reine Dekoration: für Hilfstechnik ausgeblendet, ohne JavaScript und in Leicht/Schwer unsichtbar.
+ */
+---
+
+<canvas class="binaerstrom" aria-hidden="true"></canvas>
+
+<script>
+  import { starteBinaerstrom } from '../scripts/binaerstrom';
+  import { stufe } from '../scripts/stufe';
+  // Erst wenn der Browser Luft hat: Das erste Zeichnen der Seite wartet nicht auf den Strom.
+  // Safari kennt requestIdleCallback nicht: dort kurz warten.
+  if (stufe() === 'mittel') {
+    if ('requestIdleCallback' in window) requestIdleCallback(starteBinaerstrom, { timeout: 1500 });
+    else setTimeout(starteBinaerstrom, 300);
+  }
+</script>

@@ -6,7 +6,7 @@ import { graph, organisation } from '../lib/schema';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Kacheln from '../components/Kacheln.astro';
-import Aurora from '../components/Aurora.astro';
+import Binaerstrom from '../components/Binaerstrom.astro';
 import Terminbuch from '../components/Terminbuch.astro';
 import StufenWahl from '../components/StufenWahl.astro';
 import { standardStufe, stufenSchluessel } from '../config/stufen';
@@ -94,7 +94,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
-    <Aurora />
+    <Binaerstrom />
     <Kacheln />
     <Header />
     <main id="inhalt" data-welt={welt}>
@@ -107,7 +107,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
       import { starteStufenWahl } from '../scripts/stufe';
       import { starteHervor } from '../scripts/hervor';
       import { starteMittel } from '../scripts/mittel';
-      import { starteAurora } from '../scripts/aurora';
+      import { starteBinaerstrom } from '../scripts/binaerstrom';
       import { starteKacheln } from '../scripts/kacheln';
       import { stufe } from '../scripts/stufe';
       starteStufenWahl();
@@ -118,7 +118,7 @@ const welt = seitenWelten[Astro.url.pathname] ?? 'hero';
         if ((e as CustomEvent).detail === 'mittel') {
           starteMittel();
           starteHervor();
-          starteAurora();
+          starteBinaerstrom();
           starteKacheln();
         } else {
           document.querySelectorAll('.hervor').forEach((el) => el.classList.add('hervor-an'));

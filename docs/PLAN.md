@@ -245,7 +245,21 @@ Ausgangspunkt v5 (Zweig `claude/stufe-mittel-sichtbar-z7pvbx`, Commit 342b666). 
 - [x] Andockpunkte `data-fluss-ziel` an den 6 Karten der Startseite (`leistung-01…03`, `stufe-1…3`)
 - [x] Kontrast gemessen (Nachtrag in docs/ENTSCHEIDUNGEN.md), Leicht/Schwer bildpunktgleich, Funktionstest und Seitenprüfung ohne Befund, Lighthouse Handy Start 93–96
 - [ ] Auf echtem iPhone ansehen (geprüft nur im Testbrowser Chromium mit Handy-Nachbildung)
-- [ ] Hintergrund (Aurora) unverändert; ersetzt ihn der nächste Schritt, wirkt die Seite erst als Ganzes neu
+- [x] Hintergrund (Aurora) unverändert; ersetzt im nächsten Schritt (Binärcode-Strom, 29.10.2026)
+
+## Stufe Mittel: Binärcode-Strom statt Aurora (29.10.2026)
+
+- [x] Aurora vollständig entfernt (`Aurora.astro`, `aurora.ts`, CSS-Block); im Build kein Treffer mehr für „aurora“
+- [x] Neuer Hintergrund `src/components/Binaerstrom.astro` + `src/scripts/binaerstrom.ts`: Canvas 2D, Zeichen 0/1 in JetBrains Mono 14 px, Bahnen leicht schräg mit Sinus-Welle, 20–40 px/s, Gruppen von 3–8 Zeichen
+- [x] Dichte 30 % (Handy 15 %, höchstens 360 Zeichen; Desktop höchstens 2600), ~30 Bilder/s, Pixeldichte höchstens 2
+- [x] Deckkraft 0,10–0,18, hinter Text 0,06, kein Glimmer im Umkreis von 20 px um Text; hinter den 6 Karten mit `data-fluss-ziel` keine Zeichen
+- [x] Glimmer 0,5–0,7 für 400–800 ms mit weicher Spur (Desktop 4/s, Handy 1,5/s)
+- [x] Farbe aus `--a` der Zeichenfläche (Akzentfarbe mit 1,2-s-Gleitwechsel), kein eigener Farbmechanismus
+- [x] Pause bei verstecktem Tab und wenn die Fläche unsichtbar ist (Wechsel auf Leicht); „Bewegung reduzieren“: stehendes Muster
+- [x] Start erst, wenn der Browser Luft hat (requestIdleCallback): das erste Zeichnen der Seite wartet nicht
+- [x] Geprüft: Kontrast mindestens 5,04:1, Leicht/Schwer bildpunktgleich zu v8, Funktionstest und Seitenprüfung ohne Befund, Lighthouse Handy Startseite Median 96 (v8: 95), LCP 2,4 s unverändert, keine Konsolenfehler
+- [ ] Spur über „Übermalen mit 10 % Grundfarbe“ ausprobiert und verworfen (Ziffern verschmieren, dunkle Reste), siehe docs/ENTSCHEIDUNGEN.md
+- [ ] Auf echtem iPhone prüfen: Sichtbarkeit, Flüssigkeit, Akku/Wärme (geprüft nur im Testbrowser ohne Grafikkarte)
 
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 

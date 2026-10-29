@@ -1,8 +1,8 @@
-/* ---------- Stufe Mittel: Farbsystem, lebendiger Hintergrund, Neon-Glow ----------
+/* ---------- Stufe Mittel: Farbsystem, Binärcode-Strom, Neon-Glow ----------
    Eine Grundfarbe für alles (dunkles Blau) und drei Akzentfarben, die je Abschnitt wechseln:
    Lime im Einstieg, Pink im mittleren Teil, Violett zum Abschluss.
    Es gibt genau eine Quelle dafür: --akzent am <html>. src/scripts/mittel.ts setzt beim Scrollen
-   <html data-welt="…">; Hintergrund (src/scripts/aurora.ts), Knöpfe, Karten, Überschriften und Leuchten folgen in 1,2 s.
+   <html data-welt="…">; Binärcode-Strom (src/scripts/binaerstrom.ts), Knöpfe, Karten, Überschriften und Leuchten folgen in 1,2 s.
    Jede Regel beginnt mit html[data-stufe='mittel']: Leicht und Schwer bleiben unberührt.
    Kontraste nach WCAG 2.2 AA geprüft, Werte in docs/ENTSCHEIDUNGEN.md. */
 
@@ -432,209 +432,29 @@ html[data-stufe='mittel'] body .card:is(.getippt, :has(.card-link:focus-visible)
   }
 }
 
-/* ---------- Lebendiger Hintergrund („Aurora“, src/scripts/aurora.ts) ----------
-   Schichten: Seitengrund (body) → Aurora (z 0) → Kacheln (z 0, später im HTML) → Inhalt (z 1+). Nichts Deckendes dazwischen.
-   Jede Ebene hat vier weiche Lichtwolken (Handy drei). Sie atmen (Deckkraft und Größe, 0,3–0,4 Hz) und wandern langsam.
-   Die Stärke einer Ebene (--staerke) berechnet das Skript aus ihrer Farbe, so dass Text lesbar bleibt.
-   Animiert werden nur opacity, scale und translate: Das erledigt die Grafikkarte, auch auf dem Handy. */
-.aurora {
+/* ---------- Binärcode-Strom (src/scripts/binaerstrom.ts) ----------
+   Liegt über dem Seitengrund und unter Kacheln und Inhalt (Kacheln z 0, später im HTML; Inhalt z 1+).
+   Höhe 100lvh: Ein- und Ausblenden der Adressleiste am Handy ändert die Größe nicht (kein Neuaufbau beim Scrollen).
+   Farbe: --a, die gleitende Kopie der Akzentfarbe (1,2 s); das Skript liest sie in jedem Bild. */
+.binaerstrom {
   display: none;
 }
-html[data-stufe='mittel'] .aurora {
+html[data-stufe='mittel'] .binaerstrom {
+  --a: var(--akzent);
   display: block;
   position: fixed;
-  inset: -6vh -6vw;
+  top: 0;
+  left: 0;
   z-index: 0;
-  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
   pointer-events: none;
-  contain: strict;
-}
-html[data-stufe='mittel'] .aurora-ebene {
-  --farbe: var(--akzent);
-  position: absolute;
-  inset: 0;
-  transition: opacity 0.9s ease-in-out;
-}
-html[data-stufe='mittel'] :is(.aurora-wolken, .aurora-rand) {
-  position: absolute;
-  inset: 0;
-}
-html[data-stufe='mittel'] .aurora-wolken {
-  opacity: var(--staerke, 0.13);
-}
-/* Ränder neben der Textspalte (nur wenn dort Platz ist): kräftiger, die Maske hält die Textspalte frei */
-html[data-stufe='mittel'] .aurora-rand {
-  display: none;
-}
-@media (min-width: 1100px) {
-  html[data-stufe='mittel'] .aurora-rand {
-    display: block;
-    opacity: 0.6;
-    --frei: calc(min(var(--wrap), 100vw) / 2 - var(--gutter) + 6vw + 12px);
-    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - var(--frei) - 6rem), transparent calc(50% - var(--frei)), transparent calc(50% + var(--frei)), #000 calc(50% + var(--frei) + 6rem));
-    mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - var(--frei) - 6rem), transparent calc(50% - var(--frei)), transparent calc(50% + var(--frei)), #000 calc(50% + var(--frei) + 6rem));
-  }
-}
-html[data-stufe='mittel'] .aurora-rand i:nth-child(1) {
-  left: -6vw;
-  top: 4%;
-  width: 34vw;
-  height: 80%;
-}
-html[data-stufe='mittel'] .aurora-rand i:nth-child(2) {
-  right: -6vw;
-  top: 18%;
-  width: 34vw;
-  height: 78%;
-}
-/* Die alte Farbe geht erst, wenn die neue schon zur Hälfte da ist: keine dunkle Lücke dazwischen */
-html[data-stufe='mittel'] .aurora-ebene.weg {
-  opacity: 0;
-  transition: opacity 0.7s ease-in-out 0.55s;
-}
-/* Farbwechsel: Die neue Farbe wächst als weiche Welle über die alte (Liquid Morph, 1,2 s) */
-html[data-stufe='mittel'] .aurora-ebene:is(.morph-start, .morph) {
-  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent);
-  mask-image: radial-gradient(closest-side, #000 62%, transparent);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: 50% var(--morph-y, 115%);
-  mask-position: 50% var(--morph-y, 115%);
-  -webkit-mask-size: 0% 0%;
-  mask-size: 0% 0%;
-}
-html[data-stufe='mittel'] .aurora-ebene.morph {
-  -webkit-mask-size: 360% 360%;
-  mask-size: 360% 360%;
-  transition:
-    opacity 0.9s ease-in-out,
-    -webkit-mask-size 1.2s ease-in-out,
-    mask-size 1.2s ease-in-out;
-  transition-timing-function: ease-in-out !important;
-}
-html[data-stufe='mittel'] .aurora i {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, var(--farbe), color-mix(in srgb, var(--farbe) 55%, transparent) 45%, transparent);
-}
-/* Zwei breite Wellenbänder und zwei runde Leuchtflecken */
-html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
-  left: -14%;
-  top: 2%;
-  width: 82vmax;
-  height: 44vmax;
-  rotate: -14deg;
-}
-html[data-stufe='mittel'] .aurora-wolken i:nth-child(2) {
-  right: -18%;
-  top: 26%;
-  width: 62vmax;
-  height: 62vmax;
-}
-html[data-stufe='mittel'] .aurora-wolken i:nth-child(3) {
-  left: -8%;
-  bottom: -6%;
-  width: 96vmax;
-  height: 40vmax;
-  rotate: 9deg;
-}
-html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
-  left: 28%;
-  top: 38%;
-  width: 42vmax;
-  height: 42vmax;
-}
-/* Handy: drei Wolken, etwas größer, damit der schmale Bildschirm gut gefüllt ist */
-@media (max-width: 767px) {
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
-    display: none;
-  }
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
-    width: 110vmax;
-    height: 52vmax;
-  }
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(2) {
-    width: 78vmax;
-    height: 78vmax;
-  }
 }
 @media (prefers-reduced-motion: no-preference) {
-  html[data-stufe='mittel'] .aurora i {
-    will-change: opacity, scale, translate;
-  }
-  html[data-stufe='mittel'] .aurora-rand i:nth-child(1) {
-    animation:
-      aurora-atmen 1.7s ease-in-out -0.4s infinite alternate,
-      aurora-wandern-3 21s ease-in-out infinite;
-  }
-  html[data-stufe='mittel'] .aurora-rand i:nth-child(2) {
-    animation:
-      aurora-atmen 1.45s ease-in-out -1s infinite alternate,
-      aurora-wandern-1 25s ease-in-out infinite reverse;
-  }
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(1) {
-    animation:
-      aurora-atmen 1.5s ease-in-out infinite alternate,
-      aurora-wandern-1 19s ease-in-out infinite;
-  }
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(2) {
-    animation:
-      aurora-atmen 1.3s ease-in-out -0.6s infinite alternate,
-      aurora-wandern-2 23s ease-in-out infinite;
-  }
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(3) {
-    animation:
-      aurora-atmen 1.6s ease-in-out -1.1s infinite alternate,
-      aurora-wandern-3 27s ease-in-out infinite;
-  }
-  html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
-    animation:
-      aurora-atmen 1.25s ease-in-out -0.3s infinite alternate,
-      aurora-wandern-2 17s ease-in-out -6s infinite reverse;
-  }
-}
-/* Ruhige Darstellung: stehende Wolken in mittlerer Stärke */
-@media (prefers-reduced-motion: reduce) {
-  html[data-stufe='mittel'] .aurora i {
-    opacity: 0.75;
-  }
-}
-@keyframes aurora-atmen {
-  from {
-    opacity: 0.3;
-    scale: 0.9;
-  }
-  to {
-    opacity: 1;
-    scale: 1.08;
-  }
-}
-@keyframes aurora-wandern-1 {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 7vw 5vh;
-  }
-}
-@keyframes aurora-wandern-2 {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: -8vw 6vh;
-  }
-}
-@keyframes aurora-wandern-3 {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 6vw -7vh;
+  html[data-stufe='mittel'] .binaerstrom {
+    transition: --a 1.2s;
+    transition-timing-function: ease-in-out !important;
   }
 }
 
