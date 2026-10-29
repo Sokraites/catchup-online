@@ -1,5 +1,5 @@
 /**
- * Stufe Mittel: Akzentfarbe je Abschnitt, Überschriften Wort für Wort, Schimmer auf der Kategorie-Zeile, Scroll-Hinweis.
+ * Stufe Mittel: Akzentfarbe je Abschnitt, Überschriften Wort für Wort mit Akzent-Wort, Schimmer auf der Kategorie-Zeile, Scroll-Hinweis.
  * Ersatz für die Monitor-Dramaturgie der Stufe Schwer. Farben und Übergänge: src/styles/farbwelten.css.
  *
  * - Der Inhalt bleibt echter Text. Ohne JavaScript bleibt die Grundfarbe stehen, alles ist sofort sichtbar.
@@ -19,8 +19,9 @@ export function starteMittel() {
   starteFarbwelten();
   starteTippen();
   ladeBilderVor();
+  if (!ruhig()) starteWortweise();
+  markiereAkzentWorte();
   if (ruhig()) return;
-  starteWortweise();
   starteSchimmer();
   starteScrollHinweis();
 }
@@ -91,6 +92,31 @@ function starteWortweise() {
     });
     h.classList.add('wortweise');
     beobachter.observe(h);
+  }
+}
+
+/**
+ * Überschriften (h1, h2): Das letzte Wort bekommt die Klasse „akzent-wort“ (Verlauf von Weiß in die Akzentfarbe,
+ * farbwelten.css). Der Text bleibt gleich. Bei Wort-für-Wort-Überschriften ist es das letzte Wort-Teil,
+ * sonst wird das letzte Wort in einen <span> gelegt. Die h1 markiert beim Laden schon AkzentWort.astro;
+ * hier wird sie nur nachgezogen, wenn von Leicht auf Mittel gewechselt wird.
+ */
+function markiereAkzentWorte() {
+  for (const h of document.querySelectorAll<HTMLElement>('main h1, main h2')) {
+    if (h.querySelector('.akzent-wort')) continue;
+    const woerter = h.querySelectorAll('.wort');
+    if (woerter.length) {
+      woerter[woerter.length - 1].classList.add('akzent-wort');
+      continue;
+    }
+    if (!h.textContent?.trim() || ![...h.childNodes].every((n) => n.nodeType === Node.TEXT_NODE)) continue;
+    const text = h.textContent.trimEnd();
+    const i = text.lastIndexOf(' ');
+    const s = document.createElement('span');
+    s.className = 'akzent-wort';
+    s.textContent = text.slice(i + 1);
+    h.textContent = text.slice(0, i + 1);
+    h.append(s);
   }
 }
 

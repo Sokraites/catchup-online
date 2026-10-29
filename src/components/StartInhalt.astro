@@ -1,5 +1,6 @@
 ---
 import Faq from './Faq.astro';
+import AkzentWort from './AkzentWort.astro';
 import Kontakt from './Kontakt.astro';
 import Medium from './Medium.astro';
 import { site, REFERENZEN } from '../config/site';
@@ -14,6 +15,7 @@ import { referenzen } from '../content/referenzen';
   <div class="wrap">
     <p class="eyebrow">Webseiten für Betriebe</p>
     <h1 id="einstieg-titel">{site.claim}</h1>
+    <AkzentWort />
     <p class="lead">
       Wir bauen moderne Webseiten für Betriebe, bringen in die Jahre gekommene Auftritte auf den neuesten Stand und sorgen dafür, dass deine Kunden dich finden: bei Google und bei KI-Assistenten wie
       ChatGPT und Claude.
@@ -45,7 +47,7 @@ import { referenzen } from '../content/referenzen';
     <ul class="cards">
       {
         produkte.map((l) => (
-          <li class="card">
+          <li class="card" data-fluss-ziel={`leistung-${l.nummer}`}>
             <Medium name={l.medium} class="card-bild" />
             <span class="card-nr">{l.nummer} · {l.stufe}</span>
             <h3>
@@ -161,7 +163,7 @@ import { referenzen } from '../content/referenzen';
     <ul class="cards">
       {
         zusammenarbeit.map((s, i) => (
-          <li class="card stufen-karte" data-rang={i + 1}>
+          <li class="card stufen-karte" data-rang={i + 1} data-fluss-ziel={`stufe-${i + 1}`}>
             <span class="stufe-badge">{s.badge}</span>
             <h3>
               <a class="card-link" href={s.href}>{s.titel}</a>

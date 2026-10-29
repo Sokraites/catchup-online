@@ -68,6 +68,7 @@ html[data-stufe='mittel'][data-welt='kontakt'] {
 /* Alle Elemente, die die Akzentfarbe zeigen (Karten und Knöpfe stehen unten bei ihren eigenen Übergängen) */
 html[data-stufe='mittel'] main .eyebrow,
 html[data-stufe='mittel'] main .eyebrow::before,
+html[data-stufe='mittel'] main .eyebrow::after,
 html[data-stufe='mittel'] main h2,
 html[data-stufe='mittel'] main a,
 html[data-stufe='mittel'] main .card-more,
@@ -83,6 +84,7 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] main .eyebrow,
   html[data-stufe='mittel'] main .eyebrow::before,
+  html[data-stufe='mittel'] main .eyebrow::after,
   html[data-stufe='mittel'] main h2,
   html[data-stufe='mittel'] main a:not(.button),
   html[data-stufe='mittel'] main .card-more,
@@ -103,25 +105,73 @@ html[data-stufe='mittel'] :is(main, .site-header) .button {
   }
 }
 
-/* Akzent: Kategorie-Zeile, Überschrift, Links */
+/* Kategorie-Zeile als leuchtendes Abzeichen: Leuchtpunkt (::before), Fläche mit Rand und Leuchten (::after).
+   Die Fläche liegt auf ::after, damit der einmalige Schimmer (Verlauf auf dem Text) sie nicht verdeckt. */
 html[data-stufe='mittel'] main .eyebrow {
+  position: relative;
+  isolation: isolate;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+  padding: 0.4rem 0.95rem 0.4rem 0.8rem;
+  border-radius: 999px;
   color: var(--a);
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 8px color-mix(in srgb, var(--a) 20%, transparent);
+  letter-spacing: 0.08em;
 }
 html[data-stufe='mittel'] body main .eyebrow::before {
-  background: linear-gradient(90deg, var(--a), transparent);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--a);
+  box-shadow:
+    0 0 10px var(--a),
+    0 0 3px var(--a);
 }
+html[data-stufe='mittel'] main .eyebrow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--a) 40%, transparent);
+  background: color-mix(in srgb, var(--a) 8%, transparent);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--a) 18%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+/* Überschriften: Text hell, das Schlüsselwort (letztes Wort, .akzent-wort) im Verlauf von Weiß in die Akzentfarbe.
+   h1: Der <span> steht schon im HTML (src/lib/akzentwort.ts). h2: mittel.ts markiert das letzte Wort.
+   Der Verlauf liegt auf dem Wort selbst; sein schwächster Punkt ist die reine Akzentfarbe (gemessen ≥ 4,6:1). */
 html[data-stufe='mittel'] main h2 {
-  color: var(--a);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--a) 15%, transparent);
+  color: var(--ink);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--a) 22%, transparent);
 }
-@media (min-width: 768px) {
-  html[data-stufe='mittel'] main .eyebrow {
-    text-shadow: 0 0 12px color-mix(in srgb, var(--a) 20%, transparent);
+html[data-stufe='mittel'] main h1 {
+  text-shadow: 0 0 40px color-mix(in srgb, var(--akzent) 18%, transparent);
+}
+html[data-stufe='mittel'] main :is(h1, h2) .akzent-wort {
+  --a: var(--akzent);
+  background: linear-gradient(90deg, #ffffff, var(--a) 65%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: transparent;
+  /* Ein Schatten läge über dem Verlauf und machte ihn trüb */
+  text-shadow: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] main :is(h1, h2) .akzent-wort {
+    transition: --a 1.2s;
+    transition-timing-function: ease-in-out !important;
   }
+}
+/* Überschriften ab Tablet größer und enger gesetzt */
+@media (min-width: 768px) {
   html[data-stufe='mittel'] main h2 {
-    text-shadow: 0 0 20px color-mix(in srgb, var(--a) 15%, transparent);
+    font-size: clamp(2.25rem, 4.6vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    text-shadow: 0 0 32px color-mix(in srgb, var(--a) 25%, transparent);
   }
 }
 html[data-stufe='mittel'] main a:not(.button, .card-link),
@@ -182,69 +232,79 @@ html[data-stufe='mittel'] body .section::after {
   }
 }
 
-/* Karten: Glas mit 1,5 px Haarlinie in der Akzentfarbe, Innenschatten und heller Oberkante.
-   Die Fläche ist halb deckend dunkelblau: Sie dämpft den Hintergrund dahinter, so bleibt Text auf Karten gut lesbar.
-   Handy: keine Unschärfe (spart Rechenleistung), dafür kräftigeres Leuchten. Tablet Unschärfe 6 px, Desktop 8 px. */
+/* Karten: Glas mit leuchtendem Rand und dauerhaftem Leuchten in der Akzentfarbe.
+   Alles Leuchten ist box-shadow (zeichnet iOS Safari zuverlässig); Unschärfe (backdrop-filter) nur ab 768 px.
+   Handy (< 768 px): Fläche mit Akzent-Hauch statt Unschärfe, Leuchten kräftiger (Ersatz für das Überfahren).
+   Desktop (≥ 768 px): helles Glas mit 12 px Unschärfe.
+   Das stärkere Leuchten beim Überfahren liegt fertig gezeichnet auf ::before und wird nur eingeblendet (opacity). */
 html[data-stufe='mittel'] body .card {
   --karte-pad: 24px;
   padding: var(--karte-pad);
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.065), rgb(255 255 255 / 0.03)),
-    rgb(13 18 32 / 0.55);
-  border: 1.5px solid color-mix(in srgb, var(--a) 45%, transparent);
-  border-radius: 16px;
+    linear-gradient(180deg, color-mix(in srgb, var(--a) 12%, transparent), transparent 9rem),
+    color-mix(in srgb, var(--a) 6%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--a) 35%, transparent);
+  border-radius: 20px;
+  /* Leuchten weit (40 px) und eng an der Kante (12 px), Tiefenschatten, Lichtkante oben */
   box-shadow:
-    0 10px 28px rgb(0 0 0 / 0.42),
-    0 0 22px color-mix(in srgb, var(--a) 20%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 55%, rgb(255 255 255 / 0.2)),
-    inset 0 0 28px color-mix(in srgb, var(--a) 7%, transparent);
+    0 0 40px color-mix(in srgb, var(--a) 28%, transparent),
+    0 0 12px color-mix(in srgb, var(--a) 22%, transparent),
+    0 24px 48px -16px rgb(0 0 0 / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.14);
+}
+html[data-stufe='mittel'] body .card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 20px 60px rgb(0 0 0 / 0.5),
+    0 0 60px color-mix(in srgb, var(--a) 30%, transparent);
+  opacity: 0;
 }
 html[data-stufe='mittel'] body .card .card-bild {
   width: calc(100% + 2 * var(--karte-pad));
   margin: calc(-1 * var(--karte-pad)) calc(-1 * var(--karte-pad)) 1.25rem;
-  border-radius: 14.5px 14.5px 0 0;
+  border-radius: 18.5px 18.5px 0 0;
 }
 @media (min-width: 768px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 28px;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--a) 10%, transparent), transparent 9rem),
+      rgb(255 255 255 / 0.04);
     box-shadow:
-      0 8px 24px rgb(0 0 0 / 0.3),
-      0 0 16px color-mix(in srgb, var(--a) 12%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 40%, rgb(255 255 255 / 0.15)),
-      inset 0 0 24px color-mix(in srgb, var(--a) 5%, transparent);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+      0 0 40px color-mix(in srgb, var(--a) 15%, transparent),
+      0 0 12px color-mix(in srgb, var(--a) 18%, transparent),
+      0 24px 48px -16px rgb(0 0 0 / 0.7),
+      inset 0 1px 0 rgb(255 255 255 / 0.14);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
 }
 @media (min-width: 1025px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 32px;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
   }
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
 html[data-stufe='mittel'] body .stufen-karte {
   border-top: 3px solid var(--a);
 }
-/* Leuchtender Rand: beim Überfahren (Maus), beim Antippen (Handy, Klasse .getippt aus mittel.ts) und mit der Tastatur */
-html[data-stufe='mittel'] body .card:has(.card-link:focus-visible),
-html[data-stufe='mittel'] body .card.getippt {
-  border-color: color-mix(in srgb, var(--a) 85%, transparent);
-  box-shadow:
-    0 12px 32px rgb(0 0 0 / 0.4),
-    0 0 32px color-mix(in srgb, var(--a) 38%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
-    inset 0 0 28px color-mix(in srgb, var(--a) 10%, transparent);
+/* Stärkeres Leuchten: beim Überfahren (Maus), beim Antippen (Handy, Klasse .getippt aus mittel.ts) und mit der Tastatur */
+html[data-stufe='mittel'] body .card:is(.getippt, :has(.card-link:focus-visible)) {
+  border-color: color-mix(in srgb, var(--a) 70%, transparent);
+}
+html[data-stufe='mittel'] body .card:is(.getippt, :has(.card-link:focus-visible))::before {
+  opacity: 1;
 }
 @media (hover: hover) and (pointer: fine) {
   html[data-stufe='mittel'] body .card:hover {
-    border-color: color-mix(in srgb, var(--a) 85%, transparent);
-    box-shadow:
-      0 12px 32px rgb(0 0 0 / 0.4),
-      0 0 32px color-mix(in srgb, var(--a) 32%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--a) 70%, rgb(255 255 255 / 0.2)),
-      inset 0 0 28px color-mix(in srgb, var(--a) 8%, transparent);
+    border-color: color-mix(in srgb, var(--a) 70%, transparent);
+  }
+  html[data-stufe='mittel'] body .card:hover::before {
+    opacity: 1;
   }
 }
 
@@ -267,13 +327,19 @@ html[data-stufe='mittel'] body .card.getippt {
       --a 1.2s,
       opacity 0.45s,
       translate 0.45s,
-      transform 0.3s,
-      box-shadow 0.3s,
-      background 0.2s,
-      border-color 0.2s;
+      transform 0.25s,
+      border-color 0.25s;
   }
-  html[data-stufe='mittel'] body .card:has(.card-link:focus-visible) {
-    transform: translateY(-4px);
+  /* Anheben und Leuchten der Karten: 250 ms, ease (statt der gemeinsamen Kurve) */
+  html[data-stufe='mittel'] body .card {
+    transition-timing-function: ease-in-out, ease, ease, ease, ease !important;
+  }
+  html[data-stufe='mittel'] body .card::before {
+    transition: opacity 0.25s;
+    transition-timing-function: ease !important;
+  }
+  html[data-stufe='mittel'] body .card:is(.getippt, :has(.card-link:focus-visible)) {
+    transform: translateY(-6px);
   }
 
   /* Überschriften Wort für Wort (src/scripts/mittel.ts): 80 ms Abstand, 0,5 s, 12 px von unten */
@@ -340,7 +406,7 @@ html[data-stufe='mittel'] body .card.getippt {
 }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 }
 @keyframes eyebrow-schimmer {
@@ -572,43 +638,54 @@ html[data-stufe='mittel'] .aurora-wolken i:nth-child(4) {
   }
 }
 
-/* ---------- Knöpfe: Pillenform, Akzent-Verlauf, dunkle Schrift, Neon-Leuchten ----------
+/* ---------- Knöpfe: Akzent-Verlauf (135°), Glanzkante, Neon-Leuchten, Anheben ----------
    Gilt im Inhalt und in der Kopfleiste (Terminbuch und Kachel-Meldung behalten ihr Aussehen).
-   Der Verlauf geht von etwas heller zur reinen Akzentfarbe: Die dunkle Schrift hat überall mindestens 6,8:1. */
+   Verlauf von der Akzentfarbe zu „akzent-deep“ (25 % Richtung Schwarz). Schrift schwarz: So hat sie auch am dunklen
+   Ende des Verlaufs mindestens 4,6:1 (Pink, Violett); dunkelblaue Schrift läge dort bei 4,1:1.
+   Leuchten nur über box-shadow (zeichnet iOS Safari zuverlässig). Das stärkere Leuchten und der um 10 % hellere
+   Verlauf beim Überfahren/Antippen liegen fertig gezeichnet auf ::before und ::after und werden nur eingeblendet:
+   Der Browser ändert dabei nur opacity und transform. */
 html[data-stufe='mittel'] :is(main, .site-header) .button {
   --knopf: var(--a);
+  --knopf-deep: color-mix(in srgb, var(--knopf) 75%, black);
+  position: relative;
+  isolation: isolate;
   border: 1px solid transparent;
-  border-radius: 999px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--knopf) 78%, white) 0%, var(--knopf) 100%);
-  color: var(--bg);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--knopf), var(--knopf-deep));
+  color: #000;
   font-weight: 600;
+  /* Glanzkante und Leuchten (Pflichtwerte), dazu ein enges Neon-Leuchten und ein farbiger Schatten nach unten */
   box-shadow:
-    0 0 20px color-mix(in srgb, var(--knopf) 40%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.3),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 0 24px color-mix(in srgb, var(--knopf) 35%, transparent),
+    0 0 6px color-mix(in srgb, var(--knopf) 45%, transparent),
+    0 10px 28px -10px color-mix(in srgb, var(--knopf) 70%, transparent);
   transition:
     --a 1.2s,
-    transform 0.3s,
-    box-shadow 0.3s,
-    background-color 0.3s,
-    border-color 0.3s,
-    color 0.3s;
+    transform 0.2s;
+  transition-timing-function: ease-in-out, ease !important;
 }
-/* Handy und Tablet ohne Maus: kein Hover, darum leuchten die Knöpfe von Anfang an kräftiger */
-@media (hover: none), (pointer: coarse) {
-  html[data-stufe='mittel'] :is(main, .site-header) .button {
-    box-shadow:
-      0 0 26px color-mix(in srgb, var(--knopf) 55%, transparent),
-      0 0 4px color-mix(in srgb, var(--knopf) 60%, transparent),
-      0 3px 8px rgb(0 0 0 / 0.35),
-      inset 0 1px 0 rgb(255 255 255 / 0.4);
-  }
-  html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
-    background: color-mix(in srgb, var(--knopf) 8%, transparent);
-    box-shadow:
-      0 0 18px color-mix(in srgb, var(--knopf) 30%, transparent),
-      inset 0 0 12px color-mix(in srgb, var(--knopf) 12%, transparent);
-  }
+html[data-stufe='mittel'] :is(main, .site-header) .button::before,
+html[data-stufe='mittel'] :is(main, .site-header) .button::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  transition-timing-function: ease !important;
+}
+/* Leuchten beim Überfahren/Antippen: 0 0 40px, 50 % */
+html[data-stufe='mittel'] :is(main, .site-header) .button::before {
+  box-shadow: 0 0 40px color-mix(in srgb, var(--knopf) 50%, transparent);
+}
+/* Verlauf 10 % heller (liegt unter der Schrift, über der Grundfläche) */
+html[data-stufe='mittel'] :is(main, .site-header) .button:not(.button-ghost)::after {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--knopf) 90%, white), color-mix(in srgb, var(--knopf-deep) 90%, white));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
 }
 /* Größe: im Inhalt nach Gerät; die Kopfleiste behält ihre Maße, damit sie einzeilig bleibt */
 html[data-stufe='mittel'] main .button {
@@ -617,42 +694,50 @@ html[data-stufe='mittel'] main .button {
 }
 @media (min-width: 768px) {
   html[data-stufe='mittel'] main .button {
-    padding: 12px 24px;
+    min-height: 52px;
+    padding: 14px 30px;
+    font-size: 1.05rem;
   }
 }
+/* Rahmen-Knöpfe (zweitrangig): 1,5 px Rand in der Akzentfarbe, beim Überfahren 10 % Akzent-Fläche */
 html[data-stufe='mittel'] :is(main, .site-header) .button-ghost {
   background: transparent;
-  border-color: var(--knopf);
+  border: 1.5px solid var(--knopf);
   color: var(--knopf);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--knopf) 15%, transparent);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--knopf) 20%, transparent),
+    inset 0 0 14px color-mix(in srgb, var(--knopf) 12%, transparent);
+}
+html[data-stufe='mittel'] :is(main, .site-header) .button-ghost::after {
+  inset: -1.5px;
+  background: color-mix(in srgb, var(--knopf) 10%, transparent);
 }
 html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:hover {
-  background: color-mix(in srgb, var(--knopf) 10%, transparent);
-  color: var(--knopf);
+  background: transparent;
 }
-/* Überfahren (nur mit Maus) und Antippen (Handy): stärkeres Leuchten, 2 px angehoben */
+/* Mit der 10-%-Fläche wird der Grund heller: Schrift dann etwas aufhellen (Pink am Handy sonst nur 4,2:1) */
+html[data-stufe='mittel'] :is(main, .site-header) .button-ghost:is(:hover, :active, .getippt, :focus-visible) {
+  color: color-mix(in srgb, var(--knopf) 72%, white);
+}
+/* Überfahren (nur mit Maus), Antippen (Handy: :active und .getippt aus mittel.ts) und Tastatur: stärker leuchten, 3 px anheben */
+html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt, :focus-visible)::before,
+html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt, :focus-visible)::after {
+  opacity: 1;
+}
 @media (hover: hover) and (pointer: fine) {
-  html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
-    box-shadow:
-      0 0 32px color-mix(in srgb, var(--knopf) 55%, transparent),
-      0 4px 12px rgb(0 0 0 / 0.4),
-      inset 0 1px 0 rgb(255 255 255 / 0.4);
+  html[data-stufe='mittel'] :is(main, .site-header) .button:hover::before,
+  html[data-stufe='mittel'] :is(main, .site-header) .button:hover::after {
+    opacity: 1;
   }
-}
-html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
-  box-shadow:
-    0 0 32px color-mix(in srgb, var(--knopf) 65%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.35),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
 }
 @media (prefers-reduced-motion: no-preference) {
   @media (hover: hover) and (pointer: fine) {
     html[data-stufe='mittel'] :is(main, .site-header) .button:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
     }
   }
   html[data-stufe='mittel'] :is(main, .site-header) .button:is(:active, .getippt) {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
   }
 }
 

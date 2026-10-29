@@ -119,3 +119,10 @@ Nachtrag 28.10.2026: Die dunklen Grundfarben je Abschnitt sind entfallen, der Gr
 Nachtrag 27.10.2026 (zweite Runde): Keine Farbe geändert. Titel in Karten nehmen beim Überfahren den Akzent an (Spalte „Akzent auf Karte“, mindestens 5,01:1). Der goldene Glanz des Schimmers (`#f6e2b5`) liegt auf allen Grundfarben bei 13,97 bis 15,19:1.
 
 Nachtrag 28.10.2026 (v4, Knöpfe und Abzeichen in Mittel): dunkle Schrift `#0d0d13` auf dem Akzent-Verlauf (unten 15 % dunkler) mindestens 4,83:1 (Kontakt), Rahmen-Knöpfe Akzent auf Grund mindestens 6,29:1, beim Überfahren mindestens 5,54:1, Abzeichen Stufe 1/2/3 mindestens 6,49 / 9,11 / 12,34:1. Keine Farbe angepasst.
+
+Nachtrag 29.10.2026 (Premium-Basis: Knöpfe, Karten, Überschriften in Mittel): gemessen an den gezeichneten Bildpunkten (Text ausgeblendet, Hintergrund unter jeder Textzeile fotografiert, Aurora läuft, 390 und 1440 px, jeder Abschnitt der Startseite in Lime, Pink und Violett).
+- Knopf-Schrift jetzt **schwarz** statt dunkelblau: Am dunklen Ende des neuen Verlaufs (Akzent → 25 % Richtung Schwarz) hätte dunkelblaue Schrift bei Pink und Violett nur 4,1:1. Schwarz: mindestens 4,6:1 am dunkelsten Punkt, gemessen 5,1:1 und mehr.
+- Rahmen-Knöpfe beim Überfahren/Antippen: Die 10-%-Fläche hebt den Grund an (Pink am Handy 4,20:1). Nur in diesem Zustand wird die Schrift 28 % heller, jetzt mindestens 5,06:1.
+- Überschriften-Wort im Verlauf (Weiß → Akzent): gerechnet mit der Akzentfarbe als schwächstem Punkt, mindestens 4,60:1. Restliche Überschrift weiß, mindestens 5,76:1.
+- Abzeichen (Kategorie-Zeile) mindestens 4,79:1, Kartentext auf der getönten Handy-Karte mindestens 4,58:1, Einleitungen mindestens 4,79:1.
+- Kein Wert unter 4,5:1. Nichts wurde global abgedunkelt.

@@ -232,6 +232,21 @@ Ursache „auf dem iPhone nichts zu sehen“: Der Strahl wurde über der ganzen 
 - [ ] Mit Schwer wechselt die Stufe weiter mit Neuladen (Schwer baut die Seite in den Monitor um)
 - [ ] Beschreibung der Stufe Mittel im Stufen-Menü (`src/config/stufen.ts`) nennt den neuen Hintergrund noch nicht (Text, nicht angefasst)
 
+## Stufe Mittel: Premium-Basis (29.10.2026)
+
+Ausgangspunkt v5 (Zweig `claude/stufe-mittel-sichtbar-z7pvbx`, Commit 342b666). v6 und v7 auf jenem Zweig sind nicht enthalten.
+- [x] Knöpfe: Verlauf 135° Akzent → 25 % dunkler, Glanzkante innen, Leuchten 24 px (35 %), dazu enges Neon-Leuchten und farbiger Schatten; Ecken 12 px statt Pille; schwarze Schrift
+- [x] Knöpfe beim Überfahren (Maus) und Antippen (Handy): 3 px hoch, Leuchten 40 px (50 %), Verlauf 10 % heller, 200 ms; das Leuchten liegt fertig auf ::before/::after und wird nur eingeblendet
+- [x] Rahmen-Knöpfe: 1,5 px Rand in Akzentfarbe, beim Überfahren 10 % Akzent-Fläche
+- [x] Karten Desktop (≥ 768 px): Glas 4 % Weiß, Unschärfe 12 px, Rand 1,5 px Akzent 35 %, Leuchten 40 px (15 %) + 12 px; Handy: keine Unschärfe, Akzent-Fläche 6 %, Leuchten 40 px (28 %); Ecken 20 px
+- [x] Karten beim Überfahren/Antippen/Tastatur: 6 px hoch, Schatten 0 20px 60px + Leuchten 60 px (30 %), 250 ms
+- [x] Überschriften: h1 und h2 weiß, letztes Wort im Verlauf Weiß → Akzentfarbe; h2 ab Tablet größer (bis 4 rem)
+- [x] Kategorie-Zeile als leuchtendes Abzeichen mit Leuchtpunkt
+- [x] Andockpunkte `data-fluss-ziel` an den 6 Karten der Startseite (`leistung-01…03`, `stufe-1…3`)
+- [x] Kontrast gemessen (Nachtrag in docs/ENTSCHEIDUNGEN.md), Leicht/Schwer bildpunktgleich, Funktionstest und Seitenprüfung ohne Befund, Lighthouse Handy Start 93–96
+- [ ] Auf echtem iPhone ansehen (geprüft nur im Testbrowser Chromium mit Handy-Nachbildung)
+- [ ] Hintergrund (Aurora) unverändert; ersetzt ihn der nächste Schritt, wirkt die Seite erst als Ganzes neu
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

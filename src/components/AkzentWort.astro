@@ -1,0 +1,21 @@
+---
+/**
+ * Steht direkt hinter einer h1 und markiert dort in Stufe Mittel das Schlüsselwort (letztes Wort) mit
+ * <span class="akzent-wort"> (Verlauf von Weiß in die Akzentfarbe, src/styles/farbwelten.css). Der Text bleibt gleich.
+ * Läuft während des Ladens, noch bevor die Überschrift das erste Mal gezeichnet wird: nichts springt.
+ * In Leicht und Schwer (und ohne JavaScript) bleibt das HTML unverändert. Gegenstück für h2: src/scripts/mittel.ts.
+ */
+---
+
+<script is:inline>
+  (function (h) {
+    if (document.documentElement.dataset.stufe !== 'mittel' || !h || h.querySelector('.akzent-wort')) return;
+    var t = h.textContent;
+    var i = t.lastIndexOf(' ');
+    var s = document.createElement('span');
+    s.className = 'akzent-wort';
+    s.textContent = t.slice(i + 1);
+    h.textContent = t.slice(0, i + 1);
+    h.appendChild(s);
+  })(document.currentScript && document.currentScript.previousElementSibling);
+</script>

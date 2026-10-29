@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import AkzentWort from '../components/AkzentWort.astro';
 import Platzhalter from '../components/Platzhalter.astro';
 import { site } from '../config/site';
 import { brotkrumen } from '../lib/schema';
@@ -15,6 +16,7 @@ const { telefon, email } = site.kontakt;
   <section class="hero hero-sub" aria-labelledby="seite-titel">
     <div class="wrap">
       <h1 id="seite-titel">Termin buchen</h1>
+      <AkzentWort />
       <p class="lead">
         In einem Gespräch erzählst du uns von deinem Betrieb, und wir sagen dir, was deine Webseite für dich tun kann.
       </p>

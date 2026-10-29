@@ -1,6 +1,7 @@
 ---
 import Base from './Base.astro';
 import Kontakt from '../components/Kontakt.astro';
+import AkzentWort from '../components/AkzentWort.astro';
 import { brotkrumen, leistung } from '../lib/schema';
 
 /** Gemeinsamer Rahmen für die Leistungs-Unterseiten. */
@@ -29,6 +30,7 @@ const pfad = Astro.url.pathname;
         <a href="/">Start</a> <span aria-hidden="true">/</span> <span aria-current="page">{eyebrow}</span>
       </nav>
       <h1 id="seite-titel">{h1}</h1>
+      <AkzentWort />
       <p class="lead">{lead}</p>
       <div class="actions">
         <a class="button" href="/termin/">Termin buchen</a>
