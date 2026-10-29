@@ -1,0 +1,43 @@
+CATCH UP – ÜBERGABE VERSION 8
+==============================================================================
+
+Stand:        29.10.2026
+Version:      v8 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 978b761 (GitHub: Sokraites/catchup-online, Branch claude/fervent-einstein-f37myd)
+ZIP:          releases/v8/catchup-seite-v8.zip (70 Dateien, 12,4 MB)
+Prüfsumme:    b487b39d144b6ad28aca6b731f599b9d48a6531e0280806dcce95f7947abd2cb
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+WICHTIG: v8 baut auf v5 auf, nicht auf v6/v7. v6 und v7 liegen nur auf dem
+Branch claude/stufe-mittel-sichtbar-z7pvbx. Die Nummer v8 verhindert, dass
+zwei verschiedene Versionen „v6“ heißen.
+
+
+WAS IST NEU GEGENÜBER v5 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Knöpfe: Farbverlauf schräg von der Akzentfarbe ins Dunklere, helle
+    Glanzkante oben, deutliches Leuchten in der Akzentfarbe, Ecken statt Pille.
+    Beim Überfahren (Maus) oder Antippen (Handy) heben sie sich 3 px und
+    leuchten stärker. Schrift schwarz (besser lesbar auf dem Verlauf).
+  - Rahmen-Knöpfe: Rand 1,5 px in der Akzentfarbe, beim Überfahren eine
+    leichte Fläche in der Akzentfarbe.
+  - Karten: Glas mit leuchtendem Rand und dauerhaftem Leuchten. Computer:
+    helles Glas mit Unschärfe. Handy: ohne Unschärfe (die dimmt iOS Safari),
+    dafür eine leichte Tönung und kräftigeres Leuchten.
+    Beim Überfahren/Antippen heben sie sich 6 px mit tiefem Schatten.
+  - Überschriften weiß, das letzte Wort im Verlauf von Weiß in die
+    Akzentfarbe (z. B. „aufholen.“). Ab Tablet sind die Überschriften größer.
+  - Kategorie-Zeile (z. B. „LEISTUNGEN“) als leuchtendes Abzeichen.
+  - Alles Leuchten ist „box-shadow“: Das zeichnet auch das iPhone zuverlässig.
+  - Hintergrund (Lichtwolken) und alle Texte unverändert.
+  - Leicht und Schwer sehen genau aus wie in v5 (bildpunktgleich geprüft).
+
+
+ZU PRÜFEN
+------------------------------------------------------------------------------
+  - Auf echtem iPhone ansehen. Geprüft wurde im Testbrowser Chromium mit
+    Handy-Nachbildung (390 px), nicht auf einem echten Gerät.
+  - Der Hintergrund ist noch der von v5. Erst wenn er im nächsten Schritt
+    ersetzt wird, wirkt die Seite als Ganzes neu. Knöpfe, Karten und
+    Überschriften sehen schon jetzt anders aus.
