@@ -1,0 +1,42 @@
+CATCH UP – ÜBERGABE VERSION 9
+==============================================================================
+
+Stand:        29.10.2026
+Version:      v9 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit edb938e (GitHub: Sokraites/catchup-online, Branch claude/fervent-einstein-f37myd)
+ZIP:          releases/v9/catchup-seite-v9.zip (70 Dateien, 12,3 MB)
+Prüfsumme:    f913c0c939334bc2ce9bb47ff37e0d029eaf2eca734492998add02fea6fded66
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v8 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Neuer Hintergrund: Ein ruhiger Strom aus 0 und 1 zieht leicht schräg
+    durch den Hintergrund, in der Farbe des Abschnitts (Lime, Pink, Violett).
+    Kein schneller „Matrix-Regen“, sondern ein langsamer, welliger Fluss.
+  - Einzelne Zeichen glimmen kurz auf und ziehen eine weiche Spur hinter sich.
+  - Hinter Text ist der Strom fast unsichtbar, hinter den Karten gar nicht.
+  - Die alten Lichtwolken („Aurora“) sind vollständig entfernt. Sie waren
+    auf dem iPhone nicht zu sehen.
+  - Sparsam: Auf dem Handy halb so viele Zeichen, der Strom pausiert, wenn
+    der Tab im Hintergrund liegt. Bei „Bewegung reduzieren“ steht ein ruhiges
+    Muster.
+  - Knöpfe, Karten, Überschriften, Texte: unverändert.
+  - Leicht und Schwer sehen genau aus wie in v8 (bildpunktgleich geprüft).
+
+
+ENTSCHEIDUNG, DIE DU PRÜFEN SOLLTEST
+------------------------------------------------------------------------------
+  Die weiche Spur sollte laut Auftrag entstehen, indem die ganze Fläche in
+  jedem Bild nur leicht übermalt wird. Ausprobiert: Dann verschmieren die
+  Ziffern zu Streifen, man erkennt keine 0 und 1 mehr, und es bleiben dunkle
+  Schlieren zurück. Deshalb bleiben die Ziffern jetzt scharf, und nur die
+  aufglimmenden Zeichen ziehen eine weiche Spur.
+
+
+ZU PRÜFEN
+------------------------------------------------------------------------------
+  - Auf echtem iPhone ansehen: Ist der Strom zu sehen? Läuft er flüssig?
+    Wird das Handy warm? Geprüft wurde nur im Testbrowser Chromium (ohne
+    Grafikkarte, 390 px Handy-Nachbildung).
