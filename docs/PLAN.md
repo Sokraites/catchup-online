@@ -284,6 +284,17 @@ Ausgangspunkt v5 (Zweig `claude/stufe-mittel-sichtbar-z7pvbx`, Commit 342b666). 
 - [ ] Funktionstest und Seitenprüfung sind datumsabhängig: am 30.10.2026 (Freitag, nächster Werktag erst im November) findet der Tischkalender (Schwer) keinen buchbaren Tag im Oktober, und `/termin/` meldet am Handy eine nicht per Tastatur erreichbare Wisch-Leiste. Beides auch in v10, nicht durch diese Änderung; der Test sollte unabhängig vom Datum werden
 - [ ] Auf echtem iPhone prüfen: Verdichtung an Karten sichtbar, Impuls beim Scrollen spürbar, flüssig, Handy nicht warm
 
+## Stufe Mittel: Karten-Synergie sichtbar (30.10.2026)
+
+Anlass: Am echten iPhone war die Karten-Synergie aus v11 nicht zu sehen (Strom verschwand hinter den Karten, Verdichtung und Anziehung zu schwach). Scroll-Impuls unverändert.
+- [x] Umlenkung statt Verdecken: Bahnen weichen 90 px (Handy 40 px) vor einer Karte nach oben oder unten aus, Bahnen bis 70 px (Handy 50 px) tief in der Karte werden in ein 56-px-Band am Rand gedrückt (dort ~2,4-fache Dichte, Deckkraft bis 0,55), kehren hinter der Karte zurück; tiefere Bahnen tauchen weich ab
+- [x] Rand-Glow (`.card[data-fluss-ziel]::after`, box-shadow, nur Deckkraft ändert sich): atmet zwischen 0,31 und 0,54 als Welle in Flussrichtung (3,2 s), beim Scroll-Impuls bis ~0,9; bei „Bewegung reduzieren“ aus
+- [x] Randzeichen: Dichte verdoppelt (0,3 → 0,6), Deckkraft 0,5–0,6 (vorher 0,24–0,35), Schienen 12/26 px (Handy 9 px, damit sie neben der Karte im Bild bleiben)
+- [x] Grundstrom heller: 0,22–0,34 (vorher 0,16–0,28); Dämpfung hinter Text unverändert
+- [x] Behoben (seit Schritt 1): Das Hover-Leuchten der Karten (`::before`) war in jedem Abschnitt lime, weil `--a` nicht an Pseudo-Elemente vererbt wird. Jetzt in der Abschnittsfarbe
+- [x] Geprüft: Karteninneres 0 Bildpunkte, Leicht/Schwer bildpunktgleich zu v11, Funktionstest 21/21 bis zum bekannten datumsabhängigen Kalenderschritt
+- [ ] Auf echtem iPhone prüfen: Umfließen oder Rand-Glow deutlich sichtbar, flüssig, Handy nicht warm
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

@@ -15,9 +15,11 @@
  *   Ausprobiert war zuerst, die Fläche je Bild nur zu 10 % zu übermalen: Dann verschmieren die Ziffern zu Streifen, werden
  *   3- bis 4-mal so deckend wie gewollt und hinterlassen dunkle Rundungsreste. Darum wird jedes Bild gelöscht.
  * - Farbe: --a der Zeichenfläche, also die Akzentfarbe samt ihrem 1,2-s-Gleitwechsel aus farbwelten.css.
- * - Karten-Synergie (Karten mit data-fluss-ziel): Strom-Zeichen in der Nähe werden sanft zum Kartenrand gezogen;
- *   zusätzliche Randzeichen fließen außen um die Karte (oben und unten von links nach rechts). Ins Karteninnere kommt
- *   kein Zeichen. Gerechnet wird das nur für Zeichen im Umkreis einer Karte im Bild.
+ * - Karten-Synergie (Karten mit data-fluss-ziel): Bahnen, die auf eine Karte treffen, weichen vor ihr nach oben oder
+ *   unten aus, drängen sich in einem dichten, helleren Band am Rand entlang und kehren hinter ihr zurück (Umlenkung statt
+ *   Verdecken); tiefere Bahnen tauchen weich ab. Zusätzliche Randzeichen fließen außen um die Karte. Der Kartenrand
+ *   leuchtet (CSS --fluss-glanz): atmet als Welle in Flussrichtung, hell beim Scroll-Impuls. Ins Karteninnere kommt
+ *   kein Zeichen. Gerechnet wird das nur für Zeichen im Bereich einer Karte im Bild.
  * - Scroll-Impuls: Beim Scrollen wandert ein waagerechtes Lichtband aus aufglimmenden Zeichen in Scrollrichtung über
  *   den Strom und klingt in 0,8 s aus; schnelleres Scrollen macht es breiter und heller, Kartenränder leuchten mit.
  * - Lesbarkeit: Hinter Text höchstens 0,06 und kein Glimmer oder Impuls; Karteninneres frei.
@@ -32,7 +34,7 @@ const ZEICHEN = 11;
 const RAND = 40;
 const NEIGUNG = 0.03;
 const WELLE = { hoehe: 4, laenge: 420, tempo: 0.45 };
-const DECKKRAFT = [0.16, 0.28];
+const DECKKRAFT = [0.22, 0.34];
 const HINTER_TEXT = 0.06;
 /** Ströme: Abstand und Breite der Bänder (px), Grunddichte der ruhigen Zonen (Anteil), Tempo in Bändern und dazwischen */
 const STROM = { abstand: [170, 260], breite: [40, 80], ruhe: 0.06, tempo: [32, 40], ruhigTempo: [20, 26] };
@@ -45,21 +47,27 @@ const NACHGLUEHEN = [
   [12, 0.25],
   [18, 0.12],
 ];
-/** Karten-Synergie (Karten mit data-fluss-ziel): Anziehung im Umkreis (px) mit höchstens `zug` px Ablenkung;
- *  Randzeichen auf Schienen im Abstand `schienen` px vom Kartenrand, `dichte` = belegter Anteil der Plätze,
- *  Deckkraft am Rand bis 0,35 (`band`: so nah am Rand werden auch Strom-Zeichen kräftiger) */
+/** Karten-Synergie (Karten mit data-fluss-ziel):
+ *  Umlenkung: Bahnen, die auf eine Karte treffen, weichen ab `vorlauf` px vor der Karte nach oben oder unten aus,
+ *  laufen in einem Band (`band` px, `luecke` px Abstand) am Rand entlang und kehren hinter der Karte zurück. Bahnen bis
+ *  `tiefe` px innerhalb der Karte werden so in das Band gedrückt (dort dichter, bis `saum` Deckkraft); tiefere tauchen weich ab.
+ *  Randzeichen: fließen zusätzlich auf Schienen `schienen` px außerhalb um die Karte (Dichte, Deckkraft 0,5–0,6).
+ *  Rand-Glow: Die Karte leuchtet am Rand (CSS --fluss-glanz), atmet in Flussrichtung, beim Scroll-Impuls hell auf. */
 const KARTE = {
-  umkreis: 140,
-  handyUmkreis: 90,
-  zug: 10,
-  handyZug: 6,
-  schienen: [14, 30],
-  handySchienen: [14],
-  dichte: 0.3,
-  deckkraft: [0.24, 0.35],
-  band: 40,
+  vorlauf: 90,
+  handyVorlauf: 40,
+  tiefe: 70,
+  handyTiefe: 50,
+  band: 56,
+  luecke: 8,
+  saum: 0.55,
+  schienen: [12, 26],
+  handySchienen: [9],
+  dichte: 0.6,
+  deckkraft: [0.5, 0.6],
   tempo: 30,
   ecke: 20,
+  glanz: { ruhe: [0.3, 0.55], periode: 3.2, impuls: 1 },
 };
 /** Scroll-Impuls: Lebensdauer (s), Abstand zwischen Impulsen beim Scrollen (s), Breite (px) und Leuchtkraft je nach
  *  Scroll-Tempo (px/s; ab `vollesTempo` volle Stärke, unter `minTempo` kein Impuls), Karten leuchten dabei stärker */
@@ -74,6 +82,7 @@ const ZELLE = 8;
 type Zeichen = { bahn: number; s: number; bit: number; a: number; r: number; gStart: number; gDauer: number; gSpitze: number };
 type Bahn = { y: number; tempo: number; phase: number };
 type Rechteck = { x: number; y: number; b: number; h: number };
+const glatt = (u: number) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
 /** Randzeichen: fließt auf einer Schiene (Abstand o vom Kartenrand) um die obere oder untere Hälfte der Karte */
 type Randzeichen = { o: number; unten: boolean; s: number; bit: number; a: number; r: number };
 /** Maske je 8-px-Zelle: 0 frei, 1 nahe an Text (kein Glimmer), 2 hinter Text (gedämpft), 3 Karte (kein Zeichen) */
@@ -227,7 +236,7 @@ export function starteBinaerstrom() {
   let maske = new Uint8Array(0);
   let maskeFuer = NaN;
   // Karten (Seitenkoordinaten) und ihre Randzeichen; neu angelegt nur, wenn sich eine Karte in der Größe ändert
-  let karten: (Rechteck & { rand: Randzeichen[] })[] = [];
+  let karten: (Rechteck & { rand: Randzeichen[]; el: HTMLElement; glanz: number })[] = [];
   function sammle() {
     const y0 = scrollY;
     const liste: Flaeche[] = [];
@@ -240,12 +249,12 @@ export function starteBinaerstrom() {
       nimm(el, 2, 6);
     });
     document.querySelectorAll(FREI).forEach((el) => nimm(el, 3, 2));
-    karten = [...document.querySelectorAll(FREI)].map((el, i) => {
+    karten = [...document.querySelectorAll<HTMLElement>(FREI)].map((el, i) => {
       const r = el.getBoundingClientRect();
       const k = { x: r.left, y: r.top + y0, b: r.width, h: r.height };
       const alt = karten[i];
       const gleich = alt && Math.abs(alt.b - k.b) < 1 && Math.abs(alt.h - k.h) < 1;
-      return { ...k, rand: gleich ? alt.rand : still ? [] : randzeichen(k) };
+      return { ...k, el, glanz: alt?.glanz ?? -1, rand: gleich ? alt.rand : still ? [] : randzeichen(k) };
     });
     flaechen = liste;
     flaechenDa = true;
@@ -385,13 +394,30 @@ export function starteBinaerstrom() {
       return g;
     };
 
-    // Karten im Bild (mit Umkreis); nur Zeichen in deren Nähe werden für Anziehung und Rand gerechnet
-    const umkreis = handy ? KARTE.handyUmkreis : KARTE.umkreis;
-    const zug = handy ? KARTE.handyZug : KARTE.zug;
+    // Karten im Bild (mit Umlenk-Bereich); nur Zeichen in deren Nähe werden für Umlenkung und Rand gerechnet
+    const vorlauf = handy ? KARTE.handyVorlauf : KARTE.vorlauf;
     const imBild = karten
       .map((kt) => ({ ...kt, y: kt.y - scrollY }))
-      .filter((kt) => kt.y < h + umkreis && kt.y + kt.h > -umkreis && kt.x < b + umkreis && kt.x + kt.b > -umkreis);
+      .filter((kt) => kt.y < h + KARTE.band && kt.y + kt.h > -KARTE.band && kt.x < b + vorlauf && kt.x + kt.b > -vorlauf);
     const nahe = still ? [] : imBild;
+    // Rand-Glow: atmet als Welle in Flussrichtung (links früher), leuchtet hell auf, wenn ein Impuls die Karte kreuzt
+    if (!still) {
+      for (const kt of karten) {
+        const sichtbar = imBild.find((k) => k.el === kt.el);
+        let g = 0;
+        if (sichtbar) {
+          const welleG = 0.5 + 0.5 * Math.sin((2 * Math.PI * t) / KARTE.glanz.periode - kt.x / 300);
+          g = KARTE.glanz.ruhe[0] + (KARTE.glanz.ruhe[1] - KARTE.glanz.ruhe[0]) * welleG;
+          for (const band of baender) {
+            if (band.y > sichtbar.y - band.breite && band.y < sichtbar.y + sichtbar.h + band.breite) g = Math.max(g, Math.min(KARTE.glanz.impuls, 0.45 + band.spitze));
+          }
+        }
+        if (Math.abs(g - kt.glanz) > 0.02) {
+          kt.glanz = g;
+          kt.el.style.setProperty('--fluss-glanz', g.toFixed(2));
+        }
+      }
+    }
     /** Berührt das Zeichen (sichtbarer Teil des Kästchens) eine Karte? Dann wird es nicht gezeichnet: Karten bleiben frei */
     const inKarte = (x: number, y: number) =>
       imBild.some((kt) => x + ZEICHEN - 1 > kt.x && x + 1 < kt.x + kt.b && y + ZEILE - 5 > kt.y && y + 5 < kt.y + kt.h);
@@ -442,27 +468,40 @@ export function starteBinaerstrom() {
         if (p >= 1) z.gStart = -1;
         else glanz = z.gSpitze * (p < 0.12 ? p / 0.12 : (1 - (p - 0.12) / 0.88) ** 2);
       }
-      // Anziehung: im Umkreis einer Karte sanft zum nächsten Kartenrand ziehen; ganz nah am Rand kräftiger
-      let dx = 0;
+      // Umlenkung: trifft die Bahn eine Karte, weicht das Zeichen vor ihr nach oben oder unten in das Band am Rand aus
+      // und kehrt hinter ihr zurück (bei mehreren Karten zählt die stärkste Umlenkung). Tiefere Bahnen tauchen weich ab.
       let dy = 0;
+      let f = 0;
+      const mx = x + ZEICHEN / 2;
+      const my = y + ZEILE / 2;
       for (const kt of nahe) {
-        const mx = x + ZEICHEN / 2;
-        const my = y + ZEILE / 2;
-        if (mx < kt.x - umkreis || mx > kt.x + kt.b + umkreis || my < kt.y - umkreis || my > kt.y + kt.h + umkreis) continue;
-        const px = Math.min(Math.max(mx, kt.x), kt.x + kt.b);
-        const py = Math.min(Math.max(my, kt.y), kt.y + kt.h);
-        const d = Math.hypot(px - mx, py - my);
-        if (!d || d >= umkreis) continue;
-        const n = (1 - d / umkreis) ** 2;
-        dx = ((px - mx) / d) * zug * n;
-        dy = ((py - my) / d) * zug * n;
-        if (d < KARTE.band) a = Math.max(a, a + (KARTE.deckkraft[1] - a) * (1 - d / KARTE.band));
-        break;
+        if (mx < kt.x - vorlauf || mx > kt.x + kt.b + vorlauf || my < kt.y - KARTE.band || my > kt.y + kt.h + KARTE.band) continue;
+        const fk = mx < kt.x ? glatt((mx - kt.x + vorlauf) / vorlauf) : mx > kt.x + kt.b ? glatt(1 - (mx - kt.x - kt.b) / vorlauf) : 1;
+        if (fk <= f) continue;
+        f = fk;
+        const tiefe = Math.min(handy ? KARTE.handyTiefe : KARTE.tiefe, kt.h / 2);
+        const enge = (KARTE.band - KARTE.luecke) / (KARTE.band + tiefe);
+        const oben = kt.y;
+        const unten = kt.y + kt.h;
+        let ziel: number;
+        let rand: number;
+        if (my <= oben + tiefe && my < oben + kt.h / 2) [ziel, rand] = [oben - KARTE.band + (my - oben + KARTE.band) * enge, oben];
+        else if (my >= unten - tiefe) [ziel, rand] = [unten + KARTE.band - (unten + KARTE.band - my) * enge, unten];
+        else {
+          // mitten in der Karte: abtauchen statt umlenken
+          dy = 0;
+          a *= 1 - fk;
+          glanz *= 1 - fk;
+          continue;
+        }
+        dy = (ziel - my) * fk;
+        // im Band am Rand dichter und heller
+        const nah = 1 - Math.min(1, Math.abs(ziel - rand) / KARTE.band);
+        a = Math.max(a, a + (KARTE.saum - a) * fk * nah);
       }
-      x += dx;
       y += dy;
       glanz = Math.max(glanz, impulsBei(y + ZEILE / 2));
-      setze(x, y, z.bit, z.r, a, glanz, (d) => [x - d, yAuf(bahn, x - dx - d) + dy]);
+      setze(x, y, z.bit, z.r, a, glanz, (d) => [x - d, yAuf(bahn, x - d) + dy]);
     }
 
     // ---------- Randzeichen: umfließen die Karten (oben und unten von links nach rechts) ----------

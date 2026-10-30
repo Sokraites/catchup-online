@@ -78,6 +78,8 @@ html[data-stufe='mittel'] body .section,
 html[data-stufe='mittel'] body .section::before,
 html[data-stufe='mittel'] body .section::after,
 html[data-stufe='mittel'] body .card,
+html[data-stufe='mittel'] body .card::before,
+html[data-stufe='mittel'] body .card::after,
 html[data-stufe='mittel'] :is(main, .site-header) .button {
   --a: var(--akzent);
 }
@@ -289,6 +291,31 @@ html[data-stufe='mittel'] body .card .card-bild {
 @media (min-width: 1025px) {
   html[data-stufe='mittel'] body .card {
     --karte-pad: 32px;
+  }
+}
+/* Rand-Glow der Karten mit data-fluss-ziel: vom Binärcode-Strom gesteuert (src/scripts/binaerstrom.ts setzt
+   --fluss-glanz 0–1: atmet in Flussrichtung, leuchtet beim Scroll-Impuls hell auf). Fertig gezeichnetes box-shadow
+   auf ::after, verändert wird nur die Deckkraft (zeichnet iOS ohne Neuberechnung). Ohne Skript und bei
+   „Bewegung reduzieren“ bleibt er aus. */
+html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--a) 85%, white),
+    0 0 16px 1px color-mix(in srgb, var(--a) 70%, transparent),
+    0 0 44px color-mix(in srgb, var(--a) 40%, transparent);
+  opacity: var(--fluss-glanz, 0);
+  will-change: opacity;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
+    transition:
+      --a 1.2s,
+      opacity 0.15s;
+    transition-timing-function: ease-in-out, linear !important;
   }
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
