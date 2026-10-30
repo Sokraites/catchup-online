@@ -17,9 +17,10 @@
  * - Farbe: --a der Zeichenfläche, also die Akzentfarbe samt ihrem 1,2-s-Gleitwechsel aus farbwelten.css.
  * - Karten-Synergie (Karten mit data-fluss-ziel): Bahnen, die auf eine Karte treffen, weichen vor ihr nach oben oder
  *   unten aus, drängen sich in einem dichten, helleren Band am Rand entlang und kehren hinter ihr zurück (Umlenkung statt
- *   Verdecken); tiefere Bahnen tauchen weich ab. Zusätzliche Randzeichen fließen außen um die Karte. Der Kartenrand
- *   leuchtet (CSS --fluss-glanz): atmet als Welle in Flussrichtung, hell beim Scroll-Impuls. Ins Karteninnere kommt
- *   kein Zeichen. Gerechnet wird das nur für Zeichen im Bereich einer Karte im Bild.
+ *   Verdecken); tiefere Bahnen tauchen weich ab. Ein dichtes, helles Band aus Randzeichen fließt direkt auf der
+ *   Kartenkante (eigene Fläche über den Karten, halb außen, halb im textfreien Innenrand). Der Kartenrand leuchtet
+ *   (reines CSS, atmet als Welle) und blitzt beim Scroll-Impuls auf. Über und hinter Kartentext kommt kein Zeichen.
+ *   Gerechnet wird das nur für Zeichen im Bereich einer Karte im Bild.
  * - Scroll-Impuls: Beim Scrollen wandert ein waagerechtes Lichtband aus aufglimmenden Zeichen in Scrollrichtung über
  *   den Strom und klingt in 0,8 s aus; schnelleres Scrollen macht es breiter und heller, Kartenränder leuchten mit.
  * - Lesbarkeit: Hinter Text höchstens 0,06 und kein Glimmer oder Impuls; Karteninneres frei.
@@ -51,8 +52,9 @@ const NACHGLUEHEN = [
  *  Umlenkung: Bahnen, die auf eine Karte treffen, weichen ab `vorlauf` px vor der Karte nach oben oder unten aus,
  *  laufen in einem Band (`band` px, `luecke` px Abstand) am Rand entlang und kehren hinter der Karte zurück. Bahnen bis
  *  `tiefe` px innerhalb der Karte werden so in das Band gedrückt (dort dichter, bis `saum` Deckkraft); tiefere tauchen weich ab.
- *  Randzeichen: fließen zusätzlich auf Schienen `schienen` px außerhalb um die Karte (Dichte, Deckkraft 0,5–0,6).
- *  Rand-Glow: Die Karte leuchtet am Rand (CSS --fluss-glanz), atmet in Flussrichtung, beim Scroll-Impuls hell auf. */
+ *  Randzeichen: fließen auf Schienen `schienen` px vom Kartenrand (positiv außen, negativ im textfreien Innenrand) um die
+ *  Karte, gezeichnet auf einer eigenen Fläche ÜBER den Karten (.binaerstrom-rand): Das Band liegt sichtbar auf der Kante.
+ *  Rand-Glow: reines CSS (farbwelten.css); das Skript setzt nur beim Scroll-Impuls kurz die Klasse .fluss-impuls. */
 const KARTE = {
   vorlauf: 90,
   handyVorlauf: 40,
@@ -61,13 +63,12 @@ const KARTE = {
   band: 56,
   luecke: 8,
   saum: 0.55,
-  schienen: [12, 26],
-  handySchienen: [9],
+  schienen: [14, 2, -9],
+  handySchienen: [8, -6],
   dichte: 0.6,
   deckkraft: [0.5, 0.6],
   tempo: 30,
   ecke: 20,
-  glanz: { ruhe: [0.3, 0.55], periode: 3.2, impuls: 1 },
 };
 /** Scroll-Impuls: Lebensdauer (s), Abstand zwischen Impulsen beim Scrollen (s), Breite (px) und Leuchtkraft je nach
  *  Scroll-Tempo (px/s; ab `vollesTempo` volle Stärke, unter `minTempo` kein Impuls), Karten leuchten dabei stärker */
@@ -94,6 +95,10 @@ let gestartet = false;
 export function starteBinaerstrom() {
   const leinwand = document.querySelector<HTMLCanvasElement>('.binaerstrom');
   const ctx = leinwand?.getContext('2d');
+  // Fläche über den Karten nur für das Randband (Binaerstrom.astro); fehlt sie, entfallen die Randzeichen
+  const randLeinwand = document.querySelector<HTMLCanvasElement>('.binaerstrom-rand');
+  const rctx = randLeinwand?.getContext('2d');
+  let randGezeichnet = 0;
   if (gestartet || !leinwand || !ctx) return;
   gestartet = true;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -116,6 +121,12 @@ export function starteBinaerstrom() {
     leinwand!.width = Math.round(b * dpr);
     leinwand!.height = Math.round(h * dpr);
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (randLeinwand && rctx) {
+      randLeinwand.width = leinwand!.width;
+      randLeinwand.height = leinwand!.height;
+      rctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      randGezeichnet = 0;
+    }
     handy = b < 768;
     const laenge = b + 2 * RAND;
     const plaetze = Math.floor(laenge / ZEICHEN);
@@ -236,7 +247,7 @@ export function starteBinaerstrom() {
   let maske = new Uint8Array(0);
   let maskeFuer = NaN;
   // Karten (Seitenkoordinaten) und ihre Randzeichen; neu angelegt nur, wenn sich eine Karte in der Größe ändert
-  let karten: (Rechteck & { rand: Randzeichen[]; el: HTMLElement; glanz: number })[] = [];
+  let karten: (Rechteck & { rand: Randzeichen[]; el: HTMLElement })[] = [];
   function sammle() {
     const y0 = scrollY;
     const liste: Flaeche[] = [];
@@ -254,7 +265,7 @@ export function starteBinaerstrom() {
       const k = { x: r.left, y: r.top + y0, b: r.width, h: r.height };
       const alt = karten[i];
       const gleich = alt && Math.abs(alt.b - k.b) < 1 && Math.abs(alt.h - k.h) < 1;
-      return { ...k, el, glanz: alt?.glanz ?? -1, rand: gleich ? alt.rand : still ? [] : randzeichen(k) };
+      return { ...k, el, rand: gleich ? alt.rand : still ? [] : randzeichen(k) };
     });
     flaechen = liste;
     flaechenDa = true;
@@ -288,7 +299,7 @@ export function starteBinaerstrom() {
   const haelfte = (k: Rechteck, o: number) => {
     const w = k.b + 2 * o;
     const hh = k.h + 2 * o;
-    const r = Math.min(KARTE.ecke + o, w / 2, hh / 2);
+    const r = Math.max(2, Math.min(KARTE.ecke + o, w / 2, hh / 2));
     return { w, hh, r, laenge: hh - 2 * r + Math.PI * r + w - 2 * r };
   };
   /** Punkt auf dem Weg: von der Mitte der linken Kante über die obere (oder untere) Hälfte zur Mitte der rechten */
@@ -400,34 +411,28 @@ export function starteBinaerstrom() {
       .map((kt) => ({ ...kt, y: kt.y - scrollY }))
       .filter((kt) => kt.y < h + KARTE.band && kt.y + kt.h > -KARTE.band && kt.x < b + vorlauf && kt.x + kt.b > -vorlauf);
     const nahe = still ? [] : imBild;
-    // Rand-Glow: atmet als Welle in Flussrichtung (links früher), leuchtet hell auf, wenn ein Impuls die Karte kreuzt
-    if (!still) {
-      for (const kt of karten) {
-        const sichtbar = imBild.find((k) => k.el === kt.el);
-        let g = 0;
-        if (sichtbar) {
-          const welleG = 0.5 + 0.5 * Math.sin((2 * Math.PI * t) / KARTE.glanz.periode - kt.x / 300);
-          g = KARTE.glanz.ruhe[0] + (KARTE.glanz.ruhe[1] - KARTE.glanz.ruhe[0]) * welleG;
-          for (const band of baender) {
-            if (band.y > sichtbar.y - band.breite && band.y < sichtbar.y + sichtbar.h + band.breite) g = Math.max(g, Math.min(KARTE.glanz.impuls, 0.45 + band.spitze));
-          }
-        }
-        if (Math.abs(g - kt.glanz) > 0.02) {
-          kt.glanz = g;
-          kt.el.style.setProperty('--fluss-glanz', g.toFixed(2));
-        }
+    // Kreuzt ein Scroll-Impuls eine Karte, blitzt ihr Rand auf (CSS-Animation über die Klasse .fluss-impuls, 0,7 s)
+    for (const kt of nahe) {
+      if (kt.el.classList.contains('fluss-impuls')) continue;
+      if (baender.some((band) => band.spitze > 0.25 && band.y > kt.y - band.breite && band.y < kt.y + kt.h + band.breite)) {
+        kt.el.classList.add('fluss-impuls');
+        setTimeout(() => kt.el.classList.remove('fluss-impuls'), 700);
       }
     }
     /** Berührt das Zeichen (sichtbarer Teil des Kästchens) eine Karte? Dann wird es nicht gezeichnet: Karten bleiben frei */
     const inKarte = (x: number, y: number) =>
       imBild.some((kt) => x + ZEICHEN - 1 > kt.x && x + 1 < kt.x + kt.b && y + ZEILE - 5 > kt.y && y + 5 < kt.y + kt.h);
 
-    /** Ein Zeichen setzen: Farbwelle, Dämpfung hinter Text, Glimmer/Impuls mit Spur. spur(d) = Punkt d px weiter hinten */
-    function setze(x: number, y: number, bit: number, r: number, a: number, glanz: number, spur: (d: number) => [number, number]) {
+    /** Ein Zeichen setzen: Farbwelle, Dämpfung hinter Text, Glimmer/Impuls mit Spur. spur(d) = Punkt d px weiter hinten.
+     *  Randzeichen (aufRand) liegen auf der Fläche über den Karten: Sie dürfen auf die Kartenkante, aber nie in die Nähe
+     *  von Text (dort entfallen sie ganz, denn sie lägen über ihm). */
+    function setze(x: number, y: number, bit: number, r: number, a: number, glanz: number, spur: (d: number) => [number, number], aufRand = false) {
       const m = maskeBei(x + ZEICHEN / 2, y + ZEILE / 2);
-      if (m === 3 || inKarte(x, y)) return;
+      if (aufRand ? m === 2 : m === 3 || inKarte(x, y)) return;
       if (m) glanz = 0;
       if (m === 2) a = Math.min(a, HINTER_TEXT);
+      const c = aufRand ? rctx! : ctx!;
+      if (aufRand) randGezeichnet++;
       // Welle: Abstand vom Startrand (0–1), links etwas früher; Stufe nach Abstand zur Front, leicht verwischt
       let satz = bilder;
       let glanzSatz = leuchten;
@@ -443,14 +448,14 @@ export function starteBinaerstrom() {
         // Spur hinter dem Zeichen, darüber das leuchtende Zeichen
         for (const [abstand, anteil] of NACHGLUEHEN) {
           const [sx, sy] = spur(abstand);
-          ctx!.globalAlpha = Math.max(a, glanz * anteil);
-          ctx!.drawImage(satz[bit], sx, sy, ZEICHEN, ZEILE);
+          c.globalAlpha = Math.max(a, glanz * anteil);
+          c.drawImage(satz[bit], sx, sy, ZEICHEN, ZEILE);
         }
-        ctx!.globalAlpha = glanz;
-        ctx!.drawImage(glanzSatz[bit], x - 8, y - 8, ZEICHEN + 16, ZEILE + 16);
+        c.globalAlpha = glanz;
+        c.drawImage(glanzSatz[bit], x - 8, y - 8, ZEICHEN + 16, ZEILE + 16);
       } else {
-        ctx!.globalAlpha = a;
-        ctx!.drawImage(satz[bit], x, y, ZEICHEN, ZEILE);
+        c.globalAlpha = a;
+        c.drawImage(satz[bit], x, y, ZEICHEN, ZEILE);
       }
     }
 
@@ -504,8 +509,10 @@ export function starteBinaerstrom() {
       setze(x, y, z.bit, z.r, a, glanz, (d) => [x - d, yAuf(bahn, x - d) + dy]);
     }
 
-    // ---------- Randzeichen: umfließen die Karten (oben und unten von links nach rechts) ----------
-    for (const kt of nahe) {
+    // ---------- Randzeichen: auf der Fläche über den Karten, umfließen die Kartenkante (oben und unten nach rechts) ----------
+    if (randGezeichnet) rctx!.clearRect(0, 0, b, h);
+    randGezeichnet = 0;
+    for (const kt of rctx ? nahe : []) {
       for (const z of kt.rand) {
         const { laenge: weg } = haelfte(kt, z.o);
         z.s = (z.s + KARTE.tempo * dt) % weg;
@@ -514,10 +521,19 @@ export function starteBinaerstrom() {
         // an den Enden (Mitte der Seitenkanten) weich ein- und ausblenden
         const a = z.a * Math.min(1, z.s / 40, (weg - z.s) / 40);
         const glanz = Math.min(0.7, impulsBei(my) * IMPULS.karte);
-        setze(mx - ZEICHEN / 2, my - ZEILE / 2, z.bit, z.r, a, glanz, (d) => {
-          const [sx, sy] = aufRand(kt, z.o, z.unten, Math.max(0, z.s - d));
-          return [sx - ZEICHEN / 2, sy - ZEILE / 2];
-        });
+        setze(
+          mx - ZEICHEN / 2,
+          my - ZEILE / 2,
+          z.bit,
+          z.r,
+          a,
+          glanz,
+          (d) => {
+            const [sx, sy] = aufRand(kt, z.o, z.unten, Math.max(0, z.s - d));
+            return [sx - ZEICHEN / 2, sy - ZEILE / 2];
+          },
+          true,
+        );
       }
     }
   }
@@ -526,6 +542,8 @@ export function starteBinaerstrom() {
   let sichtbar = true;
   let laeuft = false;
   let letztes = 0;
+  /** Nur für Prüfungen: gezeichnete Bilder seit dem Start (Bildrate messen) */
+  let bilderGezaehlt = 0;
   function bild(jetzt: number) {
     if (!laeuft) return;
     requestAnimationFrame(bild);
@@ -533,6 +551,7 @@ export function starteBinaerstrom() {
     const dt = letztes ? Math.min(0.1, (jetzt - letztes) / 1000) : 0;
     letztes = jetzt;
     t += dt;
+    bilderGezaehlt++;
     zeichne(dt);
   }
   let neuZeichnen = 0;
@@ -594,6 +613,9 @@ export function starteBinaerstrom() {
       impulse: impulse.length,
       impulsZeichen,
       karten: karten.length,
+      randFlaeche: randLeinwand ? [randLeinwand.width, randLeinwand.height] : null,
+      randGezeichnet,
+      bilder: bilderGezaehlt,
       randzeichen: karten.reduce((n, kt) => n + kt.rand.length, 0),
     }),
   };

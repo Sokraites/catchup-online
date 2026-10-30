@@ -293,10 +293,10 @@ html[data-stufe='mittel'] body .card .card-bild {
     --karte-pad: 32px;
   }
 }
-/* Rand-Glow der Karten mit data-fluss-ziel: vom Binärcode-Strom gesteuert (src/scripts/binaerstrom.ts setzt
-   --fluss-glanz 0–1: atmet in Flussrichtung, leuchtet beim Scroll-Impuls hell auf). Fertig gezeichnetes box-shadow
-   auf ::after, verändert wird nur die Deckkraft (zeichnet iOS ohne Neuberechnung). Ohne Skript und bei
-   „Bewegung reduzieren“ bleibt er aus. */
+/* Rand-Glow der Karten mit data-fluss-ziel: reines CSS, unabhängig vom Skript. Der Rand atmet dauerhaft in der
+   Akzentfarbe (3,2 s, als Welle von Karte zu Karte), beim Scroll-Impuls setzt binaerstrom.ts kurz .fluss-impuls:
+   Der Rand blitzt hell auf (0,7 s). box-shadow (zeichnet iOS zuverlässig); das Atmen läuft in 16 Stufen, so wird
+   der Schatten nur rund 5-mal je Sekunde neu gezeichnet statt 60-mal. „Bewegung reduzieren“: stehendes Leuchten. */
 html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
   content: '';
   position: absolute;
@@ -304,18 +304,50 @@ html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
   border-radius: inherit;
   pointer-events: none;
   box-shadow:
-    0 0 0 1.5px color-mix(in srgb, var(--a) 85%, white),
-    0 0 16px 1px color-mix(in srgb, var(--a) 70%, transparent),
-    0 0 44px color-mix(in srgb, var(--a) 40%, transparent);
-  opacity: var(--fluss-glanz, 0);
-  will-change: opacity;
+    0 0 0 1.5px color-mix(in srgb, var(--a) 75%, transparent),
+    0 0 18px 1px color-mix(in srgb, var(--a) 50%, transparent),
+    0 0 48px color-mix(in srgb, var(--a) 28%, transparent);
 }
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
-    transition:
-      --a 1.2s,
-      opacity 0.15s;
-    transition-timing-function: ease-in-out, linear !important;
+    animation: karte-atmen 3.2s steps(16, jump-none) infinite alternate;
+  }
+  html[data-stufe='mittel'] body .cards > .card[data-fluss-ziel]:nth-child(1)::after {
+    animation-delay: -0.8s;
+  }
+  html[data-stufe='mittel'] body .cards > .card[data-fluss-ziel]:nth-child(2)::after {
+    animation-delay: -0.4s;
+  }
+  html[data-stufe='mittel'] body .card[data-fluss-ziel].fluss-impuls::after {
+    animation: karte-blitz 0.7s ease-out 1;
+  }
+}
+@keyframes karte-atmen {
+  from {
+    box-shadow:
+      0 0 0 1.5px color-mix(in srgb, var(--a) 50%, transparent),
+      0 0 14px color-mix(in srgb, var(--a) 32%, transparent),
+      0 0 40px color-mix(in srgb, var(--a) 16%, transparent);
+  }
+  to {
+    box-shadow:
+      0 0 0 1.5px color-mix(in srgb, var(--a) 100%, transparent),
+      0 0 22px 2px color-mix(in srgb, var(--a) 72%, transparent),
+      0 0 60px color-mix(in srgb, var(--a) 42%, transparent);
+  }
+}
+@keyframes karte-blitz {
+  from {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--a) 70%, white),
+      0 0 30px 5px color-mix(in srgb, var(--a) 95%, transparent),
+      0 0 90px 10px color-mix(in srgb, var(--a) 60%, transparent);
+  }
+  to {
+    box-shadow:
+      0 0 0 1.5px color-mix(in srgb, var(--a) 75%, transparent),
+      0 0 18px 1px color-mix(in srgb, var(--a) 50%, transparent),
+      0 0 48px color-mix(in srgb, var(--a) 28%, transparent);
   }
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
@@ -476,6 +508,22 @@ html[data-stufe='mittel'] .binaerstrom {
   top: 0;
   left: 0;
   z-index: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  pointer-events: none;
+}
+/* Randband der Karten: eigene Fläche ÜBER dem Inhalt (Inhalt z 1, Kopfleiste z 10, Dialoge ab z 50). Gezeichnet wird
+   nur auf den Kartenkanten (halb außen, halb im textfreien Innenrand), nie über Text. Klicks gehen durch. */
+.binaerstrom-rand {
+  display: none;
+}
+html[data-stufe='mittel'] .binaerstrom-rand {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
   width: 100%;
   height: 100vh;
   height: 100lvh;

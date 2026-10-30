@@ -295,6 +295,16 @@ Anlass: Am echten iPhone war die Karten-Synergie aus v11 nicht zu sehen (Strom v
 - [x] Geprüft: Karteninneres 0 Bildpunkte, Leicht/Schwer bildpunktgleich zu v11, Funktionstest 21/21 bis zum bekannten datumsabhängigen Kalenderschritt
 - [ ] Auf echtem iPhone prüfen: Umfließen oder Rand-Glow deutlich sichtbar, flüssig, Handy nicht warm
 
+## Stufe Mittel: Karten-Synergie, Architektur-Fix (30.10.2026)
+
+Befund vorab (gemessen): Die Karten sind in Mittel fast durchsichtig (Fläche 6 % Handy, 4 % Computer), nicht 97 % deckend; 97 % deckend sind sie nur in Leicht (das bekommt ein Gerät mit „Bewegung reduzieren“, wenn noch keine Stufe gewählt ist). Der Strom verschwand an der Karte, weil das Skript dort absichtlich nichts zeichnete. Darum Option (b): eigenes Randband über den Karten.
+- [x] Maßnahme 1: zweite Zeichenfläche `.binaerstrom-rand` (z-index 2, über dem Inhalt, unter Kopfleiste und Dialogen, keine Klicks); Randzeichen laufen dort auf drei Schienen direkt auf der Kartenkante (14 px außen, 2 px außen, 9 px innen; Handy 8 px außen, 6 px innen); nie über Text (Maske: Zeichen nahe Text entfallen)
+- [x] Maßnahme 2: Rand-Glow reines CSS (`.card[data-fluss-ziel]::after`, `@keyframes karte-atmen`, 3,2 s, 16 Stufen ≈ 5 Neuzeichnungen/s, Welle von Karte zu Karte); Impuls-Blitz über die Klasse `.fluss-impuls` (`@keyframes karte-blitz`, 0,7 s); `--fluss-glanz` entfernt
+- [x] Maßnahme 3: Randband an allen vier Kartenkanten, Dichte 0,6 je Schiene (2–3 Schienen), Deckkraft 0,5–0,6
+- [x] Gates: siehe Bericht und Commit (Fotos, box-shadow-Messung, Randband-Bildpunkte, Kartentext 0 Bildpunkte, Kontrast ≥ 5,04:1, Leicht/Schwer bildpunktgleich, Bildrate 24–28/s im Testbrowser, Lighthouse)
+- [ ] Bei „Bewegung reduzieren“ gibt es kein Randband (nur den stehenden Rand-Glow); auf Wunsch als stehendes Muster ergänzen
+- [ ] Echtes iPhone: nicht verfügbar, Prüfung beim Gründer
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
