@@ -1,0 +1,39 @@
+CATCH UP – ÜBERGABE VERSION 10
+==============================================================================
+
+Stand:        30.10.2026
+Version:      v10 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 2d21981 (GitHub: Sokraites/catchup-online, Branch claude/fervent-einstein-f37myd)
+ZIP:          releases/v10/catchup-seite-v10.zip (70 Dateien, 12,3 MB)
+Prüfsumme:    c3999662a8b8c1fd2fe34ccfbee01d53e7c21a18bc4f48fedea100af1fc534f0
+Testlink:     https://claude.ai/artifact/NURzrx88YjtHSgfpNJEF55 (privat, nur für dich)
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v9 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Der Binärcode-Strom ist kräftiger (Zeichen deutlicher sichtbar).
+  - Er fließt jetzt sichtbar von links nach rechts: Die Zeichen sind zu
+    Strömen gebündelt (längere Ketten, etwas schneller), dazwischen liegen
+    ruhige Zonen. Fast waagerecht statt schräg.
+  - Mehr aufglimmende Zeichen (+50 %).
+  - Farbwechsel als Welle: Kommt ein neuer Abschnitt, zieht seine Farbe
+    in 2 Sekunden durch den Strom (am Handy 1,6 s), von der Seite, aus der
+    der Abschnitt kommt. Dazwischen mischen sich beide Farben weich.
+  - Behoben: Am Handy ließ sich die Seite in Stufe Mittel ein paar Pixel
+    seitlich verschieben (seit v5). Ursache war das atmende Lichtband
+    zwischen den Abschnitten.
+  - Texte auf hellen Stellen sind weiter gut lesbar (gemessen mind. 5:1).
+  - Knöpfe, Karten, Überschriften, Texte: unverändert.
+  - Leicht und Schwer sehen genau aus wie in v9 (bildpunktgleich geprüft).
+
+
+BITTE PRÜFEN (auf deinem iPhone, mit dem Testlink)
+------------------------------------------------------------------------------
+  - Ist der Strom gut zu sehen? Erkennt man „fließt von links nach rechts“?
+  - Läuft er flüssig, auch beim Scrollen?
+  - Siehst du beim Weiterscrollen die Farbe als Welle wechseln?
+  - Wird das Handy nach ein, zwei Minuten warm?
+  Das konnte ich nicht selbst prüfen: Getestet wurde im Testbrowser
+  Chromium mit Handy-Nachbildung (390 px), ohne echtes Gerät.
