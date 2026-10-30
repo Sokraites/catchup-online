@@ -1,0 +1,44 @@
+CATCH UP – ÜBERGABE VERSION 12
+==============================================================================
+
+Stand:        30.10.2026
+Version:      v12 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 28c79d2 (GitHub: Sokraites/catchup-online, Branch claude/fervent-einstein-f37myd)
+ZIP:          releases/v12/catchup-seite-v12.zip (70 Dateien, 12,4 MB)
+Prüfsumme:    ef5f0cbba50d68706d05ab5ee98236a8d876f0c583ca9898554bb94c88dc48d8
+Testlink:     https://claude.ai/artifact/NURzrx88YjtHSgfpNJEF55 (privat, nur für dich)
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v11 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Der Strom läuft nicht mehr hinter den Leistungs-Karten durch, sondern
+    weicht vor ihnen nach oben und unten aus und drängt sich als dichtes,
+    helleres Band am Kartenrand entlang. Hinter der Karte kehrt er zurück.
+  - Die Kartenränder leuchten in der Abschnittsfarbe und „atmen“ sanft, als
+    Welle von links nach rechts. Kommt beim Scrollen der Lichtimpuls vorbei,
+    leuchten sie kurz hell auf.
+  - Mehr und hellere Zeichen direkt am Kartenrand (am Handy rechts und
+    links neben der Karte gut sichtbar).
+  - Der ganze Strom ist etwas heller.
+  - Behoben: Das Leuchten beim Überfahren einer Karte war in jedem Abschnitt
+    grün (Lime), auch bei Pink und Violett. Jetzt in der Abschnittsfarbe.
+  - Kartentext bleibt frei: kein einziger Bildpunkt des Stroms in den Karten.
+  - Scroll-Impuls, Knöpfe, Überschriften, Texte: unverändert.
+  - Leicht und Schwer sehen genau aus wie in v11 (bildpunktgleich geprüft).
+
+
+BITTE PRÜFEN (auf deinem iPhone, mit dem Testlink)
+------------------------------------------------------------------------------
+  - Abschnitt „Leistungen“ und „Unsere Zusammenarbeit“: Siehst du ohne
+    Erklärung, dass der Strom auf die Karten reagiert (leuchtender Rand,
+    Zeichen am Rand entlang)?
+  - Läuft alles flüssig? Wird das Handy nach ein, zwei Minuten warm?
+  Geprüft wurde nur im Testbrowser Chromium mit Handy-Nachbildung (390 px).
+
+
+HINWEIS ZU DEN PRÜFWERKZEUGEN
+------------------------------------------------------------------------------
+  Am 30.10.2026 melden zwei automatische Tests datumsabhängige Fehler (wie
+  schon in v10 und v11): Im Oktober gibt es keinen buchbaren Termin mehr.

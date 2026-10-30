@@ -1,0 +1,10 @@
+Version: v12
+Datum: 2026-10-30
+Commit: 28c79d2 (28c79d29e69fcf327e8b80957754fb7f12da1c11)
+Quellen der Seite entsprechen genau diesem Commit.
+
+Schalter INDEXIERUNG: aus (alle Seiten noindex, robots.txt sperrt Suchmaschinen)
+Schalter REFERENZEN: aus
+Platzhalter offen: ja (Impressum/Datenschutz enthalten <<HIER ANGABE EINTRAGEN …>>)
+
+HINWEIS: Testversion. Enthält Platzhalter bzw. noindex. Nicht weitergeben und nicht als fertige Seite veröffentlichen.
