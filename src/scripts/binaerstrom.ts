@@ -15,10 +15,15 @@
  *   Ausprobiert war zuerst, die Fläche je Bild nur zu 10 % zu übermalen: Dann verschmieren die Ziffern zu Streifen, werden
  *   3- bis 4-mal so deckend wie gewollt und hinterlassen dunkle Rundungsreste. Darum wird jedes Bild gelöscht.
  * - Farbe: --a der Zeichenfläche, also die Akzentfarbe samt ihrem 1,2-s-Gleitwechsel aus farbwelten.css.
- * - Lesbarkeit: Hinter Text höchstens 0,06 und kein Glimmer; hinter den Karten mit data-fluss-ziel kein Zeichen.
+ * - Karten-Synergie (Karten mit data-fluss-ziel): Strom-Zeichen in der Nähe werden sanft zum Kartenrand gezogen;
+ *   zusätzliche Randzeichen fließen außen um die Karte (oben und unten von links nach rechts). Ins Karteninnere kommt
+ *   kein Zeichen. Gerechnet wird das nur für Zeichen im Umkreis einer Karte im Bild.
+ * - Scroll-Impuls: Beim Scrollen wandert ein waagerechtes Lichtband aus aufglimmenden Zeichen in Scrollrichtung über
+ *   den Strom und klingt in 0,8 s aus; schnelleres Scrollen macht es breiter und heller, Kartenränder leuchten mit.
+ * - Lesbarkeit: Hinter Text höchstens 0,06 und kein Glimmer oder Impuls; Karteninneres frei.
  * - Sparsam: Canvas 2D, ~30 Bilder/s, höchstens doppelte Pixeldichte, Pause bei verstecktem Tab oder unsichtbarer
- *   Fläche (z. B. nach Wechsel auf Leicht). „Bewegung reduzieren“: ein stehendes Muster, neu gezeichnet nur beim
- *   Scrollen, bei Größen- und Farbwechsel.
+ *   Fläche (z. B. nach Wechsel auf Leicht). „Bewegung reduzieren“: ein stehendes Muster ohne Anziehung, Randzeichen
+ *   und Impulse, neu gezeichnet nur beim Scrollen, bei Größen- und Farbwechsel.
  */
 
 const SCHRIFT = 14;
@@ -40,14 +45,37 @@ const NACHGLUEHEN = [
   [12, 0.25],
   [18, 0.12],
 ];
+/** Karten-Synergie (Karten mit data-fluss-ziel): Anziehung im Umkreis (px) mit höchstens `zug` px Ablenkung;
+ *  Randzeichen auf Schienen im Abstand `schienen` px vom Kartenrand, `dichte` = belegter Anteil der Plätze,
+ *  Deckkraft am Rand bis 0,35 (`band`: so nah am Rand werden auch Strom-Zeichen kräftiger) */
+const KARTE = {
+  umkreis: 140,
+  handyUmkreis: 90,
+  zug: 10,
+  handyZug: 6,
+  schienen: [14, 30],
+  handySchienen: [14],
+  dichte: 0.3,
+  deckkraft: [0.24, 0.35],
+  band: 40,
+  tempo: 30,
+  ecke: 20,
+};
+/** Scroll-Impuls: Lebensdauer (s), Abstand zwischen Impulsen beim Scrollen (s), Breite (px) und Leuchtkraft je nach
+ *  Scroll-Tempo (px/s; ab `vollesTempo` volle Stärke, unter `minTempo` kein Impuls), Karten leuchten dabei stärker */
+const IMPULS = { leben: 0.8, abstand: 0.3, handyAbstand: 0.45, breite: [50, 160], handyBreite: 0.8, leuchten: [0.45, 0.7], vollesTempo: 2400, minTempo: 60, karte: 1.25 };
 const BILD_MS = 1000 / 30;
-const TEXT = 'main :is(h1, h2, h3, p, li, dt, dd, summary, .actions, .kontakt-wege, .eyebrow, .breadcrumb, .card), .site-footer :is(p, li, dd)';
+const TEXT =
+  'main :is(h1, h2, h3, p, li:not([data-fluss-ziel]), dt, dd, summary, .actions, .kontakt-wege, .eyebrow, .breadcrumb, .card:not([data-fluss-ziel])), .site-footer :is(p, li, dd)';
 const FREI = '[data-fluss-ziel]';
 const ZELLE = 8;
 
 /** r: fester Zufallswert, ab welchem Stand der Farbwelle das Zeichen die neue Farbe zeigt */
 type Zeichen = { bahn: number; s: number; bit: number; a: number; r: number; gStart: number; gDauer: number; gSpitze: number };
 type Bahn = { y: number; tempo: number; phase: number };
+type Rechteck = { x: number; y: number; b: number; h: number };
+/** Randzeichen: fließt auf einer Schiene (Abstand o vom Kartenrand) um die obere oder untere Hälfte der Karte */
+type Randzeichen = { o: number; unten: boolean; s: number; bit: number; a: number; r: number };
 /** Maske je 8-px-Zelle: 0 frei, 1 nahe an Text (kein Glimmer), 2 hinter Text (gedämpft), 3 Karte (kein Zeichen) */
 type Flaeche = { x: number; y: number; b: number; h: number; art: 1 | 2 | 3 };
 
@@ -198,6 +226,8 @@ export function starteBinaerstrom() {
   let spalten = 0;
   let maske = new Uint8Array(0);
   let maskeFuer = NaN;
+  // Karten (Seitenkoordinaten) und ihre Randzeichen; neu angelegt nur, wenn sich eine Karte in der Größe ändert
+  let karten: (Rechteck & { rand: Randzeichen[] })[] = [];
   function sammle() {
     const y0 = scrollY;
     const liste: Flaeche[] = [];
@@ -210,6 +240,13 @@ export function starteBinaerstrom() {
       nimm(el, 2, 6);
     });
     document.querySelectorAll(FREI).forEach((el) => nimm(el, 3, 2));
+    karten = [...document.querySelectorAll(FREI)].map((el, i) => {
+      const r = el.getBoundingClientRect();
+      const k = { x: r.left, y: r.top + y0, b: r.width, h: r.height };
+      const alt = karten[i];
+      const gleich = alt && Math.abs(alt.b - k.b) < 1 && Math.abs(alt.h - k.h) < 1;
+      return { ...k, rand: gleich ? alt.rand : still ? [] : randzeichen(k) };
+    });
     flaechen = liste;
     flaechenDa = true;
     gesammelt = performance.now();
@@ -236,6 +273,54 @@ export function starteBinaerstrom() {
     if (sp < 0 || sp >= spalten || y < 0) return 0;
     return maske[Math.floor(y / ZELLE) * spalten + sp] ?? 0;
   };
+
+  // ---------- Karten-Synergie: Weg um die Karte ----------
+  /** Länge einer Hälfte des Wegs um die Karte (Rechteck um o vergrößert, runde Ecken) */
+  const haelfte = (k: Rechteck, o: number) => {
+    const w = k.b + 2 * o;
+    const hh = k.h + 2 * o;
+    const r = Math.min(KARTE.ecke + o, w / 2, hh / 2);
+    return { w, hh, r, laenge: hh - 2 * r + Math.PI * r + w - 2 * r };
+  };
+  /** Punkt auf dem Weg: von der Mitte der linken Kante über die obere (oder untere) Hälfte zur Mitte der rechten */
+  function aufRand(k: Rechteck, o: number, unten: boolean, s: number): [number, number] {
+    const { w, hh, r } = haelfte(k, o);
+    const x0 = k.x - o;
+    let x: number;
+    let y: number; // gerechnet für die obere Hälfte, Abstand von der Oberkante
+    const kante = hh / 2 - r;
+    const bogen = (Math.PI * r) / 2;
+    if (s < kante) [x, y] = [x0, hh / 2 - s];
+    else if ((s -= kante) < bogen) [x, y] = [x0 + r - r * Math.cos(s / r), r - r * Math.sin(s / r)];
+    else if ((s -= bogen) < w - 2 * r) [x, y] = [x0 + r + s, 0];
+    else if ((s -= w - 2 * r) < bogen) [x, y] = [x0 + w - r + r * Math.sin(s / r), r - r * Math.cos(s / r)];
+    else [x, y] = [x0 + w, r + (s - bogen)];
+    return [x, unten ? k.y + k.h + o - y : k.y - o + y];
+  }
+  function randzeichen(k: Rechteck): Randzeichen[] {
+    const liste: Randzeichen[] = [];
+    for (const o of handy ? KARTE.handySchienen : KARTE.schienen) {
+      for (const unten of [false, true]) {
+        const { laenge } = haelfte(k, o);
+        let s = zufall(0, 30);
+        while (s < laenge) {
+          const kette = Math.round(zufall(3, 7));
+          for (let i = 0; i < kette && s < laenge; i++, s += ZEICHEN + 2) {
+            liste.push({ o, unten, s, bit: Math.random() < 0.5 ? 0 : 1, a: zufall(KARTE.deckkraft[0], KARTE.deckkraft[1]), r: Math.random() });
+          }
+          s += ((kette * (ZEICHEN + 2)) * (1 - KARTE.dichte)) / KARTE.dichte * zufall(0.5, 1.5);
+        }
+      }
+    }
+    return liste;
+  }
+
+  // ---------- Scroll-Impuls ----------
+  let impulse: { start: number; richtung: number; staerke: number }[] = [];
+  let scrollTempo = 0;
+  let letzterImpuls = -Infinity;
+  /** Nur für Prüfungen: wie viele Zeichen im letzten Bild vom Impuls leuchteten */
+  let impulsZeichen = 0;
 
   // ---------- Ein Bild ----------
   function zeichne(dt: number) {
@@ -268,22 +353,53 @@ export function starteBinaerstrom() {
       if (p >= 1) welle = null;
       else front = p * (1 + FARBWELLE.saum);
     }
-    scrollVorher = scrollY;
-    for (const z of zeichen) {
-      const bahn = bahnen[z.bahn];
-      z.s = (z.s + bahn.tempo * dt) % laenge;
-      const x = z.s - RAND;
-      const y = yAuf(bahn, x);
-      if (y < -ZEILE || y > h || x < -ZEICHEN || x > b) continue;
-      const m = maskeBei(x + ZEICHEN / 2, y + ZEILE / 2);
-      if (m === 3) continue;
-      let a = z.a;
-      let glanz = 0;
-      if (z.gStart >= 0) {
-        const p = (t - z.gStart) / z.gDauer;
-        if (p >= 1) z.gStart = -1;
-        else glanz = z.gSpitze * (p < 0.12 ? p / 0.12 : (1 - (p - 0.12) / 0.88) ** 2);
+
+    // Scroll-Impuls: Tempo messen; beim Scrollen alle 0,3 s (Handy 0,45 s) ein Impuls, Stärke nach Tempo
+    if (!still && dt) {
+      scrollTempo = scrollTempo * 0.6 + ((scrollY - scrollVorher) / dt) * 0.4;
+      if (Math.abs(scrollTempo) > IMPULS.minTempo && t - letzterImpuls > (handy ? IMPULS.handyAbstand : IMPULS.abstand)) {
+        letzterImpuls = t;
+        impulse.push({ start: t, richtung: Math.sign(scrollTempo), staerke: Math.min(1, Math.max(0.15, Math.abs(scrollTempo) / IMPULS.vollesTempo)) });
       }
+    }
+    scrollVorher = scrollY;
+    // Jeder Impuls: waagerechtes Lichtband, wandert in Scrollrichtung über die Bildhöhe und klingt in 0,8 s aus
+    impulse = impulse.filter((i) => t - i.start < IMPULS.leben);
+    const baender = impulse.map((i) => {
+      const p = (t - i.start) / IMPULS.leben;
+      const breite = (IMPULS.breite[0] + (IMPULS.breite[1] - IMPULS.breite[0]) * i.staerke) * (handy ? IMPULS.handyBreite : 1);
+      const weg = -breite + p * (h + 2 * breite);
+      return {
+        y: i.richtung > 0 ? weg : h - weg,
+        breite,
+        spitze: (IMPULS.leuchten[0] + (IMPULS.leuchten[1] - IMPULS.leuchten[0]) * i.staerke) * (p < 0.1 ? p / 0.1 : (1 - p) ** 1.2),
+      };
+    });
+    impulsZeichen = 0;
+    const impulsBei = (y: number) => {
+      let g = 0;
+      for (const band of baender) {
+        const d = Math.abs(y - band.y);
+        if (d < band.breite) g = Math.max(g, band.spitze * (1 - d / band.breite) ** 2);
+      }
+      return g;
+    };
+
+    // Karten im Bild (mit Umkreis); nur Zeichen in deren Nähe werden für Anziehung und Rand gerechnet
+    const umkreis = handy ? KARTE.handyUmkreis : KARTE.umkreis;
+    const zug = handy ? KARTE.handyZug : KARTE.zug;
+    const imBild = karten
+      .map((kt) => ({ ...kt, y: kt.y - scrollY }))
+      .filter((kt) => kt.y < h + umkreis && kt.y + kt.h > -umkreis && kt.x < b + umkreis && kt.x + kt.b > -umkreis);
+    const nahe = still ? [] : imBild;
+    /** Berührt das Zeichen (sichtbarer Teil des Kästchens) eine Karte? Dann wird es nicht gezeichnet: Karten bleiben frei */
+    const inKarte = (x: number, y: number) =>
+      imBild.some((kt) => x + ZEICHEN - 1 > kt.x && x + 1 < kt.x + kt.b && y + ZEILE - 5 > kt.y && y + 5 < kt.y + kt.h);
+
+    /** Ein Zeichen setzen: Farbwelle, Dämpfung hinter Text, Glimmer/Impuls mit Spur. spur(d) = Punkt d px weiter hinten */
+    function setze(x: number, y: number, bit: number, r: number, a: number, glanz: number, spur: (d: number) => [number, number]) {
+      const m = maskeBei(x + ZEICHEN / 2, y + ZEILE / 2);
+      if (m === 3 || inKarte(x, y)) return;
       if (m) glanz = 0;
       if (m === 2) a = Math.min(a, HINTER_TEXT);
       // Welle: Abstand vom Startrand (0–1), links etwas früher; Stufe nach Abstand zur Front, leicht verwischt
@@ -291,22 +407,78 @@ export function starteBinaerstrom() {
       let glanzSatz = leuchten;
       if (welle) {
         const weg = (welle.vonUnten ? 1 - (y + ZEILE / 2) / h : (y + ZEILE / 2) / h) * (1 - FARBWELLE.quer) + FARBWELLE.quer * (x / b);
-        const q = Math.min(1, Math.max(0, (front - weg) / FARBWELLE.saum + (z.r - 0.5) * 0.3));
+        const q = Math.min(1, Math.max(0, (front - weg) / FARBWELLE.saum + (r - 0.5) * 0.3));
         const stufe = Math.round(q * (FARBWELLE.stufen - 1));
         satz = welle.bilder[stufe];
         glanzSatz = welle.leuchten[stufe];
       }
+      if (glanz > a && baender.length) impulsZeichen++;
       if (glanz > a) {
-        // Spur auf der eigenen Bahn, dahinter das leuchtende Zeichen
+        // Spur hinter dem Zeichen, darüber das leuchtende Zeichen
         for (const [abstand, anteil] of NACHGLUEHEN) {
+          const [sx, sy] = spur(abstand);
           ctx!.globalAlpha = Math.max(a, glanz * anteil);
-          ctx!.drawImage(satz[z.bit], x - abstand, yAuf(bahn, x - abstand), ZEICHEN, ZEILE);
+          ctx!.drawImage(satz[bit], sx, sy, ZEICHEN, ZEILE);
         }
         ctx!.globalAlpha = glanz;
-        ctx!.drawImage(glanzSatz[z.bit], x - 8, y - 8, ZEICHEN + 16, ZEILE + 16);
+        ctx!.drawImage(glanzSatz[bit], x - 8, y - 8, ZEICHEN + 16, ZEILE + 16);
       } else {
         ctx!.globalAlpha = a;
-        ctx!.drawImage(satz[z.bit], x, y, ZEICHEN, ZEILE);
+        ctx!.drawImage(satz[bit], x, y, ZEICHEN, ZEILE);
+      }
+    }
+
+    // ---------- Strom ----------
+    for (const z of zeichen) {
+      const bahn = bahnen[z.bahn];
+      z.s = (z.s + bahn.tempo * dt) % laenge;
+      let x = z.s - RAND;
+      let y = yAuf(bahn, x);
+      if (y < -ZEILE || y > h || x < -ZEICHEN || x > b) continue;
+      let a = z.a;
+      let glanz = 0;
+      if (z.gStart >= 0) {
+        const p = (t - z.gStart) / z.gDauer;
+        if (p >= 1) z.gStart = -1;
+        else glanz = z.gSpitze * (p < 0.12 ? p / 0.12 : (1 - (p - 0.12) / 0.88) ** 2);
+      }
+      // Anziehung: im Umkreis einer Karte sanft zum nächsten Kartenrand ziehen; ganz nah am Rand kräftiger
+      let dx = 0;
+      let dy = 0;
+      for (const kt of nahe) {
+        const mx = x + ZEICHEN / 2;
+        const my = y + ZEILE / 2;
+        if (mx < kt.x - umkreis || mx > kt.x + kt.b + umkreis || my < kt.y - umkreis || my > kt.y + kt.h + umkreis) continue;
+        const px = Math.min(Math.max(mx, kt.x), kt.x + kt.b);
+        const py = Math.min(Math.max(my, kt.y), kt.y + kt.h);
+        const d = Math.hypot(px - mx, py - my);
+        if (!d || d >= umkreis) continue;
+        const n = (1 - d / umkreis) ** 2;
+        dx = ((px - mx) / d) * zug * n;
+        dy = ((py - my) / d) * zug * n;
+        if (d < KARTE.band) a = Math.max(a, a + (KARTE.deckkraft[1] - a) * (1 - d / KARTE.band));
+        break;
+      }
+      x += dx;
+      y += dy;
+      glanz = Math.max(glanz, impulsBei(y + ZEILE / 2));
+      setze(x, y, z.bit, z.r, a, glanz, (d) => [x - d, yAuf(bahn, x - dx - d) + dy]);
+    }
+
+    // ---------- Randzeichen: umfließen die Karten (oben und unten von links nach rechts) ----------
+    for (const kt of nahe) {
+      for (const z of kt.rand) {
+        const { laenge: weg } = haelfte(kt, z.o);
+        z.s = (z.s + KARTE.tempo * dt) % weg;
+        const [mx, my] = aufRand(kt, z.o, z.unten, z.s);
+        if (my < -ZEILE || my > h + ZEILE || mx < -ZEICHEN || mx > b + ZEICHEN) continue;
+        // an den Enden (Mitte der Seitenkanten) weich ein- und ausblenden
+        const a = z.a * Math.min(1, z.s / 40, (weg - z.s) / 40);
+        const glanz = Math.min(0.7, impulsBei(my) * IMPULS.karte);
+        setze(mx - ZEICHEN / 2, my - ZEILE / 2, z.bit, z.r, a, glanz, (d) => {
+          const [sx, sy] = aufRand(kt, z.o, z.unten, Math.max(0, z.s - d));
+          return [sx - ZEICHEN / 2, sy - ZEILE / 2];
+        });
       }
     }
   }
@@ -380,6 +552,10 @@ export function starteBinaerstrom() {
       laeuft,
       still,
       welle: welle && { fortschritt: Math.min(1, (performance.now() - welle.start) / welle.dauer), vonUnten: welle.vonUnten },
+      impulse: impulse.length,
+      impulsZeichen,
+      karten: karten.length,
+      randzeichen: karten.reduce((n, kt) => n + kt.rand.length, 0),
     }),
   };
 }

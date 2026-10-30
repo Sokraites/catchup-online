@@ -272,6 +272,18 @@ Ausgangspunkt v5 (Zweig `claude/stufe-mittel-sichtbar-z7pvbx`, Commit 342b666). 
 - [x] Geprüft: Farbwelle gemessen (0,5 s nach dem Wechsel unten 89–100 % pink, oben 0 %), Kontrast mindestens 5,04:1, Lighthouse Handy Startseite Median 97 (v9: 97), LCP 2,4 s unverändert, Leicht/Schwer bildpunktgleich zu v9, Funktionstest und Seitenprüfung ohne Befund, keine Konsolenfehler, ruhige Variante zeigt die richtige Abschnittsfarbe
 - [ ] Auf echtem iPhone prüfen: sichtbar, flüssig, Handy nicht warm (hier nicht möglich, nur Testbrowser)
 
+## Stufe Mittel: Karten-Synergie + Scroll-Impuls (30.10.2026)
+
+- [x] Anziehung: Strom-Zeichen im Umkreis von 140 px (Handy 90 px) um eine Karte mit `data-fluss-ziel` werden sanft zum nächsten Kartenrand gezogen (höchstens 10 px, Handy 6 px, weicher Verlauf ohne Knick); im 40-px-Band am Rand kräftiger (bis 0,35)
+- [x] Randzeichen umfließen die Karten: auf Schienen 14 und 30 px außerhalb des Rands (Handy nur 14 px), oben und unten von links nach rechts, runde Ecken, 30 px/s, Deckkraft 0,24–0,35, an den Enden weich ein- und ausgeblendet; Desktop ~600, Handy ~250 Randzeichen
+- [x] Karteninneres frei: Zeichen, deren Kästchen eine Karte berührt, werden nicht gezeichnet (geprüft: 0 Bildpunkte der Zeichenfläche in den Karten, 390 und 1440 px); Karten mit `data-fluss-ziel` haben keinen Text-Dämpfungsrand mehr, ihr Text hat ihn weiterhin
+- [x] Scroll-Impuls: beim Scrollen alle 0,3 s (Handy 0,45 s) ein waagerechtes Lichtband, wandert in Scrollrichtung über die Bildhöhe, klingt in 0,8 s aus; Breite 50–160 px (Handy ×0,8) und Leuchtkraft 0,45–0,7 nach Scroll-Tempo; nutzt die Glimmer-Zeichen samt Spur; Randzeichen leuchten dabei 25 % stärker
+- [x] Hinter und nahe an Text leuchtet kein Impuls (Lesbarkeit); darum ist er am Handy schwächer (dort ist fast die ganze Breite Text)
+- [x] „Bewegung reduzieren“: keine Anziehung, keine Randzeichen, keine Impulse
+- [x] Geprüft: Kontrast mindestens 4,95:1, Leicht/Schwer bildpunktgleich zu v10, Seitenprüfung und Funktionstest wie v10 (siehe unten), keine Konsolenfehler
+- [ ] Funktionstest und Seitenprüfung sind datumsabhängig: am 30.10.2026 (Freitag, nächster Werktag erst im November) findet der Tischkalender (Schwer) keinen buchbaren Tag im Oktober, und `/termin/` meldet am Handy eine nicht per Tastatur erreichbare Wisch-Leiste. Beides auch in v10, nicht durch diese Änderung; der Test sollte unabhängig vom Datum werden
+- [ ] Auf echtem iPhone prüfen: Verdichtung an Karten sichtbar, Impuls beim Scrollen spürbar, flüssig, Handy nicht warm
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
