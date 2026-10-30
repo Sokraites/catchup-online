@@ -194,6 +194,9 @@ html[data-stufe='mittel'] main .button-ghost:hover {
 html[data-stufe='mittel'] body .section {
   border-bottom: 0;
   background: none;
+  /* Das atmende Band wird bis 5 % breiter als der Bildschirm: seitlich abschneiden, sonst lässt sich die Seite
+     am Handy ein paar Pixel seitwärts schieben (und der Binärcode-Strom baut sich dabei neu auf) */
+  overflow-x: clip;
 }
 html[data-stufe='mittel'] body .section::before {
   z-index: 1;

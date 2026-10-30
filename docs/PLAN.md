@@ -261,6 +261,17 @@ Ausgangspunkt v5 (Zweig `claude/stufe-mittel-sichtbar-z7pvbx`, Commit 342b666). 
 - [ ] Spur über „Übermalen mit 10 % Grundfarbe“ ausprobiert und verworfen (Ziffern verschmieren, dunkle Reste), siehe docs/ENTSCHEIDUNGEN.md
 - [ ] Auf echtem iPhone prüfen: Sichtbarkeit, Flüssigkeit, Akku/Wärme (geprüft nur im Testbrowser ohne Grafikkarte)
 
+## Stufe Mittel: Binärstrom kalibriert + Sektions-Farbwelle (29.10.2026)
+
+- [x] Deckkraft normaler Zeichen 0,16–0,28 (vorher 0,10–0,18); Dämpfung hinter Text (0,06) und Karten (frei) unverändert
+- [x] Gerichteter Fluss: Bahnen zu Strömen gebündelt (Bänder alle 170–260 px, 40–80 px breit, voller, schneller 32–40 px/s, lange Ketten 8–16 Zeichen), ruhige Zonen dazwischen (6 % Grunddichte, 20–26 px/s); mittlere Dichte unverändert 30 % (Handy 15 %, höchstens 360 Zeichen, jetzt harte Grenze)
+- [x] Fast waagerecht (Neigung 0,03 statt 0,18), Welle 4 px statt 7 px
+- [x] Glimmer +50 %: Desktop 6/s (vorher 4), Handy 2,25/s (vorher 1,5); Deckkraft und Spur unverändert
+- [x] Farbwelle beim Abschnittswechsel: 2 s (Handy 1,6 s), beim Herunterscrollen von unten nach oben, beim Hochscrollen von oben nach unten, links etwas früher; Mischsaum mit 6 vorgezeichneten Farbstufen je Zeichen, kein Farbwechsel pro Zeichen beim Zeichnen, jedes Zeichen geht nur vorwärts (kein Flackern)
+- [x] Behoben (seit v5): Das atmende Lichtband zwischen den Abschnitten ragte am Handy bis 10 px über den Rand, die Seite ließ sich seitlich schieben und der Strom baute sich beim Scrollen neu auf. Abschnitte schneiden jetzt seitlich ab (`overflow-x: clip`)
+- [x] Geprüft: Farbwelle gemessen (0,5 s nach dem Wechsel unten 89–100 % pink, oben 0 %), Kontrast mindestens 5,04:1, Lighthouse Handy Startseite Median 97 (v9: 97), LCP 2,4 s unverändert, Leicht/Schwer bildpunktgleich zu v9, Funktionstest und Seitenprüfung ohne Befund, keine Konsolenfehler, ruhige Variante zeigt die richtige Abschnittsfarbe
+- [ ] Auf echtem iPhone prüfen: sichtbar, flüssig, Handy nicht warm (hier nicht möglich, nur Testbrowser)
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden
