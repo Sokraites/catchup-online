@@ -1,0 +1,47 @@
+CATCH UP – ÜBERGABE VERSION 11
+==============================================================================
+
+Stand:        30.10.2026
+Version:      v11 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 575c4ab (GitHub: Sokraites/catchup-online, Branch claude/fervent-einstein-f37myd)
+ZIP:          releases/v11/catchup-seite-v11.zip (70 Dateien, 12,3 MB)
+Prüfsumme:    43c9582c8df01756d4950b090531929618ec194bde82d963980a215c04eb5a39
+Testlink:     https://claude.ai/artifact/NURzrx88YjtHSgfpNJEF55 (privat, nur für dich)
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v10 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Der Binärcode-Strom „sieht“ die Leistungs-Karten: In ihrer Nähe biegen
+    die Zeichen sanft zur Karte hin ab.
+  - Am Kartenrand verdichtet sich der Strom und fließt außen um die Karte
+    herum (oben und unten von links nach rechts), etwas heller als sonst.
+  - In die Karten hinein kommt kein Zeichen: Der Kartentext bleibt frei.
+  - Beim Scrollen wandert ein Lichtimpuls durch den Strom: ein Band aus
+    aufleuchtenden Zeichen. Schnelles Scrollen macht ihn breiter und heller,
+    nach dem Anhalten klingt er in unter einer Sekunde aus. Kommt er an
+    einer Karte vorbei, leuchtet ihr Rand kurz mit.
+  - Hinter Text leuchtet nichts auf. Darum ist der Impuls am Handy
+    schwächer als am Computer (dort ist fast die ganze Breite Text).
+  - Bei „Bewegung reduzieren“: kein Impuls, kein Umfließen, ruhiges Muster.
+  - Knöpfe, Karten, Überschriften, Texte: unverändert.
+  - Leicht und Schwer sehen genau aus wie in v10 (bildpunktgleich geprüft).
+
+
+BITTE PRÜFEN (auf deinem iPhone, mit dem Testlink)
+------------------------------------------------------------------------------
+  - Abschnitt „Leistungen“: Sieht man, dass die Zeichen um die Karten
+    fließen und sich am Rand sammeln?
+  - Beim Scrollen: Spürst du den Lichtimpuls? Ist er dir zu schwach oder
+    zu stark?
+  - Läuft alles flüssig? Wird das Handy nach ein, zwei Minuten warm?
+  Geprüft wurde nur im Testbrowser Chromium mit Handy-Nachbildung (390 px).
+
+
+HINWEIS ZU DEN PRÜFWERKZEUGEN
+------------------------------------------------------------------------------
+  Am 30.10.2026 melden zwei automatische Tests Fehler, die vom Datum
+  abhängen und schon in v10 auftreten (nichts mit dieser Änderung zu tun):
+  Im Oktober gibt es keinen buchbaren Termin mehr (heute Freitag, Samstag
+  ist frei), darum findet der Kalendertest in Stufe Schwer keinen Tag.
