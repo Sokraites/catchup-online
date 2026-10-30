@@ -1,0 +1,10 @@
+Version: v13
+Datum: 2026-10-30
+Commit: 2ecafa9 (2ecafa94b65db3910283a2077fb3284d87221781)
+Quellen der Seite entsprechen genau diesem Commit.
+
+Schalter INDEXIERUNG: aus (alle Seiten noindex, robots.txt sperrt Suchmaschinen)
+Schalter REFERENZEN: aus
+Platzhalter offen: ja (Impressum/Datenschutz enthalten <<HIER ANGABE EINTRAGEN …>>)
+
+HINWEIS: Testversion. Enthält Platzhalter bzw. noindex. Nicht weitergeben und nicht als fertige Seite veröffentlichen.

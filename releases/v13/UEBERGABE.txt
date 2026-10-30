@@ -1,0 +1,38 @@
+CATCH UP – ÜBERGABE VERSION 13
+==============================================================================
+
+Stand:        30.10.2026
+Version:      v13 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit 2ecafa9 (GitHub: Sokraites/catchup-online, Branch claude/fervent-einstein-f37myd)
+ZIP:          releases/v13/catchup-seite-v13.zip (70 Dateien, 12,4 MB)
+Prüfsumme:    d0032a11d73704c4f8f4d90a50ce88eb45afc6a17b6bbff8ff0199f20913538f
+Testlink:     https://claude.ai/artifact/NURzrx88YjtHSgfpNJEF55 (privat, nur für dich)
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v12 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Ein dichtes, helles Band aus 0 und 1 fließt jetzt direkt AUF der Kante
+    jeder Leistungs-Karte (halb außen, halb auf dem Innenrand). Es liegt
+    über der Karte und wird nicht mehr verdeckt. Über den Text kommt es nie.
+  - Der Kartenrand leuchtet dauerhaft und „atmet“ (unabhängig vom Skript,
+    reines CSS). Beim Scroll-Impuls blitzt er hell auf.
+  - Scroll-Impuls, Knöpfe, Überschriften, Texte: unverändert.
+  - Leicht und Schwer sehen genau aus wie in v12 (bildpunktgleich geprüft).
+
+
+WICHTIG FÜR DEN IPHONE-TEST
+------------------------------------------------------------------------------
+  Oben rechts muss „Mittel“ gewählt sein. Ist auf dem iPhone „Bewegung
+  reduzieren“ eingeschaltet (Einstellungen › Bedienungshilfen › Bewegung)
+  und noch keine Stufe gewählt, zeigt die Seite automatisch „Leicht“ – dort
+  gibt es keinen Strom. Mit „Bewegung reduzieren“ zeigt „Mittel“ ein ruhiges
+  Muster mit leuchtendem Kartenrand, aber ohne Bewegung und ohne Randband.
+
+
+BITTE PRÜFEN
+------------------------------------------------------------------------------
+  - Abschnitt „Leistungen“: Siehst du ohne Erklärung, dass der Strom an
+    den Karten entlang fließt und die Ränder leuchten?
+  - Läuft es flüssig? Wird das Handy nach ein, zwei Minuten warm?
