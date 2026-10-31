@@ -43,7 +43,7 @@ BITTE PRÜFEN
 
 OFFEN
 ------------------------------------------------------------------------------
-  - Lighthouse-Messung am Handy: Mittelwert 90,5 von 14 Läufen, einzelne
+  - Lighthouse-Messung am Handy: mittlerer Lauf (Median) 90,5 von 14, einzelne
     Läufe 78 bis 97 (v13 in derselben Messumgebung: 85,5). Ziel ≥ 90 wird
     nicht in jedem Lauf erreicht. Ursache liegt im Start der Seite (nicht im
     Band); eigene Etappe nötig.
