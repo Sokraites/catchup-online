@@ -17,10 +17,12 @@
  * - Farbe: --a der Zeichenfläche, also die Akzentfarbe samt ihrem 1,2-s-Gleitwechsel aus farbwelten.css.
  * - Karten-Synergie (Karten mit data-fluss-ziel): Bahnen, die auf eine Karte treffen, weichen vor ihr nach oben oder
  *   unten aus, drängen sich in einem dichten, helleren Band am Rand entlang und kehren hinter ihr zurück (Umlenkung statt
- *   Verdecken); tiefere Bahnen tauchen weich ab. Ein dichtes, helles Band aus Randzeichen fließt direkt auf der
- *   Kartenkante (eigene Fläche über den Karten, halb außen, halb im textfreien Innenrand). Der Kartenrand leuchtet
- *   (reines CSS, atmet als Welle) und blitzt beim Scroll-Impuls auf. Über und hinter Kartentext kommt kein Zeichen.
- *   Gerechnet wird das nur für Zeichen im Bereich einer Karte im Bild.
+ *   Verdecken); tiefere Bahnen tauchen weich ab. Ein dichtes, helles Band aus Randzeichen fließt genau auf der
+ *   Kartenkante jeder Karte: Mitte des Zeichens auf der Kante (halb außen, halb im textfreien Innenrand), entlang der
+ *   Kante gedreht, in den Ecken auf dem Bogen des border-radius. Die Kanten werden in jedem Bild neu gemessen
+ *   (getBoundingClientRect). Das Band liegt auf einer eigenen Fläche über den Karten, die im Dokument liegt und darum
+ *   beim Scrollen ohne Verzug mitläuft. Der Kartenrand leuchtet (reines CSS, atmet als Welle) und blitzt beim
+ *   Scroll-Impuls auf. Über und hinter Kartentext kommt kein Zeichen.
  * - Scroll-Impuls: Beim Scrollen wandert ein waagerechtes Lichtband aus aufglimmenden Zeichen in Scrollrichtung über
  *   den Strom und klingt in 0,8 s aus; schnelleres Scrollen macht es breiter und heller, Kartenränder leuchten mit.
  * - Lesbarkeit: Hinter Text höchstens 0,06 und kein Glimmer oder Impuls; Karteninneres frei.
@@ -52,8 +54,8 @@ const NACHGLUEHEN = [
  *  Umlenkung: Bahnen, die auf eine Karte treffen, weichen ab `vorlauf` px vor der Karte nach oben oder unten aus,
  *  laufen in einem Band (`band` px, `luecke` px Abstand) am Rand entlang und kehren hinter der Karte zurück. Bahnen bis
  *  `tiefe` px innerhalb der Karte werden so in das Band gedrückt (dort dichter, bis `saum` Deckkraft); tiefere tauchen weich ab.
- *  Randzeichen: fließen auf Schienen `schienen` px vom Kartenrand (positiv außen, negativ im textfreien Innenrand) um die
- *  Karte, gezeichnet auf einer eigenen Fläche ÜBER den Karten (.binaerstrom-rand): Das Band liegt sichtbar auf der Kante.
+ *  Randzeichen: fließen auf Schienen `schienen` px vom Kartenrand (0 = genau auf der Kante) um die Karte, gezeichnet
+ *  auf einer eigenen Fläche ÜBER den Karten (.binaerstrom-rand): Das Band liegt sichtbar auf der Kante.
  *  Rand-Glow: reines CSS (farbwelten.css); das Skript setzt nur beim Scroll-Impuls kurz die Klasse .fluss-impuls. */
 const KARTE = {
   vorlauf: 90,
@@ -63,12 +65,16 @@ const KARTE = {
   band: 56,
   luecke: 8,
   saum: 0.55,
-  schienen: [14, 2, -9],
-  handySchienen: [8, -6],
-  dichte: 0.6,
-  deckkraft: [0.5, 0.6],
+  /** Eine Schiene genau auf der Kante (Abstand 0): Die Zeichen liegen halb außen, halb im textfreien Innenrand */
+  schienen: [0],
+  handySchienen: [0],
+  dichte: 0.85,
+  deckkraft: [0.78, 0.95],
   tempo: 30,
+  /** Ersatz, falls der Eckenradius der Karte nicht lesbar ist (sonst: border-radius der Karte) */
   ecke: 20,
+  /** Prüfpunkt nach innen (px): Liegt dort Text, entfällt das Randzeichen */
+  innen: 7,
 };
 /** Scroll-Impuls: Lebensdauer (s), Abstand zwischen Impulsen beim Scrollen (s), Breite (px) und Leuchtkraft je nach
  *  Scroll-Tempo (px/s; ab `vollesTempo` volle Stärke, unter `minTempo` kein Impuls), Karten leuchten dabei stärker */
@@ -77,6 +83,9 @@ const BILD_MS = 1000 / 30;
 const TEXT =
   'main :is(h1, h2, h3, p, li:not([data-fluss-ziel]), dt, dd, summary, .actions, .kontakt-wege, .eyebrow, .breadcrumb, .card:not([data-fluss-ziel])), .site-footer :is(p, li, dd)';
 const FREI = '[data-fluss-ziel]';
+/** Randband-Fläche: liegt im Dokument (scrollt ohne Verzug mit den Karten) und reicht so viele px über und unter das
+ *  Bild hinaus. Zwischen zwei Bildern (30/s) bewegt sie sich beim Scrollen nativ mit, das Skript rückt sie nur nach. */
+const PUFFER = 140;
 const ZELLE = 8;
 
 /** r: fester Zufallswert, ab welchem Stand der Farbwelle das Zeichen die neue Farbe zeigt */
@@ -84,7 +93,8 @@ type Zeichen = { bahn: number; s: number; bit: number; a: number; r: number; gSt
 type Bahn = { y: number; tempo: number; phase: number };
 type Rechteck = { x: number; y: number; b: number; h: number };
 const glatt = (u: number) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
-/** Randzeichen: fließt auf einer Schiene (Abstand o vom Kartenrand) um die obere oder untere Hälfte der Karte */
+/** Randzeichen: fließt auf einer Schiene (Abstand o vom Kartenrand) um die obere oder untere Hälfte der Karte.
+ *  Gedreht entlang der Kante gezeichnet: an den Ecken folgt es dem Bogen des border-radius. */
 type Randzeichen = { o: number; unten: boolean; s: number; bit: number; a: number; r: number };
 /** Maske je 8-px-Zelle: 0 frei, 1 nahe an Text (kein Glimmer), 2 hinter Text (gedämpft), 3 Karte (kein Zeichen) */
 type Flaeche = { x: number; y: number; b: number; h: number; art: 1 | 2 | 3 };
@@ -99,6 +109,8 @@ export function starteBinaerstrom() {
   const randLeinwand = document.querySelector<HTMLCanvasElement>('.binaerstrom-rand');
   const rctx = randLeinwand?.getContext('2d');
   let randGezeichnet = 0;
+  /** Lage der Randband-Fläche im Dokument (px von oben) */
+  let randOben = NaN;
   if (gestartet || !leinwand || !ctx) return;
   gestartet = true;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -123,8 +135,9 @@ export function starteBinaerstrom() {
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (randLeinwand && rctx) {
       randLeinwand.width = leinwand!.width;
-      randLeinwand.height = leinwand!.height;
-      rctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      randLeinwand.height = Math.round((h + 2 * PUFFER) * dpr);
+      randLeinwand.style.height = `${h + 2 * PUFFER}px`;
+      randOben = NaN;
       randGezeichnet = 0;
     }
     handy = b < 768;
@@ -229,6 +242,26 @@ export function starteBinaerstrom() {
     x.fillText(text, rand + ZEICHEN / 2, rand + ZEILE / 2);
     return c;
   }
+  /** Um ±90° gedrehte Kopien eines vorgezeichneten Zeichens (Seitenkanten der Karten). Ungedrehtes Zeichnen ist für den
+   *  Browser viel billiger als eine Drehung in jedem Bild: Gedreht wird nur noch in den Eckbögen. */
+  const gedreht = new WeakMap<HTMLCanvasElement, [HTMLCanvasElement, HTMLCanvasElement]>();
+  function drehe(quelle: HTMLCanvasElement, runter: boolean) {
+    let paar = gedreht.get(quelle);
+    if (!paar) {
+      paar = [true, false].map((r) => {
+        const c = document.createElement('canvas');
+        c.width = quelle.height;
+        c.height = quelle.width;
+        const x = c.getContext('2d')!;
+        x.translate(c.width / 2, c.height / 2);
+        x.rotate(r ? Math.PI / 2 : -Math.PI / 2);
+        x.drawImage(quelle, -quelle.width / 2, -quelle.height / 2);
+        return c;
+      }) as [HTMLCanvasElement, HTMLCanvasElement];
+      gedreht.set(quelle, paar);
+    }
+    return paar[runter ? 0 : 1];
+  }
   function pruefeFarbe() {
     if (performance.now() > farbeLesenBis && farbe) return false;
     const neu = getComputedStyle(leinwand!).getPropertyValue('--a').trim();
@@ -246,8 +279,10 @@ export function starteBinaerstrom() {
   let spalten = 0;
   let maske = new Uint8Array(0);
   let maskeFuer = NaN;
-  // Karten (Seitenkoordinaten) und ihre Randzeichen; neu angelegt nur, wenn sich eine Karte in der Größe ändert
-  let karten: (Rechteck & { rand: Randzeichen[]; el: HTMLElement })[] = [];
+  // Karten (Koordinaten im Bild, in jedem Bild neu gemessen: getBoundingClientRect) und ihre Randzeichen;
+  // die Randzeichen werden nur neu angelegt, wenn sich eine Karte in der Größe ändert
+  type Karte = Rechteck & { rand: Randzeichen[]; el: HTMLElement; ecke: number };
+  let karten: Karte[] = [];
   function sammle() {
     const y0 = scrollY;
     const liste: Flaeche[] = [];
@@ -262,9 +297,10 @@ export function starteBinaerstrom() {
     document.querySelectorAll(FREI).forEach((el) => nimm(el, 3, 2));
     karten = [...document.querySelectorAll<HTMLElement>(FREI)].map((el, i) => {
       const r = el.getBoundingClientRect();
-      const k = { x: r.left, y: r.top + y0, b: r.width, h: r.height };
       const alt = karten[i];
-      const gleich = alt && Math.abs(alt.b - k.b) < 1 && Math.abs(alt.h - k.h) < 1;
+      const ecke = parseFloat(getComputedStyle(el).borderTopLeftRadius) || KARTE.ecke;
+      const k = { x: r.left, y: r.top, b: r.width, h: r.height, ecke };
+      const gleich = alt && alt.el === el && Math.abs(alt.b - k.b) < 1 && Math.abs(alt.h - k.h) < 1 && alt.ecke === ecke;
       return { ...k, el, rand: gleich ? alt.rand : still ? [] : randzeichen(k) };
     });
     flaechen = liste;
@@ -273,13 +309,14 @@ export function starteBinaerstrom() {
     maskeFuer = NaN;
   }
   function baueMaske() {
+    // reicht PUFFER px über und unter das Bild (dort liegt die Randband-Fläche auch)
     spalten = Math.ceil(b / ZELLE);
-    const zeilen = Math.ceil(h / ZELLE);
+    const zeilen = Math.ceil((h + 2 * PUFFER) / ZELLE);
     if (maske.length !== spalten * zeilen) maske = new Uint8Array(spalten * zeilen);
     else maske.fill(0);
     for (const f of flaechen) {
-      const oben = f.y - scrollY;
-      if (oben > h || oben + f.h < 0) continue;
+      const oben = f.y - scrollY + PUFFER;
+      if (oben > h + 2 * PUFFER || oben + f.h < 0) continue;
       const x0 = Math.max(0, Math.floor(f.x / ZELLE));
       const x1 = Math.min(spalten - 1, Math.floor((f.x + f.b) / ZELLE));
       const z0 = Math.max(0, Math.floor(oben / ZELLE));
@@ -290,20 +327,35 @@ export function starteBinaerstrom() {
   }
   const maskeBei = (x: number, y: number) => {
     const sp = Math.floor(x / ZELLE);
-    if (sp < 0 || sp >= spalten || y < 0) return 0;
-    return maske[Math.floor(y / ZELLE) * spalten + sp] ?? 0;
+    if (sp < 0 || sp >= spalten || y < -PUFFER) return 0;
+    return maske[Math.floor((y + PUFFER) / ZELLE) * spalten + sp] ?? 0;
   };
 
+  /** Kartenkanten jetzt: jede Karte in jedem Bild neu messen (folgt Scrollen, Größenänderung, Einblenden und Anheben
+   *  ohne Verzug). Wenige Karten, das Layout ist zu diesem Zeitpunkt aktuell: kostet kaum etwas. */
+  function kartenMessen() {
+    for (const kt of karten) {
+      const r = kt.el.getBoundingClientRect();
+      if (Math.abs(r.width - kt.b) >= 1 || Math.abs(r.height - kt.h) >= 1) {
+        kt.b = r.width;
+        kt.h = r.height;
+        kt.rand = still ? [] : randzeichen(kt);
+      }
+      kt.x = r.left;
+      kt.y = r.top;
+    }
+  }
+
   // ---------- Karten-Synergie: Weg um die Karte ----------
-  /** Länge einer Hälfte des Wegs um die Karte (Rechteck um o vergrößert, runde Ecken) */
-  const haelfte = (k: Rechteck, o: number) => {
+  /** Länge einer Hälfte des Wegs um die Karte (Rechteck um o vergrößert, Ecken mit dem border-radius der Karte) */
+  const haelfte = (k: Rechteck & { ecke: number }, o: number) => {
     const w = k.b + 2 * o;
     const hh = k.h + 2 * o;
-    const r = Math.max(2, Math.min(KARTE.ecke + o, w / 2, hh / 2));
+    const r = Math.max(2, Math.min(k.ecke + o, w / 2, hh / 2));
     return { w, hh, r, laenge: hh - 2 * r + Math.PI * r + w - 2 * r };
   };
   /** Punkt auf dem Weg: von der Mitte der linken Kante über die obere (oder untere) Hälfte zur Mitte der rechten */
-  function aufRand(k: Rechteck, o: number, unten: boolean, s: number): [number, number] {
+  function aufRand(k: Rechteck & { ecke: number }, o: number, unten: boolean, s: number): [number, number] {
     const { w, hh, r } = haelfte(k, o);
     const x0 = k.x - o;
     let x: number;
@@ -317,7 +369,7 @@ export function starteBinaerstrom() {
     else [x, y] = [x0 + w, r + (s - bogen)];
     return [x, unten ? k.y + k.h + o - y : k.y - o + y];
   }
-  function randzeichen(k: Rechteck): Randzeichen[] {
+  function randzeichen(k: Rechteck & { ecke: number }): Randzeichen[] {
     const liste: Randzeichen[] = [];
     for (const o of handy ? KARTE.handySchienen : KARTE.schienen) {
       for (const unten of [false, true]) {
@@ -346,6 +398,7 @@ export function starteBinaerstrom() {
   function zeichne(dt: number) {
     if (!flaechenDa || performance.now() - gesammelt > 1500) sammle();
     if (maskeFuer !== scrollY) baueMaske();
+    kartenMessen();
     pruefeFarbe();
     ctx!.clearRect(0, 0, b, h);
     if (!still) {
@@ -407,9 +460,7 @@ export function starteBinaerstrom() {
 
     // Karten im Bild (mit Umlenk-Bereich); nur Zeichen in deren Nähe werden für Umlenkung und Rand gerechnet
     const vorlauf = handy ? KARTE.handyVorlauf : KARTE.vorlauf;
-    const imBild = karten
-      .map((kt) => ({ ...kt, y: kt.y - scrollY }))
-      .filter((kt) => kt.y < h + KARTE.band && kt.y + kt.h > -KARTE.band && kt.x < b + vorlauf && kt.x + kt.b > -vorlauf);
+    const imBild = karten.filter((kt) => kt.y < h + KARTE.band && kt.y + kt.h > -KARTE.band && kt.x < b + vorlauf && kt.x + kt.b > -vorlauf);
     const nahe = still ? [] : imBild;
     // Kreuzt ein Scroll-Impuls eine Karte, blitzt ihr Rand auf (CSS-Animation über die Klasse .fluss-impuls, 0,7 s)
     for (const kt of nahe) {
@@ -423,26 +474,25 @@ export function starteBinaerstrom() {
     const inKarte = (x: number, y: number) =>
       imBild.some((kt) => x + ZEICHEN - 1 > kt.x && x + 1 < kt.x + kt.b && y + ZEILE - 5 > kt.y && y + 5 < kt.y + kt.h);
 
-    /** Ein Zeichen setzen: Farbwelle, Dämpfung hinter Text, Glimmer/Impuls mit Spur. spur(d) = Punkt d px weiter hinten.
-     *  Randzeichen (aufRand) liegen auf der Fläche über den Karten: Sie dürfen auf die Kartenkante, aber nie in die Nähe
-     *  von Text (dort entfallen sie ganz, denn sie lägen über ihm). */
-    function setze(x: number, y: number, bit: number, r: number, a: number, glanz: number, spur: (d: number) => [number, number], aufRand = false) {
+    /** Vorgezeichnete Zeichen für diese Stelle: Farbwelle (Abstand vom Startrand 0–1, links etwas früher; Stufe nach
+     *  Abstand zur Front, leicht verwischt) */
+    function saetze(x: number, y: number, r: number): [HTMLCanvasElement[], HTMLCanvasElement[]] {
+      if (!welle) return [bilder, leuchten];
+      const weg = (welle.vonUnten ? 1 - (y + ZEILE / 2) / h : (y + ZEILE / 2) / h) * (1 - FARBWELLE.quer) + FARBWELLE.quer * (x / b);
+      const q = Math.min(1, Math.max(0, (front - weg) / FARBWELLE.saum + (r - 0.5) * 0.3));
+      const stufe = Math.round(q * (FARBWELLE.stufen - 1));
+      return [welle.bilder[stufe], welle.leuchten[stufe]];
+    }
+
+    /** Ein Zeichen des Stroms setzen: Farbwelle, Dämpfung hinter Text, Glimmer/Impuls mit Spur. spur(d) = Punkt d px
+     *  weiter hinten. Karten bleiben frei (dort liegt das Randband auf der eigenen Fläche). */
+    function setze(x: number, y: number, bit: number, r: number, a: number, glanz: number, spur: (d: number) => [number, number]) {
       const m = maskeBei(x + ZEICHEN / 2, y + ZEILE / 2);
-      if (aufRand ? m === 2 : m === 3 || inKarte(x, y)) return;
+      if (m === 3 || inKarte(x, y)) return;
       if (m) glanz = 0;
       if (m === 2) a = Math.min(a, HINTER_TEXT);
-      const c = aufRand ? rctx! : ctx!;
-      if (aufRand) randGezeichnet++;
-      // Welle: Abstand vom Startrand (0–1), links etwas früher; Stufe nach Abstand zur Front, leicht verwischt
-      let satz = bilder;
-      let glanzSatz = leuchten;
-      if (welle) {
-        const weg = (welle.vonUnten ? 1 - (y + ZEILE / 2) / h : (y + ZEILE / 2) / h) * (1 - FARBWELLE.quer) + FARBWELLE.quer * (x / b);
-        const q = Math.min(1, Math.max(0, (front - weg) / FARBWELLE.saum + (r - 0.5) * 0.3));
-        const stufe = Math.round(q * (FARBWELLE.stufen - 1));
-        satz = welle.bilder[stufe];
-        glanzSatz = welle.leuchten[stufe];
-      }
+      const c = ctx!;
+      const [satz, glanzSatz] = saetze(x, y, r);
       if (glanz > a && baender.length) impulsZeichen++;
       if (glanz > a) {
         // Spur hinter dem Zeichen, darüber das leuchtende Zeichen
@@ -509,31 +559,65 @@ export function starteBinaerstrom() {
       setze(x, y, z.bit, z.r, a, glanz, (d) => [x - d, yAuf(bahn, x - d) + dy]);
     }
 
-    // ---------- Randzeichen: auf der Fläche über den Karten, umfließen die Kartenkante (oben und unten nach rechts) ----------
-    if (randGezeichnet) rctx!.clearRect(0, 0, b, h);
+    // ---------- Randband: auf der Fläche über den Karten, genau auf der Kartenkante ----------
+    // Jedes Zeichen liegt mit seiner Mitte auf der Kante (halb außen, halb im textfreien Innenrand) und ist entlang der
+    // Kante gedreht: An den Ecken folgt das Band dem Bogen des border-radius. Leuchtende Zeichen (vorgezeichnet mit
+    // Lichthof) machen das Band hell. Liegt Text in der Nähe (Prüfpunkt 7 px nach innen), entfällt das Zeichen.
+    // Fläche nachrücken: PUFFER über dem Bild beginnen, nie über das Seitenende hinaus (sonst würde die Seite länger)
+    const hoeheRand = h + 2 * PUFFER;
+    if (rctx && !still) {
+      const oben = Math.max(0, Math.min(Math.round(scrollY - PUFFER), document.documentElement.scrollHeight - hoeheRand));
+      if (oben !== randOben) {
+        randOben = oben;
+        randLeinwand!.style.transform = `translate3d(0, ${oben}px, 0)`;
+      }
+    }
+    // obere Kante der Fläche im Bild; gezeichnet wird weiter in Bild-Koordinaten (Verschiebung im Grund-Transform)
+    const versatz = randOben - scrollY;
+    const grund = () => rctx!.setTransform(dpr, 0, 0, dpr, 0, Math.round(-versatz * dpr));
+    if (randGezeichnet) {
+      rctx!.setTransform(1, 0, 0, 1, 0, 0);
+      rctx!.clearRect(0, 0, randLeinwand!.width, randLeinwand!.height);
+    }
     randGezeichnet = 0;
-    for (const kt of rctx ? nahe : []) {
+    if (rctx) grund();
+    const amRand = still || !rctx ? [] : karten.filter((kt) => kt.y < versatz + hoeheRand + ZEILE && kt.y + kt.h > versatz - ZEILE && kt.x < b && kt.x + kt.b > 0);
+    for (const kt of amRand) {
       for (const z of kt.rand) {
         const { laenge: weg } = haelfte(kt, z.o);
         z.s = (z.s + KARTE.tempo * dt) % weg;
         const [mx, my] = aufRand(kt, z.o, z.unten, z.s);
-        if (my < -ZEILE || my > h + ZEILE || mx < -ZEICHEN || mx > b + ZEICHEN) continue;
-        // an den Enden (Mitte der Seitenkanten) weich ein- und ausblenden
-        const a = z.a * Math.min(1, z.s / 40, (weg - z.s) / 40);
-        const glanz = Math.min(0.7, impulsBei(my) * IMPULS.karte);
-        setze(
-          mx - ZEICHEN / 2,
-          my - ZEILE / 2,
-          z.bit,
-          z.r,
-          a,
-          glanz,
-          (d) => {
-            const [sx, sy] = aufRand(kt, z.o, z.unten, Math.max(0, z.s - d));
-            return [sx - ZEICHEN / 2, sy - ZEILE / 2];
-          },
-          true,
-        );
+        if (my < versatz - ZEILE || my > versatz + hoeheRand + ZEILE || mx < -ZEICHEN || mx > b + ZEICHEN) continue;
+        // Richtung der Kante an dieser Stelle (für die Drehung) und Richtung nach innen (für den Text-Prüfpunkt)
+        const s0 = Math.min(z.s, weg - 1);
+        const [ux, uy] = aufRand(kt, z.o, z.unten, s0);
+        const [vx, vy] = aufRand(kt, z.o, z.unten, s0 + 1);
+        let tx = vx - ux;
+        let ty = vy - uy;
+        const n = Math.hypot(tx, ty) || 1;
+        tx /= n;
+        ty /= n;
+        const [ix, iy] = z.unten ? [ty, -tx] : [-ty, tx];
+        if (maskeBei(mx + ix * KARTE.innen, my + iy * KARTE.innen) === 2 || maskeBei(mx, my) === 2) continue;
+        // an den Enden (Mitte der Seitenkanten) weich ineinander übergehen
+        const ende = Math.min(1, z.s / 24, (weg - z.s) / 24);
+        const glanz = Math.min(1, impulsBei(my) * IMPULS.karte);
+        const a = Math.min(1, Math.max(z.a, z.a * 0.6 + glanz)) * (0.35 + 0.65 * ende);
+        if (glanz > 0.25 && baender.length) impulsZeichen++;
+        const [, glanzSatz] = saetze(mx - ZEICHEN / 2, my - ZEILE / 2, z.r);
+        const bild = glanzSatz[z.bit];
+        const [w, hb] = [ZEICHEN + 16, ZEILE + 16];
+        const pix = (v: number) => Math.round(v * dpr) / dpr;
+        rctx!.globalAlpha = a;
+        if (Math.abs(tx) > 0.999) rctx!.drawImage(bild, pix(mx - w / 2), pix(my - hb / 2), w, hb);
+        else if (Math.abs(ty) > 0.999) rctx!.drawImage(drehe(bild, ty > 0), pix(mx - hb / 2), pix(my - w / 2), hb, w);
+        else {
+          // im Eckbogen: entlang des Bogens gedreht
+          rctx!.setTransform(dpr * tx, dpr * ty, -dpr * ty, dpr * tx, mx * dpr, (my - versatz) * dpr);
+          rctx!.drawImage(bild, -w / 2, -hb / 2, w, hb);
+          grund();
+        }
+        randGezeichnet++;
       }
     }
   }

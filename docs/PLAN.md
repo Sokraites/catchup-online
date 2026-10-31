@@ -305,6 +305,16 @@ Befund vorab (gemessen): Die Karten sind in Mittel fast durchsichtig (Fläche 6 
 - [ ] Bei „Bewegung reduzieren“ gibt es kein Randband (nur den stehenden Rand-Glow); auf Wunsch als stehendes Muster ergänzen
 - [ ] Echtes iPhone: nicht verfügbar, Prüfung beim Gründer
 
+## Stufe Mittel: Band genau auf der Kartenkante (31.10.2026)
+
+Anlass: Am iPhone lief das Band in Leistungen wie ein Rahmen um den Bildschirm statt auf den Kartenkanten (äußere Schiene 8 px neben der Karte, Karte fast so breit wie der Bildschirm), mit Lücke zur Karte und ohne Bogen an den Ecken; der Rand-Glow war nicht zu sehen.
+- [x] Maßnahme 1: eine Schiene genau auf der Kante (Abstand 0, Zeichen halb außen, halb im textfreien Innenrand), Zeichen entlang der Kante gedreht, Ecken auf dem Bogen des echten `border-radius` (aus dem CSS gelesen). Kanten jeder Karte in jedem Bild neu gemessen (`getBoundingClientRect`), nicht mehr alle 1,5 s. Randfläche liegt im Dokument (`position: absolute`, das Skript rückt sie nach): Beim Scrollen läuft das Band ohne Verzug mit (vorher hinkte es bei schnellem Scrollen bis zu ~100 px hinterher). Dichte 0,85, Deckkraft 0,78–0,95, mit Lichthof
+- [x] Maßnahme 2: Rand-Glow nur noch mit `currentColor` und festen Zahlen in den Keyframes (Farbe als `color` am Leucht-Rahmen; kein `var()`/`color-mix()` in den Keyframes, iOS-sicher), atmet über box-shadow und Deckkraft (0,55–1, 3,2 s), dauerhaft ohne Skript; Blitz beim Scroll-Impuls bleibt zusätzlich
+- [x] Maßnahme 3: gleiches Verhalten in Leistungen und Unsere Zusammenarbeit (alle Karten mit `data-fluss-ziel`)
+- [x] Sparsam: gerade Kanten mit vorgedrehten Zeichen, echte Drehung nur in den Eckbögen (sonst +8 Prozentpunkte Last am Handy)
+- [x] Gates 1–8 mit Messwerten und Fotos (siehe Commit)
+- [ ] Echtes iPhone: Prüfung beim Gründer (Stufe Mittel, „Bewegung reduzieren“ aus)
+
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
 
 - [ ] Name und Domain final entschieden

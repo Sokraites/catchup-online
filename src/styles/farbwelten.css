@@ -293,23 +293,28 @@ html[data-stufe='mittel'] body .card .card-bild {
     --karte-pad: 32px;
   }
 }
-/* Rand-Glow der Karten mit data-fluss-ziel: reines CSS, unabhängig vom Skript. Der Rand atmet dauerhaft in der
-   Akzentfarbe (3,2 s, als Welle von Karte zu Karte), beim Scroll-Impuls setzt binaerstrom.ts kurz .fluss-impuls:
-   Der Rand blitzt hell auf (0,7 s). box-shadow (zeichnet iOS zuverlässig); das Atmen läuft in 16 Stufen, so wird
-   der Schatten nur rund 5-mal je Sekunde neu gezeichnet statt 60-mal. „Bewegung reduzieren“: stehendes Leuchten. */
+/* Rand-Glow der Karten mit data-fluss-ziel: reines CSS, unabhängig vom Skript, dauerhaft sichtbar. Der Rand leuchtet
+   in der Akzentfarbe und atmet (3,2 s, als Welle von Karte zu Karte); beim Scroll-Impuls setzt binaerstrom.ts kurz
+   .fluss-impuls: Der Rand blitzt hell auf (0,7 s, rein zusätzlich). Für iOS Safari bewusst schlicht: Die Farbe steht
+   als „color“ auf dem Leucht-Rahmen, box-shadow und Keyframes nutzen nur currentColor und feste Zahlen (kein var(),
+   kein color-mix() in den Keyframes). Das Atmen läuft in 16 Stufen: Der Schatten wird nur rund 5-mal je Sekunde neu
+   gezeichnet statt 60-mal. „Bewegung reduzieren“: stehendes Leuchten. */
 html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
   content: '';
   position: absolute;
-  inset: -1.5px;
+  inset: -1px;
   border-radius: inherit;
   pointer-events: none;
+  color: var(--a);
+  opacity: 0.85;
   box-shadow:
-    0 0 0 1.5px color-mix(in srgb, var(--a) 75%, transparent),
-    0 0 18px 1px color-mix(in srgb, var(--a) 50%, transparent),
-    0 0 48px color-mix(in srgb, var(--a) 28%, transparent);
+    0 0 0 1.5px currentColor,
+    0 0 16px 1px currentColor,
+    0 0 44px -4px currentColor;
 }
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
+    transition: color 1.2s ease-in-out;
     animation: karte-atmen 3.2s steps(16, jump-none) infinite alternate;
   }
   html[data-stufe='mittel'] body .cards > .card[data-fluss-ziel]:nth-child(1)::after {
@@ -324,30 +329,34 @@ html[data-stufe='mittel'] body .card[data-fluss-ziel]::after {
 }
 @keyframes karte-atmen {
   from {
+    opacity: 0.55;
     box-shadow:
-      0 0 0 1.5px color-mix(in srgb, var(--a) 50%, transparent),
-      0 0 14px color-mix(in srgb, var(--a) 32%, transparent),
-      0 0 40px color-mix(in srgb, var(--a) 16%, transparent);
+      0 0 0 1px currentColor,
+      0 0 10px 0 currentColor,
+      0 0 32px -8px currentColor;
   }
   to {
+    opacity: 1;
     box-shadow:
-      0 0 0 1.5px color-mix(in srgb, var(--a) 100%, transparent),
-      0 0 22px 2px color-mix(in srgb, var(--a) 72%, transparent),
-      0 0 60px color-mix(in srgb, var(--a) 42%, transparent);
+      0 0 0 2px currentColor,
+      0 0 22px 2px currentColor,
+      0 0 60px -2px currentColor;
   }
 }
 @keyframes karte-blitz {
   from {
+    opacity: 1;
     box-shadow:
-      0 0 0 2px color-mix(in srgb, var(--a) 70%, white),
-      0 0 30px 5px color-mix(in srgb, var(--a) 95%, transparent),
-      0 0 90px 10px color-mix(in srgb, var(--a) 60%, transparent);
+      0 0 0 3px currentColor,
+      0 0 34px 8px currentColor,
+      0 0 100px 12px currentColor;
   }
   to {
+    opacity: 0.85;
     box-shadow:
-      0 0 0 1.5px color-mix(in srgb, var(--a) 75%, transparent),
-      0 0 18px 1px color-mix(in srgb, var(--a) 50%, transparent),
-      0 0 48px color-mix(in srgb, var(--a) 28%, transparent);
+      0 0 0 1.5px currentColor,
+      0 0 16px 1px currentColor,
+      0 0 44px -4px currentColor;
   }
 }
 /* Stufen-Karten („Unsere Zusammenarbeit“): Oberkante in der Akzentfarbe */
@@ -514,13 +523,15 @@ html[data-stufe='mittel'] .binaerstrom {
   pointer-events: none;
 }
 /* Randband der Karten: eigene Fläche ÜBER dem Inhalt (Inhalt z 1, Kopfleiste z 10, Dialoge ab z 50). Gezeichnet wird
-   nur auf den Kartenkanten (halb außen, halb im textfreien Innenrand), nie über Text. Klicks gehen durch. */
+   nur auf den Kartenkanten (halb außen, halb im textfreien Innenrand), nie über Text. Klicks gehen durch.
+   Liegt im Dokument (absolute, nicht fixed): Beim Scrollen bewegt sie sich ohne Verzug mit den Karten, auch zwischen
+   zwei Bildern des Skripts (30/s). Höhe (Bild + Puffer) und Lage (transform) setzt binaerstrom.ts. */
 .binaerstrom-rand {
   display: none;
 }
 html[data-stufe='mittel'] .binaerstrom-rand {
   display: block;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 2;
@@ -528,6 +539,8 @@ html[data-stufe='mittel'] .binaerstrom-rand {
   height: 100vh;
   height: 100lvh;
   pointer-events: none;
+  contain: strict;
+  will-change: transform;
 }
 @media (prefers-reduced-motion: no-preference) {
   html[data-stufe='mittel'] .binaerstrom {
