@@ -125,8 +125,9 @@ export function starteBinaerstrom() {
   let t = 0;
 
   // ---------- Bahnen und Zeichen ----------
-  function aufbauen() {
-    const r = leinwand!.getBoundingClientRect();
+  /** Größe kommt aus dem ResizeObserver: Der meldet sie nach dem Layout, ohne es vorzeitig zu erzwingen (sonst fiele
+   *  beim Start ein langer Task an, der die Ladezeit-Messung verschlechtert). */
+  function aufbauen(r: { width: number; height: number }) {
     b = Math.round(r.width);
     h = Math.round(r.height);
     dpr = Math.min(2, devicePixelRatio || 1);
@@ -396,6 +397,7 @@ export function starteBinaerstrom() {
 
   // ---------- Ein Bild ----------
   function zeichne(dt: number) {
+    if (!b) return; // Größe noch nicht bekannt (erste Meldung des ResizeObservers steht aus)
     if (!flaechenDa || performance.now() - gesammelt > 1500) sammle();
     if (maskeFuer !== scrollY) baueMaske();
     kartenMessen();
@@ -655,7 +657,6 @@ export function starteBinaerstrom() {
     if (laeuft) requestAnimationFrame(bild);
   }
 
-  aufbauen();
   // Schrift (selbst ausgeliefert) laden; ist sie da, die vorgezeichneten Zeichen neu anlegen
   document.fonts?.load(schrift).then(() => {
     farbe = '';
@@ -667,10 +668,11 @@ export function starteBinaerstrom() {
   }).observe(leinwand);
   document.addEventListener('visibilitychange', auffrischen);
   // Größe: nur bei echter Änderung neu aufbauen (die Höhe ist 100lvh, die Adressleiste am Handy ändert sie nicht)
-  new ResizeObserver(() => {
-    const r = leinwand.getBoundingClientRect();
+  // Auch der Aufbau beim Start läuft hier (erste Meldung kommt im nächsten Bild, nach dem Layout)
+  new ResizeObserver(([e]) => {
+    const r = e.contentRect;
     if (Math.round(r.width) === b && Math.round(r.height) === h) return;
-    aufbauen();
+    aufbauen(r);
     farbe = '';
     if (still) auffrischen();
   }).observe(leinwand);

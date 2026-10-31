@@ -312,7 +312,9 @@ Anlass: Am iPhone lief das Band in Leistungen wie ein Rahmen um den Bildschirm s
 - [x] Maßnahme 2: Rand-Glow nur noch mit `currentColor` und festen Zahlen in den Keyframes (Farbe als `color` am Leucht-Rahmen; kein `var()`/`color-mix()` in den Keyframes, iOS-sicher), atmet über box-shadow und Deckkraft (0,55–1, 3,2 s), dauerhaft ohne Skript; Blitz beim Scroll-Impuls bleibt zusätzlich
 - [x] Maßnahme 3: gleiches Verhalten in Leistungen und Unsere Zusammenarbeit (alle Karten mit `data-fluss-ziel`)
 - [x] Sparsam: gerade Kanten mit vorgedrehten Zeichen, echte Drehung nur in den Eckbögen (sonst +8 Prozentpunkte Last am Handy)
-- [x] Gates 1–8 mit Messwerten und Fotos (siehe Commit)
+- [x] Start ohne erzwungenes Layout: Größe der Zeichenfläche kommt aus dem ResizeObserver (Start-Task 1–3 ms statt 4–9 ms)
+- [x] Gates 1–7 mit Messwerten und Fotos (siehe Commit); Gate 8: 30 Bilder/s, Pause bei verstecktem Tab, Hauptthread-Last wie v13
+- [ ] Gate 8 Lighthouse Handy ≥ 90 nicht verlässlich: 14 Läufe Median 90,5 (78–97, 7 unter 90); v13 in derselben Umgebung Median 85,5 (72–97). Ursache: ein Idle-Task beim Start (erstes Layout nach dem Laden, zuletzt in `starteKacheln`) fällt je nach Zeitpunkt ins Messfenster. Eigene Etappe nötig
 - [ ] Echtes iPhone: Prüfung beim Gründer (Stufe Mittel, „Bewegung reduzieren“ aus)
 
 ## Phase F: Vor dem Livegang (liegt bei den Gründern)
