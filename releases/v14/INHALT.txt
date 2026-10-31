@@ -1,0 +1,77 @@
+Inhalt von catchup-seite-v14.zip
+Dateien: 70
+Größte Datei: media/02-modernisierung.webm (1884.9 KB)
+ZIP-Größe: 12650.1 KB
+Geprüft: unzip -t ohne Fehler, index.html im Stamm, Dateiliste gleich dem Ordner dist/ (ohne .br/.gz)
+
+Größe      Datei
+  16.7 KB  _astro/aussicht.Dp15PM86.js
+   4.3 KB  _astro/Base.astro_astro_type_script_index_0_lang.LuaCQ6AC.js
+   0.2 KB  _astro/Binaerstrom.astro_astro_type_script_index_0_lang.rjNWnvz4.js
+  11.3 KB  _astro/binaerstrom.BouRoT4Y.js
+   1.0 KB  _astro/index.astro_astro_type_script_index_0_lang.bFr0yFxF.js
+   0.2 KB  _astro/Kacheln.astro_astro_type_script_index_0_lang.DEaJ6Xt8.js
+   5.1 KB  _astro/kacheln.B1UX-KNQ.js
+   3.9 KB  _astro/Medium.astro_astro_type_script_index_0_lang.CTtUJ_Q3.js
+   5.0 KB  _astro/monitor-tabs.BlADcYOH.js
+ 116.6 KB  _astro/monitor.wA4uHrZ9.js
+   2.4 KB  _astro/page.B3sWyS9n.js
+   1.6 KB  _astro/preload-helper.DHhhL8Zf.js
+   2.4 KB  _astro/stufe.C6QST9tR.js
+   0.6 KB  _astro/Terminbuch.astro_astro_type_script_index_0_lang.B3rnGK8Y.js
+  14.6 KB  _astro/terminbuch.D7DG0jp5.js
+   1.6 KB  _headers
+  63.1 KB  404.html
+  69.0 KB  auffindbarkeit/index.html
+ 190.8 KB  aussicht/fenster.webp
+  20.0 KB  bilder/gefunden.webp
+  18.7 KB  bilder/loesung.webp
+  21.3 KB  bilder/modernisierung.webp
+  23.0 KB  bilder/neue-webseite.webp
+  32.4 KB  bilder/zeitreise-breit.webp
+  27.4 KB  bilder/zeitreise-hoch.webp
+  66.0 KB  datenschutz/index.html
+   0.3 KB  favicon.svg
+   4.4 KB  fonts/inter-LICENSE.txt
+  47.1 KB  fonts/inter.woff2
+   4.4 KB  fonts/jetbrains-mono-LICENSE.txt
+  39.5 KB  fonts/jetbrains-mono.woff2
+   4.3 KB  fonts/space-grotesk-LICENSE.txt
+  21.8 KB  fonts/space-grotesk.woff2
+  63.8 KB  impressum/index.html
+ 102.6 KB  index.html
+   1.1 KB  llms.txt
+  14.2 KB  logo.png
+1045.2 KB  media/01-neue-webseite.mp4
+1033.0 KB  media/01-neue-webseite.webm
+  47.3 KB  media/01-neue-webseite.webp
+1725.9 KB  media/02-modernisierung.mp4
+1884.9 KB  media/02-modernisierung.webm
+  68.8 KB  media/02-modernisierung.webp
+1193.1 KB  media/03-gefunden-werden.mp4
+1302.6 KB  media/03-gefunden-werden.webm
+  34.9 KB  media/03-gefunden-werden.webp
+1549.8 KB  media/05-deine-idee.mp4
+1755.9 KB  media/05-deine-idee.webm
+  42.6 KB  media/05-deine-idee.webp
+   3.0 KB  monitore/fuss-0.webp
+   2.1 KB  monitore/fuss-1.webp
+   2.1 KB  monitore/fuss-2.webp
+   2.1 KB  monitore/fuss-3.webp
+   1.3 KB  monitore/fuss-4.webp
+   1.2 KB  monitore/knoepfe-0.webp
+   1.0 KB  monitore/knoepfe-1.webp
+   1.4 KB  monitore/knoepfe-2.webp
+   5.4 KB  monitore/rahmen-0.webp
+   4.1 KB  monitore/rahmen-1.webp
+   3.3 KB  monitore/rahmen-2.webp
+   3.1 KB  monitore/rahmen-3.webp
+   2.5 KB  monitore/rahmen-4.webp
+ 247.8 KB  og.png
+   0.0 KB  robots.txt
+   0.5 KB  site.webmanifest
+   0.6 KB  sitemap.xml
+  66.5 KB  software-nach-mass/index.html
+  63.5 KB  termin/index.html
+  66.2 KB  webseiten-erstellen/index.html
+  65.9 KB  webseiten-modernisieren/index.html

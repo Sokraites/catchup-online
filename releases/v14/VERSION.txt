@@ -1,0 +1,10 @@
+Version: v14
+Datum: 2026-10-31
+Commit: f054be0 (f054be01e81165e823f8a232b7da14a8c1309b75)
+Quellen der Seite entsprechen genau diesem Commit.
+
+Schalter INDEXIERUNG: aus (alle Seiten noindex, robots.txt sperrt Suchmaschinen)
+Schalter REFERENZEN: aus
+Platzhalter offen: ja (Impressum/Datenschutz enthalten <<HIER ANGABE EINTRAGEN …>>)
+
+HINWEIS: Testversion. Enthält Platzhalter bzw. noindex. Nicht weitergeben und nicht als fertige Seite veröffentlichen.

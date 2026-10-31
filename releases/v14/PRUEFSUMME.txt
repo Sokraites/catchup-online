@@ -1,0 +1,4 @@
+SHA-256-Prüfsumme der Datei catchup-seite-v14.zip
+(stimmt die selbst berechnete Zahl damit überein, ist die Datei unversehrt; Anleitung in START-HIER.md)
+
+cabbfeb1f2d9039cdad5fc7282762b021714866bd5d12164b1cff16824b97aba  catchup-seite-v14.zip

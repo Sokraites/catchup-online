@@ -1,0 +1,50 @@
+CATCH UP – ÜBERGABE VERSION 14
+==============================================================================
+
+Stand:        31.10.2026
+Version:      v14 (Testversion, Suchmaschinen ausgesperrt, Platzhalter in Impressum/Datenschutz)
+Gebaut aus:   Commit f054be0 (GitHub: Sokraites/catchup-online, Branch claude/tender-ride-ellekf)
+ZIP:          releases/v14/catchup-seite-v14.zip (70 Dateien, 12,4 MB)
+Prüfsumme:    cabbfeb1f2d9039cdad5fc7282762b021714866bd5d12164b1cff16824b97aba
+
+Die Testversion nicht weitergeben und nicht als fertige Seite veröffentlichen.
+
+
+WAS IST NEU GEGENÜBER v13 (nur Stufe „Mittel“)
+------------------------------------------------------------------------------
+  - Das helle Band aus 0 und 1 liegt jetzt GENAU auf der Kante jeder Karte:
+    halb außen, halb auf dem Innenrand, ohne Lücke. Die Zeichen folgen der
+    Kante, auch um die runden Ecken herum.
+  - Vorher lief es am Handy etwas neben der Karte – weil die Karte fast so
+    breit ist wie der Bildschirm, sah das wie ein Rahmen um den Bildschirm
+    aus. Außerdem hing es beim schnellen Scrollen hinter der Karte her.
+    Beides ist behoben: Das Band scrollt jetzt mit der Karte mit.
+  - Der Kartenrand leuchtet dauerhaft in der Abschnittsfarbe und „atmet“
+    (reines CSS, ohne Skript). Beim Scroll-Impuls blitzt er hell auf.
+  - Gleich in „Leistungen“ und „Unsere Zusammenarbeit“.
+  - Leicht und Schwer: unverändert (bildpunktgleich zu v13 geprüft).
+
+
+WICHTIG FÜR DEN IPHONE-TEST
+------------------------------------------------------------------------------
+  Oben rechts muss „Mittel“ gewählt sein, „Bewegung reduzieren“ aus
+  (Einstellungen › Bedienungshilfen › Bewegung). Mit „Bewegung reduzieren“
+  gibt es nur den leuchtenden Rand, kein laufendes Band.
+
+
+BITTE PRÜFEN
+------------------------------------------------------------------------------
+  - „Leistungen“: Liegt das Band sichtbar AUF dem Kartenrand, auch an den
+    Ecken? Bleibt es beim schnellen Wischen an der Karte?
+  - Leuchtet der Rand sichtbar und atmet er?
+  - „Unsere Zusammenarbeit“: dasselbe in Violett?
+  - Läuft es flüssig? Wird das Handy nach ein, zwei Minuten warm?
+
+
+OFFEN
+------------------------------------------------------------------------------
+  - Lighthouse-Messung am Handy: Mittelwert 90,5 von 14 Läufen, einzelne
+    Läufe 78 bis 97 (v13 in derselben Messumgebung: 85,5). Ziel ≥ 90 wird
+    nicht in jedem Lauf erreicht. Ursache liegt im Start der Seite (nicht im
+    Band); eigene Etappe nötig.
+  - Echtes iPhone: konnte ich nicht prüfen (nur nachgestellt im Testbrowser).
