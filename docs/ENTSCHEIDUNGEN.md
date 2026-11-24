@@ -69,6 +69,7 @@ Stand: 20.10.2026. Ergänzt `UEBERGABE.md`, Abschnitt 9. Bei Widerspruch gilt di
 | Lichtstrahl (Mittel) | Pulsierende Lichtfasern hinter dem Inhalt, Farbe je Welt. Hinter der Inhaltsspalte so gedämpft, dass gedämpfter Text mindestens 4,5:1 behält (Lesbarkeit vor Show-Effekt); daneben volle Stärke. Halbe Auflösung, höchstens 30 Bilder/s. | 28.10.2026 |
 | Glas-Karten (Mittel) | Unschärfe wie bestellt (Tablet 6 px, Desktop 8 px). In der Testumgebung ohne Grafikkarte senkt sie die Bildrate am Desktop von 60 auf rund 35 Bilder/s, Eingaben bleiben sofort bedienbar. Auf echten Geräten prüfen. | 28.10.2026 |
 | Preis in der FAQ | Nicht eingebaut: widerspricht „Keine Preise“ in CLAUDE.md. Erst nach ausdrücklicher Freigabe (inkl. netto/brutto, kostenloses Erstgespräch). | 28.10.2026 |
+| Effekt-Nachbau nach Referenz | Ziel: Die Effekte einer hochwertigen, interaktiven Referenzseite technisch nachbauen, um zu lernen, was möglich ist und was nicht. Bisherige Versuche kamen nicht an das Vorbild heran. Erst die Effekte, eigener Inhalt kommt immer zuletzt. Auswertung über Link (Browser im Arbeitsbereich), Videodatei (in Einzelbilder zerlegt) und Screenshots. | 24.11.2026 |
 
 ## In Klärung
 

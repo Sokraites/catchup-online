@@ -46,3 +46,4 @@ Getroffene und offene Entscheidungen: `docs/ENTSCHEIDUNGEN.md`. Etappen: `docs/P
 - Speichern in GitHub (`Sokraites/catchup-online`, privat) ist erlaubt. Alles andere gilt als Veröffentlichung: nichts veröffentlichen, nichts auf Fremdserver hochladen, keine Zugangsdaten nutzen, ohne vorher zu fragen.
 - Entscheidungen kurz und in einfachem Deutsch erklären. Der Gründer ist kein Webentwickler.
 - Fehlt eine Angabe, die eine Entscheidung stark beeinflusst: nachfragen, nicht raten.
+- Referenzseiten: Es geht um die Technik der Effekte. Erst den Effekt nachbauen, eigener Inhalt kommt immer zuletzt. Dass nichts kopiert wird, ist selbstverständlich und muss nicht jedes Mal erwähnt werden.
